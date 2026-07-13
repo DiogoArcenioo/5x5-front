@@ -21,8 +21,6 @@ Variáveis necessárias:
 
 ```dotenv
 BACKEND_URL=http://servico-backend:3000
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=uma-senha-longa
 ```
 
-Use o mesmo usuário e senha configurados no backend. O Dockerfile gera a saída standalone do Next e expõe a porta `3001`.
+O login administrativo é validado pelo backend usando os usuários e sessões armazenados no PostgreSQL. O Dockerfile gera a saída standalone do Next e expõe a porta `3001`.
