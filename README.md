@@ -13,6 +13,8 @@ npm run dev
 
 Abra `http://localhost:3001`. A variável `BACKEND_URL` está definida em `.env.local` para o ambiente local.
 
+O healthcheck próprio do frontend está disponível em `http://localhost:3001/health`.
+
 ## Produção
 
 Variáveis necessárias:
