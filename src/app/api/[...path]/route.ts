@@ -2,6 +2,15 @@ type ApiRouteContext = {
   params: Promise<{ path: string[] }>;
 };
 
+const FORWARDED_REQUEST_HEADERS = [
+  "accept",
+  "accept-language",
+  "authorization",
+  "content-type",
+  "cookie",
+  "user-agent",
+];
+
 async function forward(request: Request, context: ApiRouteContext): Promise<Response> {
   const configuredBackend = process.env.BACKEND_URL
     ?? (process.env.NODE_ENV === "development" ? "http://localhost:3000" : undefined);
@@ -22,16 +31,32 @@ async function forward(request: Request, context: ApiRouteContext): Promise<Resp
     const target = new URL(`api/${path.map(encodeURIComponent).join("/")}`, backendBase);
     target.search = new URL(request.url).search;
 
-    const proxyRequest = new Request(target, request);
-    return await fetch(proxyRequest, {
+    const headers = new Headers();
+    for (const name of FORWARDED_REQUEST_HEADERS) {
+      const value = request.headers.get(name);
+      if (value) headers.set(name, value);
+    }
+
+    const hasBody = request.method !== "GET" && request.method !== "HEAD";
+    const body = hasBody ? await request.arrayBuffer() : undefined;
+
+    return await fetch(target, {
+      method: request.method,
+      headers,
+      body,
       cache: "no-store",
+      redirect: "manual",
       signal: AbortSignal.timeout(30_000),
     });
-  } catch {
-    return Response.json(
-      { statusCode: 502, message: "Não foi possível acessar a API." },
-      { status: 502 },
-    );
+  } catch (error) {
+    console.error("Backend proxy request failed", error);
+    return Response.json({
+      statusCode: 502,
+      message: "Não foi possível acessar a API.",
+      detail: process.env.NODE_ENV === "development" && error instanceof Error
+        ? error.message
+        : undefined,
+    }, { status: 502 });
   }
 }
 

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#0d1017" />
+  <path d="M17 13h39l-6 38H11l6-38Z" fill="#ff4d19" />
+  <text
+    x="33.5"
+    y="37.5"
+    fill="#090b0f"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="17"
+    font-weight="900"
+    text-anchor="middle"
+  >5x5</text>
+</svg>
