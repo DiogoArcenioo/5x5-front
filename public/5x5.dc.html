@@ -38,6 +38,9 @@
     [data-platform-grid]{grid-template-columns:repeat(2,1fr) !important}
     [data-footer-grid]{grid-template-columns:1fr 1fr !important;gap:24px !important}
     [data-draft-grid]{grid-template-columns:1fr !important}
+    [data-strategy-grid]{grid-template-columns:1fr !important}
+    [data-strategy-slots]{grid-template-columns:1fr 1fr !important}
+    [data-player-draft-grid]{grid-template-columns:1fr !important}
     [data-catalog-grid]{grid-template-columns:1fr !important}
     [data-resumo-players]{grid-template-columns:repeat(2,1fr) !important}
     [data-resumo-grid],[data-resumo-grid2]{grid-template-columns:1fr !important}
@@ -57,6 +60,7 @@
   @media (max-width:560px){
     [data-players-grid],[data-platform-grid]{grid-template-columns:1fr 1fr !important}
     [data-footer-grid]{grid-template-columns:1fr !important}
+    [data-strategy-slots]{grid-template-columns:1fr !important}
   }
 </style>
 </helmet>
@@ -458,6 +462,153 @@
       </div>
     </sc-if>
 
+    <sc-if value="{{ isMajorStrategy }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Estratégia do time" style="max-width:1180px;margin:0 auto;padding:32px 24px 90px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+          <span style="font-size:11px;font-weight:700;color:#ff5c1a;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.28);border-radius:100px;padding:5px 11px">ETAPA 1 DE 3</span>
+          <span style="font-size:12px;color:#636d7e">Defina a identidade do seu time</span>
+        </div>
+        <h1 style="font-family:'Chakra Petch',sans-serif;font-size:34px;font-weight:700;margin:0 0 10px">Como seu time vai jogar?</h1>
+        <p style="font-size:14.5px;color:#9aa3b2;line-height:1.7;max-width:760px;margin:0 0 28px">Escolha uma sugestão ou monte sua própria composição. No draft, o desempenho de cada jogador será influenciado pelos atributos exigidos na posição que ele ocupar.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px" data-strategy-grid="1">
+          <sc-for list="{{ strategyPresets }}" as="preset" hint-placeholder-count="3">
+            <div onClick="{{ preset.onSelect }}" style="{{ preset.style }}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+                <div>
+                  <div style="font-size:15px;font-weight:800;color:#f4f5f7">{{ preset.name }}</div>
+                  <div style="font-size:11px;font-weight:700;color:{{ preset.accent }};margin-top:3px">{{ preset.tagline }}</div>
+                </div>
+                <div style="{{ preset.checkStyle }}">✓</div>
+              </div>
+              <p style="font-size:12.5px;color:#9aa3b2;line-height:1.55;margin:0 0 13px">{{ preset.description }}</p>
+              <div style="display:flex;gap:5px;flex-wrap:wrap">
+                <sc-for list="{{ preset.roles }}" as="role" hint-placeholder-count="5"><span style="{{ role.style }}">{{ role.label }}</span></sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px" data-strategy-grid="1">
+          <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px">
+              <div>
+                <div style="font-size:15px;font-weight:800;color:#f4f5f7">Seu layout</div>
+                <div style="font-size:12px;color:#636d7e;margin-top:3px">Defina a função principal de cada jogador</div>
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#34c77b;background:rgba(52,199,123,.1);padding:5px 9px;border-radius:6px">5 POSIÇÕES</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" data-strategy-slots="1">
+              <sc-for list="{{ strategySlots }}" as="slot" hint-placeholder-count="5">
+                <div style="background:#0d0f14;border:1px solid #242833;border-radius:10px;padding:13px">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <div style="width:28px;height:28px;border-radius:7px;background:{{ slot.bg }};color:{{ slot.color }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700">{{ slot.number }}</div>
+                    <select value="{{ slot.role }}" onChange="{{ slot.onChange }}" style="flex:1;min-width:0;background:#171a22;border:1px solid #33394a;border-radius:7px;padding:8px;color:#f4f5f7;font-size:12.5px;font-weight:700;outline:none">
+                      <sc-for list="{{ strategyRoleOptions }}" as="option" hint-placeholder-count="6"><option value="{{ option.code }}">{{ option.label }}</option></sc-for>
+                    </select>
+                  </div>
+                  <p style="font-size:11.5px;color:#9aa3b2;line-height:1.5;margin:0 0 9px;min-height:35px">{{ slot.description }}</p>
+                  <div style="font-size:10.5px;color:#636d7e">ATRIBUTO-CHAVE <b style="color:{{ slot.color }};margin-left:4px">{{ slot.attribute }}</b></div>
+                  <sc-if value="{{ slot.hasSecondaryEffect }}">
+                    <div style="font-size:10.5px;color:#9aa3b2;background:rgba(255,92,26,.07);border:1px solid rgba(255,92,26,.18);border-radius:6px;padding:7px 8px;margin-top:9px;line-height:1.45"><b style="color:#ff5c1a">FIREPOWER:</b> alto concede bônus; baixo reduz levemente o desempenho.</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:18px">
+              <div style="font-size:12px;font-weight:700;color:#9aa3b2;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px">Leitura da composição</div>
+              <div style="font-size:14px;font-weight:800;color:#f4f5f7;margin-bottom:6px">{{ strategyAnalysis.title }}</div>
+              <p style="font-size:12.5px;color:#9aa3b2;line-height:1.6;margin:0 0 14px">{{ strategyAnalysis.description }}</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ strategyAnalysis.items }}" as="item" hint-placeholder-count="3">
+                  <div style="display:flex;gap:8px;align-items:flex-start;font-size:11.5px;color:#c8ccd4"><span style="color:{{ item.color }};font-weight:800">{{ item.icon }}</span><span>{{ item.text }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:rgba(47,184,198,.07);border:1px solid rgba(47,184,198,.22);border-radius:12px;padding:14px">
+              <div style="font-size:11px;font-weight:800;color:#2fb8c6;margin-bottom:6px">COMO A SIMULAÇÃO LÊ ISSO</div>
+              <p style="font-size:11.5px;color:#9aa3b2;line-height:1.55;margin:0">Um Support com Utility alta rende melhor nessa função. Para o AWPer, Sniping terá maior peso. O mesmo princípio vale para todas as posições.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px">
+          <div onClick="{{ backToMajorIntro }}" style="font-size:13px;font-weight:700;color:#9aa3b2;background:#12151c;border:1px solid #242833;border-radius:9px;padding:13px 22px;cursor:pointer">Voltar</div>
+          <div onClick="{{ confirmStrategy }}" style="font-size:13.5px;font-weight:800;color:#0a0c10;background:#ff5c1a;border-radius:9px;padding:13px 24px;cursor:pointer">Confirmar estratégia e sortear temporada →</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPlayerDraft }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Seleção de jogadores" style="max-width:1240px;margin:0 auto;padding:28px 24px 90px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:#ff5c1a;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.28);border-radius:100px;padding:5px 11px">ETAPA 2 DE 3</span><span style="font-size:12px;color:#636d7e">Escolha {{ playerDraftFilledCount }} de 5</span></div>
+            <h1 style="font-family:'Chakra Petch',sans-serif;font-size:30px;font-weight:700;margin:0 0 6px">Monte sua lineup</h1>
+            <p style="font-size:13.5px;color:#9aa3b2;margin:0">A cada rodada, um ano e um time definem os jogadores disponíveis.</p>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9aa3b2;background:#12151c;border:1px solid #242833;border-radius:9px;padding:10px 14px">{{ playerDraftFilledCount }}/5 JOGADORES</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;align-items:start" data-player-draft-grid="1">
+          <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:18px">
+            <div style="font-size:11px;font-weight:800;color:#636d7e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Sorteio da rodada</div>
+            <sc-if value="{{ playerDraftRolling }}">
+              <div style="height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+                <div style="width:54px;height:54px;border-radius:50%;border:3px solid #242833;border-top-color:#ff5c1a;animation:spin5x5 .8s linear infinite;margin-bottom:14px"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:#ff5c1a;line-height:1">{{ playerDraftPreviewYear }}</div>
+                <div style="font-size:13px;font-weight:800;color:#e6e8ec;margin-top:7px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ playerDraftPreviewTeam }}</div>
+                <div style="font-size:10.5px;font-weight:700;color:#636d7e;text-transform:uppercase;letter-spacing:.08em;margin-top:9px;animation:pulse5x5 .7s ease infinite">Sorteando ano e time</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ !playerDraftRolling }}">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+                <div style="background:#0d0f14;border:1px solid #242833;border-radius:9px;padding:11px"><div style="font-size:9.5px;font-weight:700;color:#636d7e;margin-bottom:4px">ANO SORTEADO</div><div style="font-family:'Chakra Petch',sans-serif;font-size:21px;font-weight:700;color:#ff5c1a">{{ playerDraftYear }}</div></div>
+                <div style="background:#0d0f14;border:1px solid #242833;border-radius:9px;padding:11px"><div style="font-size:9.5px;font-weight:700;color:#636d7e;margin-bottom:4px">TIME SORTEADO</div><div style="font-size:13px;font-weight:800;color:#f4f5f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ playerDraftTeamName }}</div></div>
+              </div>
+              <div style="font-size:11px;color:#636d7e;margin-bottom:9px">Selecione um jogador deste elenco:</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ playerDraftCandidates }}" as="candidate" hint-placeholder-count="5">
+                  <div onClick="{{ candidate.onSelect }}" style="{{ candidate.style }}">
+                    <div style="{{ candidate.avatarStyle }}">{{ candidate.initials }}</div>
+                    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#f4f5f7">{{ candidate.nick }}</div><div style="font-size:10.5px;color:#636d7e">OVR {{ candidate.overall }} · {{ candidate.bestAttribute }}</div></div>
+                    <div style="{{ candidate.checkStyle }}">✓</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div onClick="{{ rerollPlayerDraft }}" style="text-align:center;font-size:11.5px;font-weight:700;color:#9aa3b2;border:1px solid #33394a;border-radius:8px;padding:9px;margin-top:12px;cursor:pointer">Sortear outro ano e time</div>
+            </sc-if>
+          </div>
+
+          <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px"><div><div style="font-size:15px;font-weight:800;color:#f4f5f7">Layout do time</div><div style="font-size:12px;color:#636d7e;margin-top:3px">{{ playerDraftActionText }}</div></div><div style="font-size:10.5px;color:#34c77b;background:rgba(52,199,123,.1);padding:5px 9px;border-radius:6px">{{ playerDraftSelectionHint }}</div></div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:11px" data-strategy-slots="1">
+              <sc-for list="{{ playerDraftSlots }}" as="slot" hint-placeholder-count="5">
+                <div onClick="{{ slot.onPlace }}" style="{{ slot.style }}">
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <div style="{{ slot.avatarStyle }}">{{ slot.avatarText }}</div>
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12.5px;font-weight:800;color:#f4f5f7">{{ slot.roleLabel }}</span><span style="font-size:9px;font-weight:700;color:{{ slot.color }};background:{{ slot.bg }};border-radius:4px;padding:2px 5px">{{ slot.attribute }}</span></div>
+                      <div style="font-size:12px;color:{{ slot.playerColor }};margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ slot.playerName }}</div>
+                    </div>
+                    <sc-if value="{{ slot.swapSelected }}"><div style="font-size:9px;font-weight:800;color:#0a0c10;background:#f2b53d;border-radius:5px;padding:4px 6px">TROCAR</div></sc-if>
+                  </div>
+                  <sc-if value="{{ slot.filled }}"><div style="display:flex;gap:10px;margin-top:11px;padding-top:9px;border-top:1px solid #242833;font-size:10.5px;color:#636d7e;flex-wrap:wrap"><span>ANO <b style="color:#c8ccd4">{{ slot.year }}</b></span><span>TIME <b style="color:#c8ccd4">{{ slot.teamName }}</b></span><span>OVR <b style="color:#c8ccd4">{{ slot.overall }}</b></span><span style="color:{{ slot.color }}">{{ slot.attribute }}</span></div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:17px;border-top:1px solid #242833">
+              <div onClick="{{ backToStrategy }}" style="font-size:12.5px;font-weight:700;color:#9aa3b2;cursor:pointer">← Voltar à estratégia</div>
+              <div onClick="{{ finishPlayerDraft }}" style="{{ finishPlayerDraftStyle }}">Confirmar lineup →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ isMajorSorteio }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Sorteio da Temporada" style="max-width:720px;margin:0 auto;padding:56px 24px 90px;text-align:center">
         <h1 style="font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin:0 0 8px">Sorteando sua temporada…</h1>
@@ -827,6 +978,45 @@
             </div>
           </div>
         </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMajorGroups }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Fase Suíça do Major" style="max-width:1280px;margin:0 auto;padding:26px 24px 90px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px">
+          <div><div style="font-size:11px;font-weight:800;color:#ff5c1a;margin-bottom:8px">MAJOR · FASE SUÍÇA</div><h1 style="font-family:'Chakra Petch',sans-serif;font-size:29px;margin:0 0 6px">{{ swissStageTitle }}</h1><p style="font-size:13px;color:#9aa3b2;margin:0">3 vitórias classificam · 3 derrotas eliminam · até 5 rodadas</p></div>
+          <div style="display:flex;gap:8px"><div onClick="{{ setSwissNormal }}" style="{{ swissNormalStyle }}">Simulação normal</div><div onClick="{{ simulateSwissFast }}" style="{{ swissFastStyle }}">Simulação rápida</div></div>
+        </div>
+        <div style="background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)">
+          <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 260px;gap:20px;align-items:center" data-player-draft-grid="1">
+            <div><div style="font-size:10px;font-weight:800;color:#2fb8c6;margin-bottom:5px">SUA CAMPANHA</div><div style="font-size:12px;color:#9aa3b2">{{ swissCampaignRecord }}</div></div>
+            <div>
+              <sc-if value="{{ swissUserMatch }}"><div style="display:flex;align-items:center;justify-content:center;gap:20px"><div style="flex:1;text-align:right;font-size:13px;font-weight:800">SEU TIME · MISTO</div><div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;color:#f4f5f7">{{ swissUserMatch.score }}</div><div style="flex:1;font-size:13px;font-weight:800">{{ swissUserMatch.opponent }}</div></div><div style="height:7px;background:#0a0c10;border-radius:4px;overflow:hidden;margin-top:11px"><div style="{{ swissUserMatch.progressStyle }}"></div></div><div style="font-size:10.5px;color:#9aa3b2;text-align:center;margin-top:7px">{{ swissUserMatch.message }}</div></sc-if>
+              <sc-if value="{{ !swissUserMatch }}"><div style="font-size:12.5px;color:#9aa3b2;text-align:center">Clique em simular rodada para iniciar. Os demais jogos acontecem em segundo plano.</div></sc-if>
+            </div>
+            <div><div onClick="{{ swissPrimaryAction }}" style="{{ swissPrimaryStyle }}">{{ swissPrimaryLabel }}</div><div style="font-size:9.5px;color:#636d7e;text-align:center;margin-top:7px">1 segundo por round</div></div>
+          </div>
+        </div>
+        <div style="background:#12151c;border:1px solid #33394a;border-radius:14px;padding:20px;margin-bottom:18px;overflow-x:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px"><div><b style="font-size:13px">Chaveamento suíço</b><div style="font-size:10.5px;color:#636d7e;margin-top:3px">Os próximos confrontos são definidos pelo record após cada rodada</div></div><span style="font-size:9.5px;font-weight:800;color:#2fb8c6">FORMATO HLTV · GROUP SWISS</span></div>
+          <div style="display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:12px;min-width:1240px">
+            <sc-for list="{{ swissBracketColumns }}" as="column" hint-placeholder-count="5">
+              <div style="background:#0b0e13;border:1px solid #2c3240;border-radius:10px;padding:12px;align-self:start"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:11.5px;color:#f4f5f7">{{ column.title }}</b><span style="font-size:9.5px;color:#7b8598">{{ column.pools }}</span></div><div style="display:flex;flex-direction:column;gap:7px"><sc-for list="{{ column.matches }}" as="match" hint-placeholder-count="4"><div style="{{ match.style }}"><div style="{{ match.teamAStyle }}">{{ match.teamA }}</div><div style="display:flex;justify-content:space-between;color:#7b8598;font-size:9px;margin:4px 0"><span>{{ match.pool }}</span><b style="color:{{ match.scoreColor }}">{{ match.score }}</b></div><div style="{{ match.teamBStyle }}">{{ match.teamB }}</div><sc-if value="{{ match.showOutcome }}"><div style="{{ match.outcomeStyle }}">SEU TIME · {{ match.outcome }}</div></sc-if></div></sc-for><sc-if value="{{ column.waiting }}"><div style="border:1px dashed #33394a;border-radius:7px;padding:16px 8px;text-align:center;font-size:10px;color:#7b8598">Aguardando resultados anteriores</div></sc-if></div></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:18px" data-player-draft-grid="1">
+          <div>
+            <div style="background:#12151c;border:1px solid #242833;border-radius:14px;overflow:hidden;margin-bottom:16px">
+              <div style="padding:14px 17px;border-bottom:1px solid #242833;display:flex;justify-content:space-between"><b style="font-size:13px">Classificação geral</b><span style="font-size:11px;color:#636d7e">{{ swissRoundLabel }}</span></div>
+              <div style="display:grid;grid-template-columns:34px 1fr 74px 68px;padding:8px 14px;font-size:9.5px;font-weight:800;color:#636d7e"><span>#</span><span>TIME / TEMPORADA</span><span>RECORD</span><span>STATUS</span></div>
+              <sc-for list="{{ swissStandings }}" as="team" hint-placeholder-count="16">
+                <div style="{{ team.style }}"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#636d7e">{{ team.rank }}</span><div><div style="font-size:12.5px;font-weight:800;color:#f4f5f7">{{ team.name }}</div><div style="font-size:10px;color:#636d7e">{{ team.tag }}</div></div><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ team.recordColor }}">{{ team.record }}</span><span style="{{ team.statusStyle }}">{{ team.status }}</span></div>
+              </sc-for>
+            </div>
+            <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:17px"><div style="font-size:13px;font-weight:800;margin-bottom:12px">Resultados da rodada</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" data-strategy-slots="1"><sc-for list="{{ swissRoundMatches }}" as="match" hint-placeholder-count="8"><div style="{{ match.style }}"><div style="display:flex;justify-content:space-between;gap:8px"><span>{{ match.teamA }}</span><b style="color:{{ match.scoreColor }}">{{ match.score }}</b><span style="text-align:right">{{ match.teamB }}</span></div><div style="font-size:9.5px;color:#636d7e;text-align:center;margin-top:5px">{{ match.format }} · {{ match.state }}</div></div></sc-for></div></div>
+          </div>
+        </div>
       </div>
     </sc-if>
 
@@ -1584,6 +1774,20 @@ const ROLE_META = {
   rotator:{label:'Rotator',color:'#3ddbb8',bg:'rgba(61,219,184,.14)'}
 };
 
+const STRATEGY_ROLES = {
+  awper:{label:'AWPer',attribute:'SNIPING alto',description:'Especialista na AWP, responsável por abates de longa distância e controle de linhas.',color:'#2fb8c6',bg:'rgba(47,184,198,.14)'},
+  entry:{label:'Entry Fragger',attribute:'ENTRYING alto',description:'Abre espaço para o time buscando o primeiro duelo e iniciando as entradas.',color:'#ff5c1a',bg:'rgba(255,92,26,.14)'},
+  support:{label:'Support',attribute:'UTILITY alta + FIREPOWER',description:'Potencializa o time com utilitárias. Firepower alto concede bônus e Firepower baixo prejudica levemente seu desempenho.',color:'#34c77b',bg:'rgba(52,199,123,.14)'},
+  lurker:{label:'Lurker',attribute:'CLUTCHING alto',description:'Joga separado, pune rotações e decide rounds em situações de clutch.',color:'#d65db1',bg:'rgba(214,93,177,.14)'},
+  rifler:{label:'Rifler',attribute:'FIREPOWER alto',description:'Garante poder de fogo consistente, trades e presença nos duelos de rifle.',color:'#4f8dfd',bg:'rgba(79,141,253,.14)'},
+  trader:{label:'Trader',attribute:'TRADING alto',description:'Acompanha a linha de frente e converte rapidamente as eliminações dos aliados.',color:'#f2b53d',bg:'rgba(242,181,61,.14)'}
+};
+const STRATEGY_PRESETS = [
+  {id:'balanced',name:'Equilibrado',tagline:'RECOMENDADO',description:'Uma composição segura para começar, cobrindo abertura, AWP, suporte e fim de round.',roles:['entry','awper','support','rifler','lurker'],accent:'#34c77b'},
+  {id:'double-support',name:'Duplo suporte',tagline:'CONTROLE E CONSISTÊNCIA',description:'Mais utilitárias e preparação de jogadas, sacrificando parte do poder de fogo bruto.',roles:['entry','awper','support','support','lurker'],accent:'#2fb8c6'},
+  {id:'aggressive',name:'Agressivo',tagline:'PRESSÃO DESDE O INÍCIO',description:'Dois jogadores de impacto para disputar aberturas e acelerar o ritmo das partidas.',roles:['entry','entry','awper','trader','support'],accent:'#ff5c1a'}
+];
+
 let TEAMS = [];
 function avatarStyle(hue){ return `width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,${hue}22,${hue}44);border:1px solid ${hue}55;display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;color:${hue};flex-shrink:0`; }
 function roleChip(code){ const m=ROLE_META[code]; if(!m) return {label:code,style:''}; return {label:m.label, style:`font-size:10.5px;font-weight:700;color:${m.color};background:${m.bg};border-radius:5px;padding:3px 8px`}; }
@@ -1624,9 +1828,12 @@ const ROUND_LABELS = ['Quartas de final','Semifinal','Final'];
 class Component extends DCLogic {
   state = { screen:'home', params:{}, mobileNavOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, playerProfileYear:null, teamProfileYear:null, rouletteDone:false, drawnSeasonId:null, draftId:null,
     draftRoster:[null,null,null,null,null], draftCoach:null, draftCaptain:null,
+    strategyPreset:'balanced', strategyRoles:['entry','awper','support','rifler','lurker'],
+    playerDraftRolling:false, playerDraftYear:null, playerDraftTeamSlug:null, playerDraftCandidateSlugs:[], playerDraftSelectedSlug:null, playerDraftSwapIndex:null, playerDraftPreviewYear:'—', playerDraftPreviewTeam:'Preparando sorteio',
     draftFilters:{search:'', team:'', role:'', sortBy:'overall', onlyEligible:true},
     playerDrawerSlug:null, coachPickerOpen:false,
     simRound:0, simMatches:[], simEliminated:false, simChampion:false, simSkipAnim:false,
+    swissTeams:[], swissRound:0, swissHistory:[], swissPendingMatches:null, swissUserRounds:[], swissUserRoundIndex:0, swissMode:'normal',
     guessMatchId:null, guessTargetSlug:null, guessScore:1000, guessAttempts:[], guessRevealedHints:[], guessPendingHint:null, guessInput:'', guessAutocompleteOpen:false, guessSelectedSlug:null, guessOver:false, guessWon:false,
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
     rankingTab:'overall', userProfileTab:'visao', authName:'', authEmail:'', authPassword:'',
@@ -1639,7 +1846,7 @@ class Component extends DCLogic {
     });
     this.loadCatalog();
   }
-  componentWillUnmount(){ document.removeEventListener('keydown', this._onKey); }
+  componentWillUnmount(){ document.removeEventListener('keydown', this._onKey); clearInterval(this._playerDraftTicker); clearTimeout(this._playerDraftTimer); clearTimeout(this._swissAutoTimer); }
 
   loadCatalog = async () => {
     try {
@@ -1706,6 +1913,78 @@ class Component extends DCLogic {
       }, 1400);
     }
   };
+  selectStrategyPreset = (id) => {
+    const preset = STRATEGY_PRESETS.find(item=>item.id===id);
+    if(preset) this.setState({strategyPreset:id, strategyRoles:[...preset.roles]});
+  };
+  setStrategyRole = (idx, role) => this.setState(s=>{
+    const strategyRoles=[...s.strategyRoles]; strategyRoles[idx]=role;
+    const matched=STRATEGY_PRESETS.find(p=>p.roles.every((value,index)=>value===strategyRoles[index]));
+    return {strategyRoles, strategyPreset:matched?.id || 'custom'};
+  });
+  confirmStrategy = () => {
+    const id='d'+Date.now().toString(36);
+    this.setState({screen:'major-player-draft',params:{id},draftId:id,draftRoster:[null,null,null,null,null],playerDraftSelectedSlug:null,playerDraftSwapIndex:null});
+    window.scrollTo(0,0);
+    setTimeout(()=>this._drawPlayerPool(),80);
+  };
+  backToMajorIntro = () => this.nav('major-intro');
+  backToStrategy = () => this.nav('major-strategy');
+  _drawPlayerPool = () => {
+    const used=new Set(this.state.draftRoster.filter(Boolean).map(r=>r.slug));
+    const pools=[];
+    for(const team of TEAMS){
+      for(const lineup of team.lineups || []){
+        const slugs=(lineup.players || []).map(p=>p.slug).filter(slug=>!used.has(slug));
+        if(slugs.length) pools.push({year:lineup.year,teamSlug:team.slug,slugs});
+      }
+    }
+    if(!pools.length){
+      this.showToast({icon:'⚠️',title:'Sorteio indisponível',desc:'Não há outros jogadores elegíveis no catálogo.',accent:'#f2b53d',border:'#33394a'});
+      return;
+    }
+    this.setState({playerDraftRolling:true,playerDraftSelectedSlug:null});
+    clearTimeout(this._playerDraftTimer);
+    clearInterval(this._playerDraftTicker);
+    this._playerDraftTicker=setInterval(()=>{
+      const preview=pools[Math.floor(Math.random()*pools.length)];
+      this.setState({playerDraftPreviewYear:preview.year,playerDraftPreviewTeam:teamOf(preview.teamSlug).name});
+    },95);
+    this._playerDraftTimer=setTimeout(()=>{
+      clearInterval(this._playerDraftTicker);
+      const pool=pools[Math.floor(Math.random()*pools.length)];
+      this.setState({playerDraftRolling:false,playerDraftYear:pool.year,playerDraftTeamSlug:pool.teamSlug,playerDraftCandidateSlugs:pool.slugs,drawnSeasonId:`s${pool.year}`});
+    },1400);
+  };
+  selectPlayerDraftCandidate = (slug) => this.setState({playerDraftSelectedSlug:slug,playerDraftSwapIndex:null});
+  placePlayerDraftCandidate = (idx) => {
+    const s=this.state;
+    if(s.draftRoster[idx] || !s.playerDraftSelectedSlug) return;
+    const roster=[...s.draftRoster];
+    roster[idx]={slug:s.playerDraftSelectedSlug,role:s.strategyRoles[idx],year:s.playerDraftYear,teamSlug:s.playerDraftTeamSlug};
+    this.setState({draftRoster:roster,playerDraftSelectedSlug:null});
+    if(roster.filter(Boolean).length<5) setTimeout(()=>this._drawPlayerPool(),250);
+  };
+  handlePlayerDraftSlot = (idx) => {
+    const s=this.state;
+    if(!s.draftRoster[idx]){ this.placePlayerDraftCandidate(idx); return; }
+    if(s.playerDraftSelectedSlug) return;
+    if(s.playerDraftSwapIndex===null){ this.setState({playerDraftSwapIndex:idx}); return; }
+    if(s.playerDraftSwapIndex===idx){ this.setState({playerDraftSwapIndex:null}); return; }
+    const roster=[...s.draftRoster];
+    const first=s.playerDraftSwapIndex;
+    [roster[first],roster[idx]]=[roster[idx],roster[first]];
+    roster[first]={...roster[first],role:s.strategyRoles[first]};
+    roster[idx]={...roster[idx],role:s.strategyRoles[idx]};
+    this.setState({draftRoster:roster,playerDraftSwapIndex:null});
+    this.showToast({icon:'↔',title:'Posições alteradas',desc:'Os jogadores trocaram de função no layout.',accent:'#2fb8c6',border:'#33394a'});
+  };
+  finishPlayerDraft = () => {
+    if(this.state.draftRoster.filter(Boolean).length<5){
+      this.showToast({icon:'⚠️',title:'Lineup incompleta',desc:'Escolha os cinco jogadores antes de continuar.',accent:'#ef4444',border:'#33394a'}); return;
+    }
+    this.nav('major-resumo',{id:this.state.draftId});
+  };
   startDraft = () => {
     const id = 'd' + Date.now().toString(36);
     this.nav('major-draft', {id});
@@ -1718,7 +1997,7 @@ class Component extends DCLogic {
   openPlayerDrawer = (slug)=> this.setState({playerDrawerSlug:slug});
   closePlayerDrawer = ()=> this.setState({playerDrawerSlug:null});
   _draftYear(){ return seasonOf(this.state.drawnSeasonId)?.year || Math.max(2017, ...PLAYERS.flatMap(p=>(p.teamHistory || []).map(link=>link.year))); }
-  _draftPlayer(slug){ return playerInYear(playerOf(slug), this._draftYear()); }
+  _draftPlayer(slug,year){ return playerInYear(playerOf(slug), year || this._draftYear()); }
   selectPlayer = (slug)=> {
     const s = this.state;
     if(s.draftRoster.some(r=>r && r.slug===slug)) return;
@@ -1743,12 +2022,104 @@ class Component extends DCLogic {
     this.nav('major-resumo', {id:s.draftId});
   };
   backToDraft = ()=> this.nav('major-draft', {id:this.state.draftId});
-  disputarMajor = ()=> { this.setState({simRound:0, simMatches:[], simEliminated:false, simChampion:false}); this.nav('major-simulacao', {id:this.state.draftId}); };
+  disputarMajor = ()=> {
+    const used=new Set(); const entrants=[];
+    const pools=[];
+    for(const team of TEAMS) for(const lineup of team.lineups || []) if((lineup.players || []).length>=5) pools.push({team,lineup});
+    while(entrants.length<15 && pools.length){
+      const idx=Math.floor(Math.random()*pools.length); const pick=pools.splice(idx,1)[0];
+      if(used.has(pick.team.slug)) continue; used.add(pick.team.slug);
+      const values=(pick.lineup.players || []).map(p=>p.overall).filter(Number.isFinite);
+      entrants.push({id:pick.team.slug,name:`${pick.team.name.toUpperCase()} · ${pick.lineup.year}`,tag:pick.team.tag,year:pick.lineup.year,strength:values.length?values.reduce((a,b)=>a+b,0)/values.length:70,wins:0,losses:0,status:'playing',opponents:[]});
+    }
+    const teams=[{id:'user',name:'SEU TIME · MISTO',tag:'VOCÊ',year:'MISTO',strength:this._teamOverall(),wins:0,losses:0,status:'playing',isUser:true,opponents:[]},...entrants];
+    this.setState({screen:'major-groups',params:{id:this.state.draftId},swissTeams:teams,swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal'});
+    window.scrollTo(0,0);
+  };
+  _buildSwissRound(teams,round){
+    const active=teams.filter(t=>t.status==='playing');
+    const matches=[];
+    const pools=new Map();
+    for(const team of active){ const key=`${team.wins}-${team.losses}`; if(!pools.has(key)) pools.set(key,[]); pools.get(key).push(team); }
+    for(const poolTeams of pools.values()){
+      const available=[...poolTeams].sort((a,b)=>b.strength-a.strength);
+      while(available.length>1){
+      const a=available.shift(); let opponentIndex=-1;
+      for(let i=available.length-1;i>=0;i--){ if(!(a.opponents || []).includes(available[i].id)){ opponentIndex=i; break; } }
+      if(opponentIndex<0) opponentIndex=available.length-1;
+      const b=available.splice(opponentIndex,1)[0];
+      const deciding=a.wins===2||a.losses===2||b.wins===2||b.losses===2;
+      const seed=hashStr(`${this.state.draftId}-${round}-${a.id}-${b.id}`); const rng=mulberry32(seed);
+      const chance=1/(1+Math.pow(10,(b.strength-a.strength)/18)); const aWon=rng()<chance;
+      const winner=aWon?a:b, loser=aWon?b:a;
+      const format=deciding?'BO3':'BO1';
+      matches.push({aId:a.id,bId:b.id,teamA:a.name,teamB:b.name,pool:`${a.wins}–${a.losses}`,winnerId:winner.id,loserId:loser.id,format,score:format==='BO3'?(aWon?'2–'+(rng()>.55?'0':'1'):(rng()>.55?'0':'1')+'–2'):(aWon?'13–'+Math.floor(5+rng()*7):Math.floor(5+rng()*7)+'–13'),isUser:a.isUser||b.isUser});
+      }
+    }
+    return matches;
+  }
+  _applySwissMatches(teams,matches){
+    for(const match of matches){
+      const winner=teams.find(t=>t.id===match.winnerId), loser=teams.find(t=>t.id===match.loserId);
+      winner.wins++; loser.losses++;
+      winner.opponents=[...(winner.opponents || []),loser.id]; loser.opponents=[...(loser.opponents || []),winner.id];
+      if(winner.wins>=3) winner.status='qualified'; if(loser.losses>=3) loser.status='eliminated';
+    }
+  }
+  _userRoundTimeline(match){
+    const userWon=match.winnerId==='user'; const seed=hashStr(`${this.state.draftId}-live-${this.state.swissRound}`); const rng=mulberry32(seed);
+    let us=0,them=0; const frames=[]; const target=13;
+    while(us<target&&them<target){ const userRound=rng()<(userWon ? 0.58 : 0.42); if(userRound) us++; else them++; frames.push({us,them}); }
+    if((us===target)!==userWon){ const finalLoser=Math.min(11,Math.max(us,them)); us=userWon?13:finalLoser; them=userWon?finalLoser:13; frames.push({us,them}); }
+    return frames;
+  }
+  startSwissRound = ()=>{
+    if(this.state.swissPendingMatches) return;
+    const matches=this._buildSwissRound(this.state.swissTeams,this.state.swissRound+1);
+    const userMatch=matches.find(m=>m.isUser);
+    this.setState({swissPendingMatches:matches,swissUserRounds:userMatch?this._userRoundTimeline(userMatch):[],swissUserRoundIndex:0});
+    clearTimeout(this._swissAutoTimer);
+    this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),1000);
+  };
+  advanceSwissUserRound = ()=>{
+    const s=this.state;
+    if(s.swissUserRoundIndex<s.swissUserRounds.length-1){ this.setState({swissUserRoundIndex:s.swissUserRoundIndex+1}); this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),1000); return; }
+    this._completeSwissRound();
+  };
+  _completeSwissRound(){
+    const s=this.state; if(!s.swissPendingMatches) return;
+    const teams=s.swissTeams.map(t=>({...t}));
+    this._applySwissMatches(teams,s.swissPendingMatches);
+    let round=s.swissRound+1, history=[...s.swissHistory,{round:s.swissRound+1,matches:s.swissPendingMatches}];
+    if(teams.find(t=>t.id==='user')?.status!=='playing'){
+      while(round<5 && teams.some(t=>t.status==='playing')){ const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches}); }
+    }
+    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0});
+  }
+  simulateSwissFast = ()=>{
+    clearTimeout(this._swissAutoTimer);
+    let teams=this.state.swissTeams.map(t=>({...t})), round=this.state.swissRound, history=[...this.state.swissHistory];
+    if(this.state.swissPendingMatches){ const pending=this.state.swissPendingMatches; this._applySwissMatches(teams,pending); round++; history.push({round,matches:pending}); }
+    while(round<5 && teams.some(t=>t.status==='playing')){
+      const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches});
+    }
+    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'fast'});
+  };
+  setSwissNormal = ()=>this.setState({swissMode:'normal'});
 
   _teamOverall(){
     const s = this.state;
-    const filled = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug)).filter(Boolean);
-    const avg = filled.length? filled.reduce((a,p)=>a+p.overall,0)/filled.length : 75;
+    const filled = s.draftRoster.map((r,index)=>r ? {player:this._draftPlayer(r.slug,r.year),strategyRole:s.strategyRoles[index]} : null).filter(item=>item?.player);
+    const avg = filled.length? filled.reduce((total,item)=>{
+      const p=item.player;
+      let roleBonus=0;
+      if(item.strategyRole==='support'){
+        const utility=Number.isFinite(p.utility)?p.utility:50;
+        const firepower=Number.isFinite(p.firepower)?p.firepower:50;
+        roleBonus=((utility-50)*0.06)+((firepower-50)*0.03);
+      }
+      return total+p.overall+roleBonus;
+    },0)/filled.length : 75;
     const coachBonus = s.draftCoach ? 4 : 0;
     return avg + coachBonus;
   }
@@ -1759,7 +2130,7 @@ class Component extends DCLogic {
     const opp = OPPONENT_POOL[Math.floor(rng()*OPPONENT_POOL.length)];
     const teamOv = this._teamOverall();
     const oppOv = 74 + rng()*22;
-    const filled = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug)).filter(Boolean);
+    const filled = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug,r.year)).filter(Boolean);
     const maps = (this.state.drawnSeasonId ? seasonOf(this.state.drawnSeasonId) : SEASONS_FULL[0]).maps;
     let userMapWins=0, oppMapWins=0; const mapResults=[];
     for(let i=0;i<3 && userMapWins<2 && oppMapWins<2;i++){
@@ -1967,6 +2338,52 @@ class Component extends DCLogic {
     const majorHistory = [];
     const drawnSeason = s.drawnSeasonId ? seasonOf(s.drawnSeasonId) : {label:'',period:'',engine:'',mapCount:0,maps:[],year:this._draftYear()};
 
+    // ---- TEAM STRATEGY ----
+    const strategyRoleOptions = Object.entries(STRATEGY_ROLES).map(([code,role])=>({code,label:role.label}));
+    const strategyPresets = STRATEGY_PRESETS.map(preset=>({
+      ...preset,
+      onSelect:()=>this.selectStrategyPreset(preset.id),
+      roles:preset.roles.map(code=>{const role=STRATEGY_ROLES[code];return {label:role.label,style:`font-size:10px;font-weight:700;color:${role.color};background:${role.bg};border-radius:5px;padding:3px 7px`};}),
+      style:`background:#12151c;border:1px solid ${s.strategyPreset===preset.id?preset.accent:'#242833'};border-radius:12px;padding:17px;cursor:pointer;box-shadow:${s.strategyPreset===preset.id?`0 0 0 1px ${preset.accent}22`:'none'};transition:border-color .18s ease,transform .18s ease`,
+      checkStyle:`width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:${s.strategyPreset===preset.id?'#0a0c10':'transparent'};background:${s.strategyPreset===preset.id?preset.accent:'#1a1e28'};border:1px solid ${s.strategyPreset===preset.id?preset.accent:'#33394a'}`
+    }));
+    const strategySlots = s.strategyRoles.map((code,index)=>{
+      const role=STRATEGY_ROLES[code];
+      return {number:index+1,role:code,description:role.description,attribute:role.attribute,color:role.color,bg:role.bg,hasSecondaryEffect:code==='support',onChange:(e)=>this.setStrategyRole(index,e.target.value)};
+    });
+    const supportCount=s.strategyRoles.filter(role=>role==='support').length;
+    const entryCount=s.strategyRoles.filter(role=>role==='entry').length;
+    const hasAwper=s.strategyRoles.includes('awper');
+    const strategyAnalysis = {
+      title:s.strategyPreset==='custom'?'Composição personalizada':STRATEGY_PRESETS.find(p=>p.id===s.strategyPreset)?.name || 'Sua composição',
+      description:supportCount>=2?'Seu time terá bastante recurso para executar e retomar bombsites.':entryCount>=2?'Seu time prioriza ritmo, abertura e pressão nos primeiros duelos.':'Sua composição distribui as responsabilidades entre as diferentes fases do round.',
+      items:[
+        {icon:hasAwper?'✓':'!',color:hasAwper?'#34c77b':'#f2b53d',text:hasAwper?'AWPer dedicado para controlar linhas longas.':'Sem AWPer dedicado: rifles terão mais responsabilidade.'},
+        {icon:supportCount?'✓':'!',color:supportCount?'#34c77b':'#ef4444',text:supportCount?`${supportCount} Support: Utility será decisiva na escolha.`:'Sem Support: uso de utilitárias pode limitar o time.'},
+        {icon:entryCount?'✓':'!',color:entryCount?'#34c77b':'#f2b53d',text:entryCount?`${entryCount} Entry: Entrying pesará no desempenho.`:'Sem Entry dedicado para iniciar as jogadas.'}
+      ]
+    };
+
+    // ---- SEQUENTIAL PLAYER DRAFT ----
+    const playerDraftTeam=teamOf(s.playerDraftTeamSlug);
+    const playerDraftCandidates=(s.playerDraftCandidateSlugs || []).map(slug=>playerInYear(playerOf(slug),s.playerDraftYear)).filter(Boolean).map(p=>{
+      const selected=s.playerDraftSelectedSlug===p.slug;
+      const stats=[['Firepower',p.firepower],['Entrying',p.entrying],['Trading',p.trading],['Clutching',p.clutching],['Sniping',p.sniping],['Utility',p.utility]].filter(([,value])=>Number.isFinite(value)).sort((a,b)=>b[1]-a[1]);
+      return {nick:p.nick,initials:p.nick.slice(0,2).toUpperCase(),overall:p.overall,bestAttribute:stats.length?`${stats[0][0]} ${stats[0][1]}`:'Sem stats',onSelect:()=>this.selectPlayerDraftCandidate(p.slug),avatarStyle:`width:36px;height:36px;border-radius:8px;background:${playerDraftTeam.hue}22;color:${playerDraftTeam.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px`,style:`display:flex;align-items:center;gap:10px;background:${selected?'rgba(255,92,26,.08)':'#0d0f14'};border:1px solid ${selected?'#ff5c1a':'#242833'};border-radius:9px;padding:9px 10px;cursor:pointer`,checkStyle:`width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${selected?'#0a0c10':'transparent'};background:${selected?'#ff5c1a':'#1a1e28'}`};
+    });
+    const playerDraftSlots=s.strategyRoles.map((roleCode,index)=>{
+      const role=STRATEGY_ROLES[roleCode]; const rosterItem=s.draftRoster[index];
+      const p=rosterItem?this._draftPlayer(rosterItem.slug,rosterItem.year):null;
+      const team=rosterItem?teamOf(rosterItem.teamSlug || p?.team):null;
+      const canPlace=!rosterItem && !!s.playerDraftSelectedSlug && !s.playerDraftRolling;
+      const swapSelected=s.playerDraftSwapIndex===index;
+      return {filled:!!p,swapSelected,roleLabel:role.label,attribute:role.attribute,color:role.color,bg:role.bg,playerName:p?p.nick:(canPlace?'Clique para posicionar':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():index+1,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':'#0d0f14'};border:1px solid ${swapSelected?'#f2b53d':canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace?'pointer':'default'};min-height:105px`,year:rosterItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
+    });
+    const playerDraftFilledCount=s.draftRoster.filter(Boolean).length;
+    const playerDraftSelectionHint=s.playerDraftSwapIndex!==null?'SELECIONE A NOVA POSIÇÃO':s.playerDraftSelectedSlug?'JOGADOR SELECIONADO':'CLIQUE PARA TROCAR POSIÇÕES';
+    const playerDraftActionText=s.playerDraftSwapIndex!==null?'Agora clique em outro jogador para trocar as posições.':s.playerDraftSelectedSlug?'Clique em uma posição vazia para colocar o jogador.':'Clique em um jogador escalado e depois em outro para trocar suas funções.';
+    const finishPlayerDraftStyle=`font-size:13px;font-weight:800;color:${playerDraftFilledCount===5?'#0a0c10':'#636d7e'};background:${playerDraftFilledCount===5?'#ff5c1a':'#1a1e28'};border-radius:8px;padding:11px 19px;cursor:${playerDraftFilledCount===5?'pointer':'default'}`;
+
     // ---- DRAFT SCREEN ----
     const rosterSlugs = s.draftRoster.filter(Boolean).map(r=>r.slug);
     const roleOrder = ['igl','awper','entry','lurker','rifler','support','anchor','rotator'];
@@ -2007,7 +2424,7 @@ class Component extends DCLogic {
 
     const rosterSlots = s.draftRoster.map((r,idx)=>{
       if(!r) return {idx:idx+1, filled:false, style:'display:flex;align-items:center;gap:10px;background:#0d0f14;border:1px dashed #262b36;border-radius:9px;padding:10px 12px;min-height:52px'};
-      const p = this._draftPlayer(r.slug); const team = teamOf(p.team);
+      const p = this._draftPlayer(r.slug,r.year); const team = teamOf(p.team);
       const isCaptain = s.draftCaptain===r.slug;
       return {
         idx:idx+1, filled:true, isCaptain,
@@ -2029,7 +2446,7 @@ class Component extends DCLogic {
       attrs:[{label:'Liderança',value:c.leadership},{label:'Tática',value:c.tatica},{label:'Desenvolv.',value:c.desenvolvimento},{label:'Mental',value:c.mental}]
     }));
 
-    const filledPlayers = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug)).filter(Boolean);
+    const filledPlayers = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug,r.year)).filter(Boolean);
     const avg = (arr)=> arr.length? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
     const compBars = [
       {label:'Força ofensiva', value: avg(filledPlayers.map(p=>p.overall))},
@@ -2050,7 +2467,7 @@ class Component extends DCLogic {
 
     // ---- RESUMO SCREEN ----
     const resumoPlayers = s.draftRoster.filter(Boolean).map(r=>{
-      const p = this._draftPlayer(r.slug); const team = teamOf(p.team);
+      const p = this._draftPlayer(r.slug,r.year); const team = teamOf(p.team);
       return { avatarStyle:avatarStyle(team.hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick, isCaptain:s.draftCaptain===r.slug, roleLabel:ROLE_META[r.role]?.label||r.role, overall:p.overall };
     });
     const resumoCoach = coach || {name:'Nenhum coach selecionado', leadership:'—', tatica:'—', avatarStyle:coachAvatarStyle};
@@ -2080,6 +2497,28 @@ class Component extends DCLogic {
     if(!weaknesses.length) weaknesses.push('Nenhuma fraqueza crítica identificada.');
     const classificationChance = Math.max(8, Math.min(92, Math.round(avg(filledPlayers.map(p=>p.overall)) - 40 + (coach?6:0))));
     const classificationBarStyle = `height:100%;width:${classificationChance}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d)`;
+
+    // ---- MAJOR SWISS STAGE ----
+    const swissSorted=[...s.swissTeams].sort((a,b)=>b.wins-a.wins || a.losses-b.losses || b.strength-a.strength);
+    const swissStandings=swissSorted.map((team,index)=>({rank:index+1,name:team.name,year:team.year,tag:team.tag,record:`${team.wins}–${team.losses}`,recordColor:team.status==='qualified'?'#34c77b':team.status==='eliminated'?'#ef4444':'#f4f5f7',status:team.status==='qualified'?'CLASSIFICADO':team.status==='eliminated'?'ELIMINADO':'JOGANDO',statusStyle:`font-size:8.5px;font-weight:800;color:${team.status==='qualified'?'#34c77b':team.status==='eliminated'?'#ef4444':'#9aa3b2'};background:${team.status==='qualified'?'rgba(52,199,123,.1)':team.status==='eliminated'?'rgba(239,68,68,.1)':'#1a1e28'};border-radius:5px;padding:4px 6px;text-align:center`,style:`display:grid;grid-template-columns:34px 1fr 74px 68px;align-items:center;padding:9px 14px;border-top:1px solid #1a1e28;background:${team.isUser?'rgba(255,92,26,.055)':'transparent'}`}));
+    const swissVisibleMatches=s.swissPendingMatches || s.swissHistory[s.swissHistory.length-1]?.matches || [];
+    const swissRoundMatches=swissVisibleMatches.map(match=>({teamA:match.teamA,teamB:match.teamB,format:match.format,score:s.swissPendingMatches?(match.isUser?'AO VIVO':'•••'):match.score,state:s.swissPendingMatches?(match.isUser?'seu jogo':'simulando em segundo plano'):'encerrado',scoreColor:match.isUser?'#ff5c1a':'#9aa3b2',style:`background:#0d0f14;border:1px solid ${match.isUser?'rgba(255,92,26,.35)':'#242833'};border-radius:8px;padding:10px;font-size:11px;color:#c8ccd4`}));
+    const swissPendingUser=s.swissPendingMatches?.find(match=>match.isUser);
+    const swissUserTeam=s.swissTeams.find(team=>team.id==='user');
+    let swissUserMatch=null;
+    if(swissPendingUser){ const frame=s.swissUserRounds[Math.min(s.swissUserRoundIndex,s.swissUserRounds.length-1)] || {us:0,them:0}; const opponent=swissPendingUser.aId==='user'?swissPendingUser.teamB:swissPendingUser.teamA; swissUserMatch={format:swissPendingUser.format,record:`Campanha ${swissUserTeam?.wins || 0}–${swissUserTeam?.losses || 0}`,opponent,score:`${frame.us} : ${frame.them}`,message:`Round ${Math.min(s.swissUserRoundIndex+1,s.swissUserRounds.length)} de ${s.swissUserRounds.length}`,progressStyle:`height:100%;width:${s.swissUserRounds.length?((s.swissUserRoundIndex+1)/s.swissUserRounds.length)*100:0}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d);transition:width .25s ease`}; }
+    const swissFinished=swissUserTeam && swissUserTeam.status!=='playing';
+    const swissPoolLabels=['0–0','1–0 / 0–1','2–0 / 1–1 / 0–2','2–1 / 1–2','2–2'];
+    const swissBracketColumns=Array.from({length:5},(_,index)=>{
+      const round=index+1; const saved=s.swissHistory.find(item=>item.round===round)?.matches; const current=s.swissPendingMatches && s.swissRound+1===round?s.swissPendingMatches:null; const matches=saved || current || [];
+      return {title:`RODADA ${round}`,pools:swissPoolLabels[index],waiting:!matches.length,matches:matches.map(match=>{ const finished=!current, userWon=match.winnerId==='user'; return {teamA:match.teamA,teamB:match.teamB,pool:`POOL ${match.pool}`,score:current?(match.isUser?'AO VIVO':'SIMULANDO'):match.score,scoreColor:match.isUser?'#ff5c1a':'#aeb7c8',showOutcome:match.isUser,outcome:finished?(userWon?'VITÓRIA':'DERROTA'):'EM ANDAMENTO',outcomeStyle:`font-size:8.5px;font-weight:900;color:${finished?(userWon?'#34c77b':'#ef4444'):'#f2b53d'};margin-top:7px;padding-top:6px;border-top:1px solid #2c3240`,teamAStyle:`white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${finished&&match.winnerId===match.aId?'#34c77b':'#e1e4ea'};font-weight:${finished&&match.winnerId===match.aId?800:500}`,teamBStyle:`white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${finished&&match.winnerId===match.bId?'#34c77b':'#e1e4ea'};font-weight:${finished&&match.winnerId===match.bId?800:500}`,style:`background:${match.isUser?'rgba(255,92,26,.075)':'#141821'};border:1px solid ${match.isUser?'rgba(255,92,26,.48)':'#2c3240'};border-radius:7px;padding:9px;font-size:10.5px;line-height:1.3;color:#e1e4ea`};})};
+    });
+    const swissPrimaryLabel=swissFinished?(swissUserTeam.status==='qualified'?'Classificado para os playoffs':'Campanha encerrada'):s.swissPendingMatches?'Rounds sendo simulados automaticamente…':`Simular rodada ${s.swissRound+1}`;
+    const swissPrimaryAction=swissFinished||s.swissPendingMatches?()=>{}:this.startSwissRound;
+    const swissPrimaryStyle=`text-align:center;font-size:13.5px;font-weight:800;color:${swissFinished||s.swissPendingMatches?'#9aa3b2':'#0a0c10'};background:${swissFinished||s.swissPendingMatches?'#1a1e28':'#ff5c1a'};border-radius:9px;padding:13px;cursor:${swissFinished||s.swissPendingMatches?'default':'pointer'}`;
+    const swissCampaignRecord=`${swissUserTeam?.wins || 0} vitórias · ${swissUserTeam?.losses || 0} derrotas`;
+    const swissNormalStyle=`font-size:11.5px;font-weight:800;color:${s.swissMode==='normal'?'#0a0c10':'#9aa3b2'};background:${s.swissMode==='normal'?'#2fb8c6':'#12151c'};border:1px solid ${s.swissMode==='normal'?'#2fb8c6':'#242833'};border-radius:8px;padding:9px 12px;cursor:pointer`;
+    const swissFastStyle='font-size:11.5px;font-weight:800;color:#0a0c10;background:#f2b53d;border:1px solid #f2b53d;border-radius:8px;padding:9px 12px;cursor:pointer';
 
     // ---- SIMULACAO / PARTIDA / RESULTADO ----
     const teamOvNow = Math.round(this._teamOverall());
@@ -2390,6 +2829,8 @@ class Component extends DCLogic {
       isHome: s.screen==='home',
       isJogarHub: s.screen==='jogar',
       isMajorIntro: s.screen==='major-intro',
+      isMajorStrategy: s.screen==='major-strategy',
+      isPlayerDraft: s.screen==='major-player-draft',
       isMajorSorteio: s.screen==='major-sorteio',
       isDraft: s.screen==='major-draft',
       isResumo: s.screen==='major-resumo',
@@ -2401,6 +2842,7 @@ class Component extends DCLogic {
       playerDrawer, closePlayerDrawer:this.closePlayerDrawer,
       resumoPlayers, resumoCoach, radarPoints, radarRings, radarLabels, mapStrengths, strengths, weaknesses, classificationChance, classificationBarStyle,
       isSimulacao: s.screen==='major-simulacao', isPartida: s.screen==='major-partida', isResultado: s.screen==='major-resultado',
+      isMajorGroups:s.screen==='major-groups', swissStageTitle:'Fase de grupos · 16 times', swissRoundLabel:`RODADA ${s.swissRound}/5`, swissCampaignRecord, swissBracketColumns, swissStandings, swissRoundMatches, swissUserMatch, swissPrimaryLabel, swissPrimaryAction, swissPrimaryStyle, swissNormalStyle, swissFastStyle, setSwissNormal:this.setSwissNormal, simulateSwissFast:this.simulateSwissFast,
       bracketRounds, currentMatchPreview, nextMatch:this.nextMatch, simulateAll:this.simulateAll,
       partidaDetail, backToSimulacao:this.backToSimulacao,
       resultadoData, playAgain:this.playAgain, shareResult:this.shareResult,
@@ -2422,8 +2864,11 @@ class Component extends DCLogic {
       isUserProfile: s.screen==='perfil', userProfileTabs, userTabVisao: s.userProfileTab==='visao', userTabHistorico: s.userProfileTab==='historico', userTabConquistas: s.userProfileTab==='conquistas',
       userStats, userHistorico, userAchievements,
       majorRules, majorHistory, rouletteDone:s.rouletteDone, drawnSeason, startDraft:this.startDraft,
+      strategyPresets, strategySlots, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro,
+      playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftSelectionHint, playerDraftActionText, finishPlayerDraftStyle,
+      rerollPlayerDraft:this._drawPlayerPool, backToStrategy:this.backToStrategy, finishPlayerDraft:this.finishPlayerDraft,
       goMajor: ()=>this.nav('major-intro'), goGuess:()=>this.nav('adivinhar-intro'),
-      goJogadoresLink:()=>this.nav('jogadores'), goRankingLink:()=>this.nav('ranking'), goCadastroLink:()=>this.nav('cadastro'), goSorteio:()=>this.nav('major-sorteio'),
+      goJogadoresLink:()=>this.nav('jogadores'), goRankingLink:()=>this.nav('ranking'), goCadastroLink:()=>this.nav('cadastro'), goSorteio:()=>this.nav('major-strategy'),
       onFooterJogar:(e)=>{e.preventDefault();this.nav('jogar')}, onFooterMajorIntro:(e)=>{e.preventDefault();this.nav('major-intro')}, onFooterAdivinhar:(e)=>{e.preventDefault();this.nav('adivinhar-intro')}, onFooterRanking:(e)=>{e.preventDefault();this.nav('ranking')},
       onFooterJogadores:(e)=>{e.preventDefault();this.nav('jogadores')}, onFooterTimes:(e)=>{e.preventDefault();this.nav('times')}, onFooterTemporadas:(e)=>{e.preventDefault();this.nav('temporadas')},
       onFooterLogin:(e)=>{e.preventDefault();this.nav('login')}, onFooterCadastro:(e)=>{e.preventDefault();this.nav('cadastro')}, onFooterRegras:(e)=>{e.preventDefault();this.nav('regras')},
