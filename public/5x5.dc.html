@@ -79,22 +79,6 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
         <div style="position:relative">
-          <div onClick="{{ toggleSeasonMenu }}" style="height:36px;padding:0 12px;border-radius:8px;background:#12151c;border:1px solid #242833;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#d8dce3;font-weight:600">
-            <span>{{ activeSeason.label }}</span>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </div>
-          <sc-if value="{{ seasonMenuOpen }}">
-            <div style="position:absolute;top:44px;right:0;width:220px;background:#12151c;border:1px solid #242833;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.5);overflow:hidden;z-index:50">
-              <sc-for list="{{ seasonOptions }}" as="s" hint-placeholder-count="3">
-                <div onClick="{{ s.onClick }}" style="{{ s.style }}">
-                  <div style="font-size:13px;font-weight:700;color:#f4f5f7">{{ s.label }}</div>
-                  <div style="font-size:11px;color:#636d7e;margin-top:2px">{{ s.sub }}</div>
-                </div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
-        <div style="position:relative">
           <div onClick="{{ toggleNotifMenu }}" style="width:36px;height:36px;border-radius:8px;background:#12151c;border:1px solid #242833;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9aa3b2;position:relative">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
             <div style="position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#ff5c1a;border:2px solid #0a0c10"></div>
@@ -211,7 +195,7 @@
             <div>
               <div style="display:inline-flex;align-items:center;gap:8px;background:#171a22;border:1px solid #262b36;border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;color:#2fb8c6;margin-bottom:24px">
                 <span style="width:6px;height:6px;border-radius:50%;background:#34c77b;animation:pulse5x5 1.8s infinite"></span>
-                TEMPORADA {{ activeSeason.label }} ATIVA
+                BASE HISTÓRICA · 2017–2026
               </div>
               <h1 style="font-family:'Chakra Petch',sans-serif;font-size:56px;line-height:1.02;font-weight:700;margin:0 0 20px;letter-spacing:-.01em">Monte sua lineup.<br/>Vença o Major.<br/><span style="color:#ff5c1a">Prove que manja de CS.</span></h1>
               <p style="font-size:16.5px;color:#9aa3b2;line-height:1.6;max-width:520px;margin:0 0 32px">5x5 é um jogo de navegador sobre a história e as estatísticas do competitivo de Counter-Strike. Drafte lendas de diferentes eras, simule um Major inteiro e teste seu conhecimento adivinhando jogadores.</p>
@@ -1179,13 +1163,19 @@
             <div style="display:flex;gap:24px;flex-wrap:wrap">
               <div><div style="font-size:10.5px;color:#636d7e">IDADE</div><div style="font-size:13px;font-weight:700;color:#e6e8ec">{{ profile.age }} anos</div></div>
               <div><div style="font-size:10.5px;color:#636d7e">ESTREIA</div><div style="font-size:13px;font-weight:700;color:#e6e8ec">{{ profile.debut }}</div></div>
-              <div><div style="font-size:10.5px;color:#636d7e">TIME ATUAL</div><div style="font-size:13px;font-weight:700;color:#e6e8ec">{{ profile.teamName }}</div></div>
+              <div><div style="font-size:10.5px;color:#636d7e">TIME EM {{ profile.statsYear }}</div><div style="font-size:13px;font-weight:700;color:#e6e8ec">{{ profile.teamName }}</div></div>
               <div><div style="font-size:10.5px;color:#636d7e">FUNÇÕES</div><div style="display:flex;gap:4px;margin-top:2px"><sc-for list="{{ profile.roles }}" as="r" hint-placeholder-count="2"><span style="{{ r.style }}">{{ r.label }}</span></sc-for></div></div>
             </div>
           </div>
-          <div style="text-align:center">
+          <div style="text-align:right;min-width:150px">
             <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#f2b53d">{{ profile.overall }}</div>
-            <div style="font-size:10.5px;color:#636d7e">OVERALL</div>
+            <div style="font-size:10.5px;color:#636d7e;margin-bottom:12px">OVERALL · {{ profile.statsYear }}</div>
+            <div style="font-size:10px;color:#636d7e;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Ano dos stats</div>
+            <div style="display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap">
+              <sc-for list="{{ profile.yearOptions }}" as="y" hint-placeholder-count="3">
+                <button onClick="{{ y.onClick }}" style="{{ y.style }}">{{ y.label }}</button>
+              </sc-for>
+            </div>
           </div>
         </div>
 
@@ -1245,8 +1235,8 @@
           <div style="display:flex;flex-direction:column;gap:24px">
             <div style="background:rgba(47,184,198,.06);border:1px solid rgba(47,184,198,.22);border-radius:14px;padding:22px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-                <span style="font-size:13px;font-weight:700;color:#2fb8c6;text-transform:uppercase;letter-spacing:.04em">Skills cadastradas</span>
-                <span style="font-size:10.5px;color:#636d7e">Banco de dados 5x5</span>
+                <span style="font-size:13px;font-weight:700;color:#2fb8c6;text-transform:uppercase;letter-spacing:.04em">Atributos HLTV · {{ profile.statsYear }}</span>
+                <span style="font-size:10.5px;color:#636d7e">Both sides</span>
               </div>
               <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
                 <sc-for list="{{ profile.observed }}" as="os" hint-placeholder-count="8">
@@ -1346,6 +1336,15 @@
           <span style="{{ teamProfile.statusStyle }}">{{ teamProfile.statusLabel }}</span>
         </div>
 
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px">
+          <div style="font-size:13px;font-weight:700;color:#e6e8ec">Ano da lineup</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ teamProfile.yearOptions }}" as="y" hint-placeholder-count="3">
+              <button onClick="{{ y.onClick }}" style="{{ y.style }}">{{ y.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
         <div style="font-size:13px;font-weight:700;color:#e6e8ec;margin-bottom:12px">Lineup {{ teamProfile.lineupYear }}</div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
           <sc-for list="{{ teamProfile.roster }}" as="r" hint-placeholder-count="5">
@@ -1435,7 +1434,10 @@
 
     <sc-if value="{{ isRegras }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Regras" style="max-width:800px;margin:0 auto;padding:24px 24px 90px">
-        <h1 style="font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin:0 0 24px">Regras</h1>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px">
+          <h1 style="font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin:0">Regras</h1>
+          <a href="https://www.hltv.org/news/39672/introducing-hltv-attributes" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:700;color:#2fb8c6;text-decoration:none">Metodologia dos atributos na HLTV ↗</a>
+        </div>
         <div style="display:flex;flex-direction:column;gap:16px">
           <sc-for list="{{ regrasSections }}" as="rs" hint-placeholder-count="4">
             <div style="background:#12151c;border:1px solid #242833;border-radius:12px;padding:20px">
@@ -1590,6 +1592,14 @@ function regionOf(code){ return (code==='BR'||code==='US') ? 'Américas' : 'Euro
 const EMPTY_TEAM = {slug:'',tag:'—',name:'SEM TIME',country:'',code:'',hue:'#636d7e',active:null,founded:'',region:'',lineups:[]};
 function teamOf(slug){ return TEAMS.find(t=>t.slug===slug) || EMPTY_TEAM; }
 function playerOf(slug){ return PLAYERS.find(p=>p.slug===slug); }
+function playerInYear(player, year){
+  if(!player) return null;
+  const season = (player.teamHistory || []).find(link=>link.year===Number(year));
+  if(!season) return null;
+  const version = {...player, ...season, team:season.teamSlug};
+  version.roles = inferredRoles(version);
+  return version;
+}
 function formatRating(value){ return Number.isFinite(value) ? value.toFixed(2) : '—'; }
 function inferredRoles(player){
   const skills = [
@@ -1612,7 +1622,7 @@ const OPPONENT_POOL = [
 ];
 const ROUND_LABELS = ['Quartas de final','Semifinal','Final'];
 class Component extends DCLogic {
-  state = { screen:'home', params:{}, mobileNavOpen:false, seasonMenuOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, activeSeasonId:'s2024b', rouletteDone:false, drawnSeasonId:null, draftId:null,
+  state = { screen:'home', params:{}, mobileNavOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, playerProfileYear:null, teamProfileYear:null, rouletteDone:false, drawnSeasonId:null, draftId:null,
     draftRoster:[null,null,null,null,null], draftCoach:null, draftCaptain:null,
     draftFilters:{search:'', team:'', role:'', sortBy:'overall', onlyEligible:true},
     playerDrawerSlug:null, coachPickerOpen:false,
@@ -1650,7 +1660,10 @@ class Component extends DCLogic {
         for(const lineup of team.lineups || []){
           for(const player of lineup.players || []){
             const history = playerTeams.get(player.slug) || [];
-            history.push({year:lineup.year, teamSlug:team.slug, teamName:team.name});
+            history.push({year:lineup.year, teamSlug:team.slug, teamName:team.name,
+              overall:player.overall, firepower:player.firepower, entrying:player.entrying,
+              trading:player.trading, opening:player.opening, clutching:player.clutching,
+              sniping:player.sniping, utility:player.utility});
             playerTeams.set(player.slug, history);
           }
         }
@@ -1665,23 +1678,23 @@ class Component extends DCLogic {
       PLAYERS = rawPlayers.map(player=>{
         const history = (playerTeams.get(player.slug) || []).sort((a,b)=>b.year-a.year);
         const current = history[0] || {};
-        const mapped = {...player, nick:player.nickname, name:player.displayName || '', country:player.countryName || '', code:player.countryCode || '',
+        const mapped = {...player, ...current, nick:player.nickname, name:player.displayName || '', country:player.countryName || '', code:player.countryCode || '',
           team:current.teamSlug || '', teamHistory:history, rating:null, form:'stable', age:'', debut:history.length ? Math.min(...history.map(x=>x.year)) : '',
           status:player.careerStatus === 'active' ? 'ativo' : 'aposentado', majorsPlayed:'', majorsWon:'', bestPlacement:'', mainAttr:''};
         mapped.roles = inferredRoles(mapped);
         return mapped;
       });
-      const yearsWithData = [...new Set(teamDetails.flatMap(t=>(t.lineups || []).map(l=>l.year)))].sort((a,b)=>b-a);
       const catalogYears = Array.from({length:10},(_,index)=>2026-index);
       SEASONS_FULL = catalogYears.map(year=>({id:`s${year}`,label:`Temporada ${year}`,period:String(year),engine:'',mapCount:0,maps:[],year}));
-      this.setState({catalogLoading:false, catalogError:'', summary, activeSeasonId:`s${yearsWithData[0] || 2026}`});
+      this.setState({catalogLoading:false, catalogError:'', summary});
     } catch(error) {
       this.setState({catalogLoading:false, catalogError:'Não foi possível carregar os dados do catálogo.'});
     }
   };
 
   nav = (screen, params={}) => {
-    this.setState({screen, params, mobileNavOpen:false});
+    const localYearReset = screen==='jogador-perfil' ? {playerProfileYear:null} : screen==='time-perfil' ? {teamProfileYear:null} : {};
+    this.setState({screen, params, mobileNavOpen:false, ...localYearReset});
     window.scrollTo(0,0);
     if(screen==='major-sorteio'){
       this.setState({rouletteDone:false, drawnSeasonId:null});
@@ -1704,12 +1717,14 @@ class Component extends DCLogic {
   onFilterEligible = ()=> this.setState(s=>({draftFilters:{...s.draftFilters, onlyEligible:!s.draftFilters.onlyEligible}}));
   openPlayerDrawer = (slug)=> this.setState({playerDrawerSlug:slug});
   closePlayerDrawer = ()=> this.setState({playerDrawerSlug:null});
+  _draftYear(){ return seasonOf(this.state.drawnSeasonId)?.year || Math.max(2017, ...PLAYERS.flatMap(p=>(p.teamHistory || []).map(link=>link.year))); }
+  _draftPlayer(slug){ return playerInYear(playerOf(slug), this._draftYear()); }
   selectPlayer = (slug)=> {
     const s = this.state;
     if(s.draftRoster.some(r=>r && r.slug===slug)) return;
     const idx = s.draftRoster.findIndex(r=>!r);
     if(idx===-1){ this.showToast({icon:'⚠️', title:'Escalação completa', desc:'Remova alguém antes de adicionar.', accent:'#f2b53d', border:'#33394a'}); return; }
-    const p = playerOf(slug);
+    const p = this._draftPlayer(slug);
     const roster = [...s.draftRoster]; roster[idx] = {slug, role:p.roles[0]};
     this.setState({draftRoster:roster, playerDrawerSlug:null});
     this.showToast({icon:'✅', title:`${p.nick} adicionado`, desc:`Slot ${idx+1} preenchido.`, accent:'#34c77b', border:'#33394a'});
@@ -1732,7 +1747,7 @@ class Component extends DCLogic {
 
   _teamOverall(){
     const s = this.state;
-    const filled = s.draftRoster.filter(Boolean).map(r=>playerOf(r.slug));
+    const filled = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug)).filter(Boolean);
     const avg = filled.length? filled.reduce((a,p)=>a+p.overall,0)/filled.length : 75;
     const coachBonus = s.draftCoach ? 4 : 0;
     return avg + coachBonus;
@@ -1744,7 +1759,7 @@ class Component extends DCLogic {
     const opp = OPPONENT_POOL[Math.floor(rng()*OPPONENT_POOL.length)];
     const teamOv = this._teamOverall();
     const oppOv = 74 + rng()*22;
-    const filled = s.draftRoster.filter(Boolean).map(r=>playerOf(r.slug));
+    const filled = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug)).filter(Boolean);
     const maps = (this.state.drawnSeasonId ? seasonOf(this.state.drawnSeasonId) : SEASONS_FULL[0]).maps;
     let userMapWins=0, oppMapWins=0; const mapResults=[];
     for(let i=0;i<3 && userMapWins<2 && oppMapWins<2;i++){
@@ -1852,8 +1867,10 @@ class Component extends DCLogic {
   onPlayersStatus = (e)=> this.setState(s=>({playersFilters:{...s.playersFilters, status:e.target.value}}));
   setPlayersView = (v)=> this.setState({playersView:v});
   openPlayerProfile = (slug)=> this.nav('jogador-perfil', {slug});
+  setPlayerProfileYear = (year)=> this.setState({playerProfileYear:Number(year)});
   setPerfilTab = (tab)=> this.setState({perfilActiveTab:tab});
   openTeamProfile = (slug)=> this.nav('time-perfil', {slug});
+  setTeamProfileYear = (year)=> this.setState({teamProfileYear:Number(year)});
   openSeason = (id)=> this.nav('temporada-detalhe', {code:id});
   setRankingTab = (tab)=> this.setState({rankingTab:tab});
   setUserProfileTab = (tab)=> this.setState({userProfileTab:tab});
@@ -1864,17 +1881,21 @@ class Component extends DCLogic {
   onAuthPassword = (e)=> this.setState({authPassword:e.target.value});
 
   _buildPlayerProfileData(slug){
-    const p = playerOf(slug); if(!p) return null;
+    const base = playerOf(slug); if(!base) return null;
+    const years = [...new Set((base.teamHistory || []).map(link=>link.year))].sort((a,b)=>b-a);
+    const requestedYear = Number(this.state.playerProfileYear);
+    const selectedYear = years.includes(requestedYear) ? requestedYear : years[0];
+    const p = playerInYear(base, selectedYear) || base;
     const team = teamOf(p.team);
-    const seasons = (p.teamHistory || []).map(link=>({
-      season:`Temporada ${link.year}`, team:link.teamName, overall:p.overall, form:'', roles:p.roles.map(r=>ROLE_META[r].label).join(', ')
+    const seasons = (base.teamHistory || []).map(link=>({
+      season:`Temporada ${link.year}`, team:link.teamName, overall:link.overall, form:'', roles:inferredRoles(link).map(r=>ROLE_META[r].label).join(', ')
     }));
     const maps = [];
     const teammates = PLAYERS.filter(o=>o.slug!==p.slug && (o.teamHistory || []).some(a=>(p.teamHistory || []).some(b=>a.year===b.year && a.teamSlug===b.teamSlug))).map(o=>({
       nick:o.nick, daysTogether:'', lineups:'', titles:'', synergy:''
     }));
     return {
-      p, team, seasons, maps, teammates,
+      p, team, seasons, maps, teammates, years, selectedYear,
       observed:[
         {label:'FIREPOWER',value:p.firepower},{label:'ENTRYING',value:p.entrying},
         {label:'TRADING',value:p.trading},{label:'OPENING',value:p.opening},
@@ -1890,8 +1911,7 @@ class Component extends DCLogic {
   goHome = () => this.nav('home');
   goPerfil = () => this.nav('perfil');
   toggleMobileNav = () => this.setState(s=>({mobileNavOpen:!s.mobileNavOpen}));
-  toggleSeasonMenu = () => this.setState(s=>({seasonMenuOpen:!s.seasonMenuOpen, notifMenuOpen:false}));
-  toggleNotifMenu = () => this.setState(s=>({notifMenuOpen:!s.notifMenuOpen, seasonMenuOpen:false}));
+  toggleNotifMenu = () => this.setState(s=>({notifMenuOpen:!s.notifMenuOpen}));
   openSearch = () => this.setState({searchOpen:true, searchQuery:''});
   closeSearch = () => this.setState({searchOpen:false});
   stopProp = (e) => e.stopPropagation();
@@ -1900,8 +1920,7 @@ class Component extends DCLogic {
 
   renderVals(){
     const s = this.state;
-    const seasons = SEASONS_FULL.map(sn=>({id:sn.id,label:String(sn.year),sub:`Temporada ${sn.year}`}));
-    const activeSeason = seasons.find(x=>x.id===s.activeSeasonId) || seasons[0] || {id:'',label:'—',sub:'Nenhuma temporada cadastrada'};
+    const currentPlayers = PLAYERS.filter(p=>Number.isFinite(p.overall));
     const navItems = [
       {key:'home', label:'Início'},
       {key:'jogar', label:'Jogar'},
@@ -1919,11 +1938,6 @@ class Component extends DCLogic {
       label:n.label, onClick:()=>this.nav(n.key),
       mstyle:`padding:12px 10px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;color:${isActiveScreen(n.key)?'#f4f5f7':'#9aa3b2'};background:${isActiveScreen(n.key)?'#171a22':'transparent'}`
     }));
-    const seasonOptions = seasons.map(sn=>({
-      label:sn.label, sub:sn.sub,
-      onClick:()=>this.setState({activeSeasonId:sn.id, seasonMenuOpen:false}),
-      style:`padding:10px 14px;cursor:pointer;background:${sn.id===s.activeSeasonId?'#171a22':'transparent'}`
-    }));
     const notifications = [];
     const searchQuery = s.searchQuery;
     const searchResults = searchQuery.length>0 ? [
@@ -1935,13 +1949,13 @@ class Component extends DCLogic {
     const breadcrumbs = s.screen==='home' ? null : this._breadcrumbsFor(s);
 
     const heroStats = [{value:s.summary.teams,label:'TIMES'},{value:s.summary.players,label:'JOGADORES'},{value:s.summary.links,label:'VÍNCULOS'}];
-    const popularPlayers = [...PLAYERS].sort((a,b)=>b.overall-a.overall).slice(0,4).map(p=>({
+    const popularPlayers = [...currentPlayers].sort((a,b)=>b.overall-a.overall).slice(0,4).map(p=>({
       onClick:()=>this.nav('jogador-perfil',{slug:p.slug}), nick:p.nick, countryCode:p.code,
       teamName: teamOf(p.team).name, initials:p.nick.slice(0,2).toUpperCase(), avatarStyle:avatarStyle(teamOf(p.team).hue),
       roles:p.roles.map(r=>roleChip(r)), rating:formatRating(p.rating), overall:p.overall
     }));
     const recentResults = [];
-    const weeklyRanking = [...PLAYERS].sort((a,b)=>b.overall-a.overall).slice(0,5).map((p,index)=>({rank:index+1,name:p.nick,initials:p.nick.slice(0,2),points:String(p.overall),rankStyle:`width:20px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;color:${index<3?'#f2b53d':'#636d7e'}`}));
+    const weeklyRanking = [...currentPlayers].sort((a,b)=>b.overall-a.overall).slice(0,5).map((p,index)=>({rank:index+1,name:p.nick,initials:p.nick.slice(0,2),points:String(p.overall),rankStyle:`width:20px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;color:${index<3?'#f2b53d':'#636d7e'}`}));
     const platformStats = [{value:s.summary.players,label:'JOGADORES CADASTRADOS'},{value:s.summary.teams,label:'TIMES'},{value:s.summary.countries,label:'PAÍSES'},{value:s.summary.regions,label:'REGIÕES'}];
 
     const majorRules = [
@@ -1951,12 +1965,13 @@ class Component extends DCLogic {
       {icon:'🏆', title:'Campanha progressiva', desc:'Avance rodada a rodada em um Major simulado com bracket real.', color:'#f2b53d'}
     ];
     const majorHistory = [];
-    const drawnSeason = s.drawnSeasonId ? seasonOf(s.drawnSeasonId) : {label:'',period:'',engine:'',mapCount:0,maps:[]};
+    const drawnSeason = s.drawnSeasonId ? seasonOf(s.drawnSeasonId) : {label:'',period:'',engine:'',mapCount:0,maps:[],year:this._draftYear()};
 
     // ---- DRAFT SCREEN ----
     const rosterSlugs = s.draftRoster.filter(Boolean).map(r=>r.slug);
     const roleOrder = ['igl','awper','entry','lurker','rifler','support','anchor','rotator'];
-    let filteredPlayers = PLAYERS.filter(p=>{
+    const draftPlayers = PLAYERS.map(p=>playerInYear(p,drawnSeason.year || this._draftYear())).filter(Boolean);
+    let filteredPlayers = draftPlayers.filter(p=>{
       const f = s.draftFilters;
       if(f.search && !p.nick.toLowerCase().includes(f.search.toLowerCase())) return false;
       if(f.team && p.team!==f.team) return false;
@@ -1992,7 +2007,7 @@ class Component extends DCLogic {
 
     const rosterSlots = s.draftRoster.map((r,idx)=>{
       if(!r) return {idx:idx+1, filled:false, style:'display:flex;align-items:center;gap:10px;background:#0d0f14;border:1px dashed #262b36;border-radius:9px;padding:10px 12px;min-height:52px'};
-      const p = playerOf(r.slug); const team = teamOf(p.team);
+      const p = this._draftPlayer(r.slug); const team = teamOf(p.team);
       const isCaptain = s.draftCaptain===r.slug;
       return {
         idx:idx+1, filled:true, isCaptain,
@@ -2014,7 +2029,7 @@ class Component extends DCLogic {
       attrs:[{label:'Liderança',value:c.leadership},{label:'Tática',value:c.tatica},{label:'Desenvolv.',value:c.desenvolvimento},{label:'Mental',value:c.mental}]
     }));
 
-    const filledPlayers = s.draftRoster.filter(Boolean).map(r=>playerOf(r.slug));
+    const filledPlayers = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug)).filter(Boolean);
     const avg = (arr)=> arr.length? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
     const compBars = [
       {label:'Força ofensiva', value: avg(filledPlayers.map(p=>p.overall))},
@@ -2035,7 +2050,7 @@ class Component extends DCLogic {
 
     // ---- RESUMO SCREEN ----
     const resumoPlayers = s.draftRoster.filter(Boolean).map(r=>{
-      const p = playerOf(r.slug); const team = teamOf(p.team);
+      const p = this._draftPlayer(r.slug); const team = teamOf(p.team);
       return { avatarStyle:avatarStyle(team.hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick, isCaptain:s.draftCaptain===r.slug, roleLabel:ROLE_META[r.role]?.label||r.role, overall:p.overall };
     });
     const resumoCoach = coach || {name:'Nenhum coach selecionado', leadership:'—', tatica:'—', avatarStyle:coachAvatarStyle};
@@ -2123,7 +2138,7 @@ class Component extends DCLogic {
       const allMvps = matches.filter(m=>m.mvp).map(m=>m.mvp);
       const mvpCounts = {}; allMvps.forEach(p=>{ mvpCounts[p.slug]=(mvpCounts[p.slug]||0)+1; });
       const topMvpSlug = Object.keys(mvpCounts).sort((a,b)=>mvpCounts[b]-mvpCounts[a])[0];
-      const mvpCampaign = topMvpSlug ? playerOf(topMvpSlug) : null;
+      const mvpCampaign = topMvpSlug ? this._draftPlayer(topMvpSlug) : null;
       resultadoData = {
         emoji: s.simChampion ? '🏆' : '❌',
         title: s.simChampion ? 'Campeão do Major!' : `Eliminado — ${ROUND_LABELS[matches.length-1]||'Quartas'}`,
@@ -2212,7 +2227,7 @@ class Component extends DCLogic {
     }
 
     // ---- PLAYERS LIST ----
-    let playersListItems = PLAYERS.filter(p=>{
+    let playersListItems = currentPlayers.filter(p=>{
       const f = s.playersFilters;
       if(f.search && !p.nick.toLowerCase().includes(f.search.toLowerCase())) return false;
       if(f.country && p.country!==f.country) return false;
@@ -2230,7 +2245,7 @@ class Component extends DCLogic {
         statusStyle:`font-size:10px;font-weight:700;color:${p.status==='ativo'?'#34c77b':'#636d7e'};background:${p.status==='ativo'?'rgba(52,199,123,.12)':'#1a1e28'};padding:3px 8px;border-radius:5px;white-space:nowrap`
       };
     });
-    const countryOptions = [...new Set(PLAYERS.map(p=>p.country))];
+    const countryOptions = [...new Set(currentPlayers.map(p=>p.country))];
     const viewCardsStyle = `padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;color:${s.playersView==='cards'?'#0a0c10':'#9aa3b2'};background:${s.playersView==='cards'?'#ff5c1a':'transparent'}`;
     const viewTableStyle = `padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;color:${s.playersView==='table'?'#0a0c10':'#9aa3b2'};background:${s.playersView==='table'?'#ff5c1a':'transparent'}`;
 
@@ -2247,14 +2262,15 @@ class Component extends DCLogic {
     if(s.screen==='jogador-perfil' && s.params && s.params.slug){
       const data = this._buildPlayerProfileData(s.params.slug);
       if(data){
-        const {p, team, seasons, maps, teammates, observed, internal} = data;
+        const {p, team, seasons, maps, teammates, observed, internal, years, selectedYear} = data;
         profile = {
           initials:p.nick.slice(0,2).toUpperCase(), avatarStyleLg:`width:88px;height:88px;border-radius:16px;background:${team.hue}22;color:${team.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:26px`,
           nick:p.nick, name:p.name, countryCode:p.code, country:p.country, region:regionOf(p.code), age:p.age, debut:p.debut, teamName:team.name, teamTag:team.tag, teamCountry:team.country,
           teamAvatarStyle:`width:52px;height:52px;border-radius:12px;background:${team.hue}22;color:${team.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px`,
-          roles:p.roles.map(r=>roleChip(r)), overall:p.overall, rating:formatRating(p.rating),
+          roles:p.roles.map(r=>roleChip(r)), overall:p.overall, rating:formatRating(p.rating), statsYear:selectedYear,
+          yearOptions:years.map(year=>({label:String(year), onClick:()=>this.setPlayerProfileYear(year), style:`border:1px solid ${year===selectedYear?'#ff5c1a':'#33394a'};background:${year===selectedYear?'#ff5c1a':'#171a22'};color:${year===selectedYear?'#0a0c10':'#c8ccd4'};border-radius:6px;padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer`})),
           statusLabel:p.status==='ativo'?'Ativo':'Aposentado', statusStyle:`font-size:11px;font-weight:700;color:${p.status==='ativo'?'#34c77b':'#9aa3b2'};background:${p.status==='ativo'?'rgba(52,199,123,.12)':'#1a1e28'};padding:3px 10px;border-radius:6px`,
-          summary:`${p.nick}${p.name ? ` (${p.name})` : ''}${p.debut ? ` está cadastrado desde ${p.debut}` : ''}${team.slug ? ` e possui vínculo com ${team.name}` : ''}. Overall atual: ${p.overall}.`,
+          summary:`${p.nick}${p.name ? ` (${p.name})` : ''}${p.debut ? ` está cadastrado desde ${p.debut}` : ''}${team.slug ? ` e possui vínculo com ${team.name} em ${selectedYear}` : ''}. Overall em ${selectedYear}: ${p.overall}.`,
           majorsPlayed:p.majorsPlayed, majorsWon:p.majorsWon, bestPlacement:p.bestPlacement,
           evolution: seasons.slice().reverse().map(sn=>({label:sn.season.replace('Temporada ',''), barStyle:`width:28px;border-radius:4px 4px 0 0;height:${sn.overall}px;background:linear-gradient(180deg,#ff5c1a,#f2b53d)`})),
           seasonsList:seasons,
@@ -2277,14 +2293,20 @@ class Component extends DCLogic {
     if(s.screen==='time-perfil' && s.params && s.params.slug){
       const t = teamOf(s.params.slug);
       if(t){
-        const selectedYear = Number(activeSeason.label);
+        const years = [...new Set((t.lineups || []).map(item=>item.year))].sort((a,b)=>b-a);
+        const requestedYear = Number(s.teamProfileYear);
+        const selectedYear = years.includes(requestedYear) ? requestedYear : years[0];
         const lineup = (t.lineups || []).find(item=>item.year===selectedYear);
-        const roster = (lineup?.players || []).map(link=>playerOf(link.slug)).filter(Boolean);
+        const roster = (lineup?.players || []).map(link=>{
+          const base=playerOf(link.slug); if(!base) return null;
+          const version={...base,...link,team:t.slug}; version.roles=inferredRoles(version); return version;
+        }).filter(Boolean);
         teamProfile = {
           tag:t.tag, name:t.name, country:t.country, region:t.region, founded:t.founded,
           avatarStyleLg:`width:80px;height:80px;border-radius:16px;background:${t.hue}22;color:${t.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px`,
           statusLabel:'', statusStyle:'display:none',
           lineupYear:lineup?.year || '',
+          yearOptions:years.map(year=>({label:String(year), onClick:()=>this.setTeamProfileYear(year), style:`border:1px solid ${year===selectedYear?'#ff5c1a':'#33394a'};background:${year===selectedYear?'#ff5c1a':'#171a22'};color:${year===selectedYear?'#0a0c10':'#c8ccd4'};border-radius:7px;padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;cursor:pointer`})),
           roster: roster.map(p=>({onClick:()=>this.openPlayerProfile(p.slug), avatarStyle:avatarStyle(t.hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick, roles:p.roles.map(r=>roleChip(r)), overall:p.overall})),
           mapStrengths: []
         };
@@ -2298,7 +2320,7 @@ class Component extends DCLogic {
       const sn = seasonOf(s.params.code);
       if(sn){
         seasonDetail = { label:sn.label, period:sn.period, engine:sn.engine, maps:sn.maps,
-          players: PLAYERS.filter(p=>(p.teamHistory || []).some(link=>link.year===sn.year)).map(p=>({onClick:()=>this.openPlayerProfile(p.slug), avatarStyle:avatarStyle(teamOf(p.team).hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick})) };
+          players: PLAYERS.map(p=>playerInYear(p,sn.year)).filter(Boolean).map(p=>({onClick:()=>this.openPlayerProfile(p.slug), avatarStyle:avatarStyle(teamOf(p.team).hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick})) };
       }
     }
 
@@ -2310,7 +2332,7 @@ class Component extends DCLogic {
     ];
     const rankingTabs = rankingTabDefs.map(rt=>({label:rt.label, onClick:()=>this.setRankingTab(rt.key),
       style:`padding:10px 16px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;color:${s.rankingTab===rt.key?'#f4f5f7':'#636d7e'};border-bottom:2px solid ${s.rankingTab===rt.key?'#ff5c1a':'transparent'}`}));
-    const rankingItems = [...PLAYERS].filter(p=>Number.isFinite(p[s.rankingTab])).sort((a,b)=>b[s.rankingTab]-a[s.rankingTab]).slice(0,50).map((p,i)=>({
+    const rankingItems = [...currentPlayers].filter(p=>Number.isFinite(p[s.rankingTab])).sort((a,b)=>b[s.rankingTab]-a[s.rankingTab]).slice(0,50).map((p,i)=>({
       rank:i+1, name:`${p.nick} · ${p.country}`, value:String(p[s.rankingTab]), rankStyle:`width:22px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:${i<3?'#f2b53d':'#636d7e'}`
     }));
 
@@ -2318,7 +2340,15 @@ class Component extends DCLogic {
     const regrasSections = [
       {title:'Monte seu time e dispute um Major', text:'Sorteie uma temporada, drafte 5 titulares e 1 coach entre jogadores elegíveis daquele período, distribua funções livremente e simule uma campanha completa de Major.'},
       {title:'Quem é o jogador?', text:'Descubra o jogador misterioso em até 6 tentativas. Dicas extras podem ser reveladas a um custo em pontos — quanto menos dicas, maior a pontuação final.'},
-      {title:'Dados e estatísticas', text:'Jogadores, times, vínculos, overall e skills exibidos no catálogo vêm dos registros cadastrados no sistema.'},
+      {title:'Como interpretar os atributos HLTV', text:'Cada atributo vai de 0 a 100 e descreve principalmente o estilo e a frequência das ações do jogador, não simplesmente se ele é bom ou ruim. Na referência da HLTV, 50 representa a média de um profissional do alto nível; por isso, uma nota baixa em determinado atributo pode apenas indicar outra função dentro do time.'},
+      {title:'Firepower', text:'Mede a produção ofensiva bruta por meio de abates, dano e multikills. Não considera vantagens de sobrevivência ou consistência entre rounds, diferenciando-se de um rating geral.'},
+      {title:'Entrying', text:'Indica com que frequência o jogador entra primeiro e acaba sacrificado para abrir espaço. Usa especialmente mortes que foram trocadas pelos companheiros; uma nota alta mostra tendência à função de entry, não necessariamente maior eficiência.'},
+      {title:'Trading', text:'Mostra a tendência de jogar logo atrás dos companheiros e converter suas mortes em trocas. Considera abates de trade e abates assistidos, destacando quem atua como segundo homem da entrada.'},
+      {title:'Opening', text:'Representa a participação em duelos no começo do round. É calculado a partir de opening kills e tentativas de abertura, identificando jogadores que procuram os primeiros confrontos.'},
+      {title:'Clutching', text:'Mede a presença e o desempenho em situações de clutch. Considera a frequência com que o jogador é o último vivo e seus pontos de clutch; amostras maiores tornam essa leitura mais confiável.'},
+      {title:'Sniping', text:'É baseado nos abates com AWP e SSG 08. Valores baixos costumam indicar riflers, a faixa intermediária identifica híbridos ou AWP secundária e valores altos apontam AWPers primários.'},
+      {title:'Utility', text:'Avalia o uso de granadas a partir de flashbangs utilizadas, flash assists e dano total de utilitários, valorizando jogadores de suporte e especialistas nesse recurso.'},
+      {title:'Dados por ano', text:'Os atributos e o overall do jogador são consultados no ano selecionado dentro do perfil dele. No perfil do time, o ano selecionado troca somente a lineup. As demais telas mostram o cadastro mais recente disponível de cada jogador.'},
       {title:'Pontuação e ranking', text:'Sua pontuação é calculada a partir das campanhas do Major e das rodadas de adivinhação, e alimenta o ranking semanal da plataforma.'}
     ];
 
@@ -2333,7 +2363,7 @@ class Component extends DCLogic {
     // player drawer
     let playerDrawer = null;
     if(s.playerDrawerSlug){
-      const p = playerOf(s.playerDrawerSlug); const team = teamOf(p.team);
+      const p = this._draftPlayer(s.playerDrawerSlug); const team = teamOf(p.team);
       const taken = rosterSlugs.includes(p.slug);
       playerDrawer = {
         avatarStyleLg:`width:56px;height:56px;border-radius:12px;background:${team.hue}22;color:${team.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px`,
@@ -2399,12 +2429,12 @@ class Component extends DCLogic {
       onFooterLogin:(e)=>{e.preventDefault();this.nav('login')}, onFooterCadastro:(e)=>{e.preventDefault();this.nav('cadastro')}, onFooterRegras:(e)=>{e.preventDefault();this.nav('regras')},
       heroStats, popularPlayers, recentResults, weeklyRanking, platformStats,
       user:{initials:'VC', name:'Você'},
-      navLinks, mobileNavLinks, activeSeason, seasonOptions, seasonMenuOpen:s.seasonMenuOpen,
+      navLinks, mobileNavLinks,
       notifMenuOpen:s.notifMenuOpen, notifications,
       mobileNavOpen:s.mobileNavOpen, toggleMobileNav:this.toggleMobileNav,
       searchOpen:s.searchOpen, searchQuery, searchResults, searchEmpty,
       openSearch:this.openSearch, closeSearch:this.closeSearch, stopProp:this.stopProp, onSearchChange:this.onSearchChange,
-      toggleSeasonMenu:this.toggleSeasonMenu, toggleNotifMenu:this.toggleNotifMenu,
+      toggleNotifMenu:this.toggleNotifMenu,
       goHome:this.goHome, goPerfil:this.goPerfil, nav:this.nav,
       toast:s.toast,
       breadcrumbs
