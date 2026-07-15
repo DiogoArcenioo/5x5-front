@@ -587,8 +587,8 @@
           <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#9aa3b2;background:#12151c;border:1px solid #242833;border-radius:8px;padding:8px 11px">{{ playerDraftFilledCount }}/5 JOGADORES</div>
         </div>
 
-        <div style="display:grid;grid-template-columns:420px minmax(0,1fr);gap:14px" data-player-draft-grid="1" data-player-draft-shell="1">
-          <div data-player-pool="1" style="background:#12151c;border:1px solid #242833;border-radius:13px;padding:12px">
+        <div style="{{ playerDraftShellStyle }}" data-player-draft-grid="1" data-player-draft-shell="1">
+          <div data-player-pool="1" style="{{ playerDraftPoolStyle }}">
             <div style="font-size:9.5px;font-weight:800;color:#636d7e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">Sorteio da rodada</div>
             <sc-if value="{{ playerDraftRolling }}">
               <div style="height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
@@ -618,7 +618,7 @@
                     <div style="{{ candidate.avatarStyle }}">{{ candidate.initials }}</div>
                     <div style="flex:1;min-width:0">
                       <div style="display:flex;align-items:center;gap:7px"><div style="font-size:13px;font-weight:800;color:#f4f5f7">{{ candidate.nick }}</div><span style="font-size:8.5px;font-weight:900;color:{{ candidate.bestFitColor }};background:{{ candidate.bestFitBg }};border-radius:4px;padding:2px 5px">FIT {{ candidate.bestFitScore }} · {{ candidate.bestFitStatus }}</span></div>
-                      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:7px"><sc-for list="{{ candidate.roleFits }}" as="roleFit" hint-placeholder-count="3"><span onClick="{{ roleFit.onPlace }}" title="Posicionar diretamente nesta vaga" style="{{ roleFit.style }}">{{ roleFit.rank }} {{ roleFit.icon }} {{ roleFit.label }} · {{ roleFit.score }}</span></sc-for></div>
+                      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:7px"><sc-for list="{{ candidate.roleFits }}" as="roleFit" hint-placeholder-count="3"><span title="Encaixe estimado nesta função" style="{{ roleFit.style }}">{{ roleFit.rank }} {{ roleFit.icon }} {{ roleFit.label }} · {{ roleFit.score }}</span></sc-for></div>
                     </div>
                     <div style="{{ candidate.checkStyle }}">✓</div>
                   </div>
@@ -1039,7 +1039,7 @@
         <sc-if value="{{ swissEliminationNotice }}">
           <div style="background:linear-gradient(135deg,rgba(239,68,68,.16),rgba(80,18,24,.2));border:1px solid rgba(239,68,68,.55);border-left:4px solid #ef4444;border-radius:14px;padding:19px 21px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;box-shadow:0 12px 34px rgba(80,10,16,.22)">
             <div><div style="font-family:'Chakra Petch',sans-serif;font-size:21px;font-weight:800;color:#ff7373">SEU TIME FOI ELIMINADO</div><div style="font-size:12px;color:#d4a2a8;margin-top:5px">A campanha terminou com {{ swissCampaignRecord }}. Revise o chaveamento e monte uma nova estratégia para o próximo Major.</div></div>
-            <div onClick="{{ backToMajorIntro }}" style="font-size:11.5px;font-weight:900;color:#fff;background:#b92f3b;border:1px solid #ef5d68;border-radius:8px;padding:10px 14px;cursor:pointer">VOLTAR AO JOGO</div>
+            <div onClick="{{ restartMajorDraft }}" style="font-size:11.5px;font-weight:900;color:#fff;background:#b92f3b;border:1px solid #ef5d68;border-radius:8px;padding:10px 14px;cursor:pointer">INICIAR NOVO DRAFT</div>
           </div>
         </sc-if>
         <div style="background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)">
@@ -1085,7 +1085,7 @@
         <div style="{{ playoffView.bannerStyle }}">
           <div><div style="font-size:10px;font-weight:900;color:{{ playoffView.bannerColor }};letter-spacing:.06em">{{ playoffView.eyebrow }}</div><div style="font-family:'Chakra Petch',sans-serif;font-size:21px;font-weight:800;color:#f4f5f7;margin-top:4px">{{ playoffView.title }}</div><div style="font-size:11.5px;color:#9aa3b2;margin-top:4px">{{ playoffView.description }}</div></div>
           <sc-if value="{{ playoffView.canPlay }}"><div onClick="{{ playoffView.primaryAction }}" style="font-size:12px;font-weight:900;color:#0a0c10;background:#ff5c1a;border-radius:8px;padding:11px 17px;cursor:pointer;white-space:nowrap">{{ playoffView.primaryLabel }} →</div></sc-if>
-          <sc-if value="{{ !playoffView.canPlay }}"><div style="font-size:10.5px;font-weight:900;color:{{ playoffView.bannerColor }};background:{{ playoffView.statusBg }};border-radius:7px;padding:9px 12px;white-space:nowrap">{{ playoffView.statusLabel }}</div></sc-if>
+          <sc-if value="{{ !playoffView.canPlay }}"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><div style="font-size:10.5px;font-weight:900;color:{{ playoffView.bannerColor }};background:{{ playoffView.statusBg }};border-radius:7px;padding:9px 12px;white-space:nowrap">{{ playoffView.statusLabel }}</div><sc-if value="{{ playoffView.showRestart }}"><div onClick="{{ playoffView.restartAction }}" style="font-size:10.5px;font-weight:900;color:#fff;background:#b92f3b;border:1px solid #ef5d68;border-radius:7px;padding:9px 12px;cursor:pointer;white-space:nowrap">INICIAR NOVO DRAFT</div></sc-if></div></sc-if>
         </div>
 
         <div style="background:#11151d;border:1px solid #33394a;border-radius:15px;padding:20px;overflow-x:auto;box-shadow:0 12px 35px rgba(0,0,0,.25)">
@@ -2177,6 +2177,22 @@ class Component extends DCLogic {
     setTimeout(()=>this._drawPlayerPool(),80);
   };
   backToMajorIntro = () => this.nav('major-intro');
+  restartMajorDraft = () => {
+    clearTimeout(this._swissAutoTimer);
+    clearTimeout(this._playerDraftTimer);
+    clearInterval(this._playerDraftTicker);
+    const screen='major-intro',params={},nextPath=pathForScreen(screen,params);
+    if(window.location.pathname!==nextPath) window.history.pushState({screen,params},'',nextPath);
+    this.setState({
+      screen,params,draftId:null,drawnSeasonId:null,rouletteDone:false,
+      draftRoster:[null,null,null,null,null],draftCoach:null,draftCaptain:null,
+      strategyPreset:'balanced',strategyRoles:['entry','awper','support','rifler','lurker'],openStrategySlot:null,
+      playerDraftRolling:false,playerDraftYear:null,playerDraftTeamSlug:null,playerDraftCandidateSlugs:[],playerDraftSelectedSlug:null,playerDraftSwapIndex:null,playerDraftRerolls:0,
+      swissTeams:[],swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1',majorLiveContext:'swiss',
+      playoffBracket:[],playoffStage:'quarter',playoffPendingMatches:null,playoffEliminated:false,playoffChampion:null
+    });
+    window.scrollTo(0,0);
+  };
   backToStrategy = () => this.nav('major-strategy');
   _drawPlayerPool = () => {
     const used=new Set(this.state.draftRoster.filter(Boolean).map(r=>r.slug));
@@ -2212,21 +2228,13 @@ class Component extends DCLogic {
     }
     this.setState(s=>({playerDraftRerolls:s.playerDraftRerolls+1}),()=>this._drawPlayerPool());
   };
-  selectPlayerDraftCandidate = (slug) => this.setState({playerDraftSelectedSlug:slug,playerDraftSwapIndex:null});
+  selectPlayerDraftCandidate = (slug) => this.setState(s=>({playerDraftSelectedSlug:s.playerDraftSelectedSlug===slug?null:slug,playerDraftSwapIndex:null}));
   placePlayerDraftCandidate = (idx) => {
     const s=this.state;
     if(s.draftRoster[idx] || !s.playerDraftSelectedSlug) return;
     const roster=[...s.draftRoster];
     roster[idx]={slug:s.playerDraftSelectedSlug,role:s.strategyRoles[idx],year:s.playerDraftYear,teamSlug:s.playerDraftTeamSlug};
     this.setState({draftRoster:roster,playerDraftSelectedSlug:null});
-    if(roster.filter(Boolean).length<5) setTimeout(()=>this._drawPlayerPool(),250);
-  };
-  placePlayerDraftCandidateAt = (slug,idx) => {
-    const s=this.state;
-    if(s.draftRoster[idx] || !(s.playerDraftCandidateSlugs || []).includes(slug)) return;
-    const roster=[...s.draftRoster];
-    roster[idx]={slug,role:s.strategyRoles[idx],year:s.playerDraftYear,teamSlug:s.playerDraftTeamSlug};
-    this.setState({draftRoster:roster,playerDraftSelectedSlug:null,playerDraftSwapIndex:null});
     if(roster.filter(Boolean).length<5) setTimeout(()=>this._drawPlayerPool(),250);
   };
   handlePlayerDraftSlot = (idx) => {
@@ -2776,12 +2784,9 @@ class Component extends DCLogic {
       const candidateSlots=openStrategySlots.length?openStrategySlots:s.strategyRoles.map((roleCode,index)=>({roleCode,index}));
       const fits=candidateSlots.map(slot=>({...slot,...evaluateRole(p,slot.roleCode)})).sort((a,b)=>b.score-a.score||a.index-b.index);
       const bestFit=fits[0] || {roleCode:'rifler',...evaluateRole(p,'rifler')}; const tone=fitTone(bestFit.score);
-      const roleFits=fits.slice(0,3).map((fit,rank)=>{const fitColor=fitTone(fit.score),isBest=rank===0,shortRole=fit.role.label.replace(' Fragger','');return {rank:`${rank+1}ª`,icon:fit.role.icon,label:`${shortRole} · P${fit.index+1}`,score:fit.score,onPlace:(event)=>{event.stopPropagation();this.placePlayerDraftCandidateAt(p.slug,fit.index)},style:`font-size:8.5px;font-weight:800;color:${fitColor.color};background:${isBest?fitColor.bg:'#171a22'};border:1px solid ${isBest?`${fitColor.color}55`:'#242833'};border-radius:4px;padding:2px 5px;cursor:pointer`};});
+      const roleFits=fits.slice(0,3).map((fit,rank)=>{const fitColor=fitTone(fit.score),isBest=rank===0,shortRole=fit.role.label.replace(' Fragger','');return {rank:`${rank+1}ª`,icon:fit.role.icon,label:`${shortRole} · P${fit.index+1}`,score:fit.score,style:`font-size:8.5px;font-weight:800;color:${fitColor.color};background:${isBest?fitColor.bg:'#171a22'};border:1px solid ${isBest?`${fitColor.color}55`:'#242833'};border-radius:4px;padding:2px 5px;cursor:default`};});
       return {nick:p.nick,initials:p.nick.slice(0,2).toUpperCase(),bestFitScore:bestFit.score,bestFitStatus:bestFit.status,bestFitColor:tone.color,bestFitBg:tone.bg,roleFits,onSelect:()=>this.selectPlayerDraftCandidate(p.slug),avatarStyle:`width:40px;height:40px;border-radius:9px;background:${playerDraftTeam.hue}22;color:${playerDraftTeam.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;flex-shrink:0`,style:`min-height:82px;box-sizing:border-box;display:flex;align-items:center;gap:10px;background:${selected?'rgba(255,92,26,.08)':'#0d0f14'};border:1px solid ${selected?'#ff5c1a':'#242833'};border-radius:9px;padding:8px 9px;cursor:pointer`,checkStyle:`width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${selected?'#0a0c10':'transparent'};background:${selected?'#ff5c1a':'#1a1e28'};flex-shrink:0`};
     }).sort((a,b)=>b.bestFitScore-a.bestFitScore||b.overall-a.overall);
-    const selectedDraftPreview=s.playerDraftSelectedSlug?playerInYear(playerOf(s.playerDraftSelectedSlug),s.playerDraftYear):null;
-    const selectedSlotRanking=selectedDraftPreview?openStrategySlots.map(slot=>({...slot,score:evaluateRole(selectedDraftPreview,slot.roleCode).score})).sort((a,b)=>b.score-a.score||a.index-b.index):[];
-    const selectedSlotRankByIndex=new Map(selectedSlotRanking.map((slot,rank)=>[slot.index,rank+1]));
     const playerDraftSlots=s.strategyRoles.map((roleCode,index)=>{
       const role=STRATEGY_ROLES[roleCode]; const rosterItem=s.draftRoster[index];
       const p=rosterItem?this._draftPlayer(rosterItem.slug,rosterItem.year):null;
@@ -2790,13 +2795,14 @@ class Component extends DCLogic {
       const canReceiveMove=!rosterItem && s.playerDraftSwapIndex!==null;
       const swapSelected=s.playerDraftSwapIndex===index;
       const movingItem=canReceiveMove?s.draftRoster[s.playerDraftSwapIndex]:null;
-      const previewPlayer=p || (canPlace?playerInYear(playerOf(s.playerDraftSelectedSlug),s.playerDraftYear):movingItem?this._draftPlayer(movingItem.slug,movingItem.year):null);
+      const previewPlayer=p;
       const fit=previewPlayer?evaluateRole(previewPlayer,roleCode):null; const tone=fitTone(fit?.score || 0);
-      const recommendationRank=canPlace?selectedSlotRankByIndex.get(index):null;
-      const recommendationLabel=recommendationRank?`${recommendationRank}ª ${recommendationRank===1?'MELHOR VAGA':'ALTERNATIVA'} · `:'';
-      return {filled:!!p,swapSelected,roleLabel:role.label,roleIcon:role.icon,attribute:role.attribute,color:role.color,bg:role.bg,fitLabel:fit?`${recommendationLabel}FIT ${fit.score}/100 · ${fit.status}`:'SEM JOGADOR',fitColor:fit?tone.color:'#636d7e',fitBg:fit?tone.bg:'#171a22',requirementText:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · '),playerName:p?p.nick:(canPlace?'Clique para posicionar':canReceiveMove?'Clique para mover aqui':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':canReceiveMove?'#f2b53d':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():role.icon,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:${p?'12px':'20px'};font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':canReceiveMove?'rgba(242,181,61,.045)':recommendationRank===1?tone.bg:'#0d0f14'};border:1px solid ${swapSelected||canReceiveMove?'#f2b53d':recommendationRank===1?tone.color:canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace||canReceiveMove?'pointer':'default'};min-height:118px`,year:rosterItem?.year || movingItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
+      return {filled:!!p,swapSelected,roleLabel:role.label,roleIcon:role.icon,attribute:role.attribute,color:role.color,bg:role.bg,fitLabel:fit?`FIT ${fit.score}/100 · ${fit.status}`:'SEM JOGADOR',fitColor:fit?tone.color:'#636d7e',fitBg:fit?tone.bg:'#171a22',requirementText:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · '),playerName:p?p.nick:(canPlace?'Clique para posicionar':canReceiveMove?'Clique para mover aqui':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':canReceiveMove?'#f2b53d':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():role.icon,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:${p?'12px':'20px'};font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':canReceiveMove?'rgba(242,181,61,.045)':'#0d0f14'};border:1px solid ${swapSelected||canReceiveMove?'#f2b53d':canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace||canReceiveMove?'pointer':'default'};min-height:118px`,year:rosterItem?.year || movingItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
     });
     const playerDraftFilledCount=s.draftRoster.filter(Boolean).length;
+    const playerDraftComplete=playerDraftFilledCount===5;
+    const playerDraftShellStyle=`display:grid;grid-template-columns:${playerDraftComplete?'minmax(0,1fr)':'420px minmax(0,1fr)'};gap:14px`;
+    const playerDraftPoolStyle=`${playerDraftComplete?'display:none;':''}background:#12151c;border:1px solid #242833;border-radius:13px;padding:12px`;
     const playerDraftRerollsRemaining=Math.max(0,2-s.playerDraftRerolls);
     const playerDraftRerollLocked=playerDraftRerollsRemaining===0;
     const playerDraftRerollLabel=playerDraftRerollLocked?'Limite de 2 novos sorteios atingido':`Sortear outro ano e time · ${playerDraftRerollsRemaining} ${playerDraftRerollsRemaining===1?'uso restante':'usos restantes'}`;
@@ -2947,9 +2953,13 @@ class Component extends DCLogic {
       const savedMap=(frame.mapStats || []).find(item=>item.map===selectedMap),viewingCurrentMap=selectedMap===frame.map;
       const selectedUserStats=isAggregate?frame.aggregateUserStats:viewingCurrentMap?frame.userStats:savedMap?.userStats || frame.userStats;
       const selectedOpponentStats=isAggregate?frame.aggregateOpponentStats:viewingCurrentMap?frame.opponentStats:savedMap?.opponentStats || frame.opponentStats;
+      const selectedScore=isAggregate?{us:frame.seriesUs,them:frame.seriesThem}:savedMap || (viewingCurrentMap?frame:null) || {us:0,them:0};
+      const selectedMapFinished=!isAggregate&&(!!savedMap || (viewingCurrentMap&&frame.mapComplete));
+      const scoreMapLabel=isAggregate?'PLACAR AGREGADO':`MAPA ${selectedMap} DE ${frame.totalMaps}`;
+      const scoreRoundLabel=isAggregate?(s.swissLiveFinished?'SÉRIE ENCERRADA':'SÉRIE EM ANDAMENTO'):selectedMapFinished?'MAPA ENCERRADO':viewingCurrentMap?(frame.mapRound?`ROUND ${frame.mapRound}`:'NOVO MAPA'):'MAPA ENCERRADO';
       const statsTabs=[...Array.from({length:frame.map},(_,index)=>{ const map=index+1,key=`map-${map}`,active=statsView===key,mapData=(frame.mapStats || []).find(item=>item.map===map); return {label:`MAPA ${map}`,score:mapData?`${mapData.us}:${mapData.them}`:map===frame.map?`${frame.us}:${frame.them}`:'',onClick:()=>this.setSwissLiveStatsView(key),style:`font-size:9.5px;font-weight:900;color:${active?'#0a0c10':'#9aa3b2'};background:${active?'#2fb8c6':'#171b24'};border:1px solid ${active?'#2fb8c6':'#2a303d'};border-radius:6px;padding:6px 9px;cursor:pointer`};}),{label:'AGREGADO',score:`${frame.seriesUs}:${frame.seriesThem}`,onClick:()=>this.setSwissLiveStatsView('aggregate'),style:`font-size:9.5px;font-weight:900;color:${isAggregate?'#0a0c10':'#f2b53d'};background:${isAggregate?'#f2b53d':'rgba(242,181,61,.08)'};border:1px solid ${isAggregate?'#f2b53d':'rgba(242,181,61,.3)'};border-radius:6px;padding:6px 9px;cursor:pointer`}];
-      const finished=s.swissLiveFinished, userLeading=frame.us>frame.them,opponentLeading=frame.them>frame.us;
-      swissLiveModal={format:livePendingUser.format,opponent,mapLabel:`MAPA ${frame.map} DE ${frame.totalMaps}`,roundLabel:finished?'SÉRIE ENCERRADA':frame.mapRound?`ROUND ${frame.mapRound}`:'NOVO MAPA',us:frame.us,them:frame.them,seriesUs:frame.seriesUs,seriesThem:frame.seriesThem,status:finished?'PARTIDA ENCERRADA':'AO VIVO',statusColor:finished?'#34c77b':'#ef6b6b',statusBg:finished?'rgba(52,199,123,.12)':'rgba(239,107,107,.12)',userScoreColor:userLeading?'#34c77b':'#f4f5f7',opponentScoreColor:opponentLeading?'#ef6b6b':'#f4f5f7',progressStyle:`height:100%;width:${Math.round((s.swissUserRoundIndex/Math.max(1,s.swissUserRounds.length-1))*100)}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d);transition:width .3s ease`,statsTabs,statsScope:isAggregate?'K/D/A AGREGADO DA SÉRIE':`K/D/A DO MAPA ${selectedMap}`,userRows:makeRows(selectedUserStats),opponentRows:makeRows(selectedOpponentStats),event:finished?(livePendingUser.winnerId==='user'?'VITÓRIA · confira cada mapa e o agregado antes de continuar':'DERROTA · confira cada mapa e o agregado antes de continuar'):frame.roundWinner,eventColor:finished?(livePendingUser.winnerId==='user'?'#34c77b':'#ef6b6b'):frame.roundWinner.startsWith('SEU')?'#34c77b':frame.roundWinner.startsWith('MAPA')?'#2fb8c6':'#ef6b6b',finished};
+      const finished=s.swissLiveFinished,userLeading=selectedScore.us>selectedScore.them,opponentLeading=selectedScore.them>selectedScore.us;
+      swissLiveModal={format:livePendingUser.format,opponent,mapLabel:scoreMapLabel,roundLabel:scoreRoundLabel,us:selectedScore.us,them:selectedScore.them,seriesUs:frame.seriesUs,seriesThem:frame.seriesThem,status:finished?'PARTIDA ENCERRADA':'AO VIVO',statusColor:finished?'#34c77b':'#ef6b6b',statusBg:finished?'rgba(52,199,123,.12)':'rgba(239,107,107,.12)',userScoreColor:userLeading?'#34c77b':'#f4f5f7',opponentScoreColor:opponentLeading?'#ef6b6b':'#f4f5f7',progressStyle:`height:100%;width:${Math.round((s.swissUserRoundIndex/Math.max(1,s.swissUserRounds.length-1))*100)}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d);transition:width .3s ease`,statsTabs,statsScope:isAggregate?'K/D/A AGREGADO DA SÉRIE':`K/D/A DO MAPA ${selectedMap}`,userRows:makeRows(selectedUserStats),opponentRows:makeRows(selectedOpponentStats),event:finished?(livePendingUser.winnerId==='user'?'VITÓRIA · confira cada mapa e o agregado antes de continuar':'DERROTA · confira cada mapa e o agregado antes de continuar'):frame.roundWinner,eventColor:finished?(livePendingUser.winnerId==='user'?'#34c77b':'#ef6b6b'):frame.roundWinner.startsWith('SEU')?'#34c77b':frame.roundWinner.startsWith('MAPA')?'#2fb8c6':'#ef6b6b',finished};
     }
     const swissFinished=swissUserTeam && swissUserTeam.status!=='playing';
     const swissPoolLabels=['0–0','1–0 / 0–1','2–0 / 1–1 / 0–2','2–1 / 1–2','2–2'];
@@ -2974,7 +2984,7 @@ class Component extends DCLogic {
     })}));
     const playoffCanPlay=s.screen==='major-playoffs'&&!s.playoffEliminated&&!s.playoffChampion&&!s.playoffPendingMatches;
     let playoffView={rounds:playoffRounds,canPlay:playoffCanPlay,primaryAction:this.startPlayoffRound,primaryLabel:`JOGAR ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,eyebrow:'VOCÊ ESTÁ NOS PLAYOFFS',title:`Próximo desafio: ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,description:'Analise os dois lados da chave e vença a série para continuar no Major.',bannerColor:'#2fb8c6',statusBg:'rgba(47,184,198,.1)',statusLabel:'AGUARDANDO',bannerStyle:'background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-left:4px solid #2fb8c6;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
-    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,eyebrow:'FIM DE CAMPANHA',title:'Seu time foi eliminado nos playoffs',description:'O resultado permanece registrado no chaveamento acima.',bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:'ELIMINADO',bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
+    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,showRestart:true,restartAction:this.restartMajorDraft,eyebrow:'FIM DE CAMPANHA',title:'Seu time foi eliminado nos playoffs',description:'O resultado permanece registrado no chaveamento acima.',bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:'ELIMINADO',bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
     if(s.playoffChampion) playoffView={...playoffView,canPlay:false,eyebrow:'CAMPEÃO DO MAJOR',title:'Seu time conquistou o título!',description:'Você venceu quartas, semifinal e final do Major.',bannerColor:'#f2b53d',statusBg:'rgba(242,181,61,.12)',statusLabel:'CAMPEÃO',bannerStyle:'background:linear-gradient(135deg,rgba(242,181,61,.17),#10131a);border:1px solid rgba(242,181,61,.55);border-left:4px solid #f2b53d;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
 
     // ---- SIMULACAO / PARTIDA / RESULTADO ----
@@ -3325,8 +3335,8 @@ class Component extends DCLogic {
       isUserProfile: s.screen==='perfil', userProfileTabs, userTabVisao: s.userProfileTab==='visao', userTabHistorico: s.userProfileTab==='historico', userTabConquistas: s.userProfileTab==='conquistas',
       userStats, userHistorico, userAchievements,
       majorRules, majorHistory, rouletteDone:s.rouletteDone, drawnSeason, startDraft:this.startDraft,
-      strategyPresets, strategySlots, strategyRequirements, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro,
-      playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftSelectionHint, playerDraftActionText, playerDraftRerollLabel, playerDraftRerollStyle, finishPlayerDraftStyle,
+      strategyPresets, strategySlots, strategyRequirements, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro, restartMajorDraft:this.restartMajorDraft,
+      playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftShellStyle, playerDraftPoolStyle, playerDraftSelectionHint, playerDraftActionText, playerDraftRerollLabel, playerDraftRerollStyle, finishPlayerDraftStyle,
       rerollPlayerDraft:this.rerollPlayerDraft, backToStrategy:this.backToStrategy, finishPlayerDraft:this.finishPlayerDraft,
       goMajor: ()=>this.nav('major-intro'), goGuess:()=>this.nav('adivinhar-intro'),
       goJogadoresLink:()=>this.nav('jogadores'), goRankingLink:()=>this.nav('ranking'), goCadastroLink:()=>this.nav('cadastro'), goSorteio:()=>this.nav('major-strategy'),
