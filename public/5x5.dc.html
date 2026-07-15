@@ -54,6 +54,7 @@
     [data-player-candidates]{flex:none;max-height:55vh}
     [data-catalog-grid]{grid-template-columns:1fr !important}
     [data-resumo-players]{grid-template-columns:repeat(2,1fr) !important}
+    [data-kdr-summary-grid]{grid-template-columns:repeat(2,minmax(140px,1fr)) !important}
     [data-resumo-grid],[data-resumo-grid2]{grid-template-columns:1fr !important}
     [data-bracket-grid]{grid-template-columns:1fr !important}
     [data-vs-row]{gap:16px !important}
@@ -930,12 +931,15 @@
             </svg>
           </div>
           <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:24px">
-            <div style="font-size:13px;font-weight:700;color:#9aa3b2;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px">Força por mapa</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px">
+              <div><div style="font-size:13px;font-weight:700;color:#9aa3b2;text-transform:uppercase;letter-spacing:.04em">Força por mapa</div><div style="font-size:11px;color:#535c6d;margin-top:5px">Desempenho projetado da escalação</div></div>
+              <div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:#f4f5f7">{{ mapStrengthAverage }}</div><div style="font-size:9px;color:#636d7e;text-transform:uppercase">média</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
               <sc-for list="{{ mapStrengths }}" as="ms" hint-placeholder-count="5">
                 <div>
-                  <div style="display:flex;justify-content:space-between;font-size:12px;color:#9aa3b2;margin-bottom:4px"><span>{{ ms.map }}</span><span style="font-family:'JetBrains Mono',monospace;color:#e6e8ec">{{ ms.value }}</span></div>
-                  <div style="height:7px;background:#0d0f14;border-radius:4px;overflow:hidden"><div style="{{ ms.barStyle }}"></div></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#c5cad4;margin-bottom:7px"><span style="font-weight:700">{{ ms.map }}</span><span style="font-family:'JetBrains Mono',monospace;font-weight:800;color:{{ ms.color }}">{{ ms.value }}<small style="font-size:9px;color:#636d7e">/100</small></span></div>
+                  <div style="height:9px;background:#090b10;border:1px solid #1a1e28;border-radius:6px;overflow:hidden"><div style="{{ ms.barStyle }}"></div></div>
                 </div>
               </sc-for>
             </div>
@@ -1042,6 +1046,14 @@
             <div onClick="{{ restartMajorDraft }}" style="font-size:11.5px;font-weight:900;color:#fff;background:#b92f3b;border:1px solid #ef5d68;border-radius:8px;padding:10px 14px;cursor:pointer">INICIAR NOVO DRAFT</div>
           </div>
         </sc-if>
+        <sc-if value="{{ showSwissKdr }}" hint-placeholder-val="{{ false }}">
+          <div style="background:linear-gradient(135deg,#131821,#0d1118);border:1px solid #343b49;border-radius:14px;margin-bottom:18px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.24)">
+            <div style="padding:15px 18px;border-bottom:1px solid #292f3b;display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><div style="font-family:'Chakra Petch',sans-serif;font-size:16px;font-weight:900;color:#f4f5f7">DESEMPENHO DA SUA LINEUP</div><div style="font-size:10.5px;color:#788295;margin-top:3px">KDR consolidado das {{ swissUserMatchCount }} partidas disputadas</div></div><span style="font-size:9px;font-weight:800;color:#ff7b45;background:rgba(255,92,26,.1);border:1px solid rgba(255,92,26,.28);border-radius:6px;padding:6px 8px">KDR = KILLS ÷ DEATHS</span></div>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:1px;background:#252b36" data-kdr-summary-grid="1">
+              <sc-for list="{{ campaignKdr }}" as="player" hint-placeholder-count="5"><div style="background:#10141b;padding:14px 15px"><div style="font-size:11.5px;font-weight:900;color:#e9ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:11px">{{ player.name }}</div><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px"><div style="display:flex;gap:11px"><div><b style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#79aaff">{{ player.kills }}</b><div style="font-size:8px;color:#596274;margin-top:2px">KILLS</div></div><div><b style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ef7d7d">{{ player.deaths }}</b><div style="font-size:8px;color:#596274;margin-top:2px">DEATHS</div></div></div><div style="text-align:right"><b style="font-family:'JetBrains Mono',monospace;font-size:20px;color:{{ player.color }}">{{ player.kd }}</b><div style="font-size:8px;color:#596274">KDR</div></div></div></div></sc-for>
+            </div>
+          </div>
+        </sc-if>
         <div style="background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)">
           <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 260px;gap:20px;align-items:center" data-player-draft-grid="1">
             <div><div style="font-size:10px;font-weight:800;color:#2fb8c6;margin-bottom:5px">SUA CAMPANHA</div><div style="font-size:12px;color:#9aa3b2">{{ swissCampaignRecord }}</div></div>
@@ -1060,6 +1072,20 @@
             </sc-for>
           </div>
         </div>
+        <sc-if value="{{ swissMatchKdr.length }}">
+          <div style="background:#12151c;border:1px solid #33394a;border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,.18)">
+            <div style="display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap;margin-bottom:14px"><div><b style="font-size:13px">KDR do seu time por partida</b><div style="font-size:10.5px;color:#636d7e;margin-top:3px">Abates e mortes registrados em cada confronto da campanha</div></div><span style="font-size:9.5px;color:#636d7e">KDR = ABATES / MORTES</span></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px">
+              <sc-for list="{{ swissMatchKdr }}" as="game" hint-placeholder-count="3">
+                <div style="background:#0b0e13;border:1px solid #2c3240;border-radius:10px;overflow:hidden">
+                  <div style="padding:11px 13px;border-bottom:1px solid #242a35;display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-size:9px;font-weight:900;color:#2fb8c6">RODADA {{ game.round }} · {{ game.format }}</div><div style="font-size:12px;font-weight:800;color:#f4f5f7;margin-top:3px">vs {{ game.opponent }}</div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:900;color:{{ game.resultColor }}">{{ game.score }}</div><div style="font-size:8.5px;font-weight:900;color:{{ game.resultColor }}">{{ game.result }}</div></div></div>
+                  <div style="display:grid;grid-template-columns:minmax(100px,1fr) 34px 34px 44px;gap:5px;padding:7px 12px;font-size:8.5px;font-weight:800;color:#596274"><span>JOGADOR</span><span style="text-align:center">K</span><span style="text-align:center">D</span><span style="text-align:right">KDR</span></div>
+                  <sc-for list="{{ game.players }}" as="player" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(100px,1fr) 34px 34px 44px;gap:5px;align-items:center;padding:8px 12px;border-top:1px solid #191e27"><span style="font-size:10.5px;font-weight:800;color:#dfe3ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ player.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;color:#79aaff">{{ player.kills }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;color:#ef7d7d">{{ player.deaths }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:900;text-align:right;color:{{ player.color }}">{{ player.kdr }}</span></div></sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
         <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:18px" data-player-draft-grid="1">
           <div>
             <div style="background:#12151c;border:1px solid #242833;border-radius:14px;overflow:hidden;margin-bottom:16px">
@@ -1108,6 +1134,13 @@
           </div>
           <div style="font-size:9.5px;color:#636d7e;margin-top:15px;text-align:center">Os vencedores de cada bloco avançam para o confronto conectado na coluna seguinte.</div>
         </div>
+        <sc-if value="{{ campaignKdr.length }}">
+          <div style="background:#11151d;border:1px solid #33394a;border-radius:15px;margin-top:18px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,.25)">
+            <div style="padding:17px 20px;border-bottom:1px solid #292f3b;display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><div style="font-size:13px;font-weight:900;color:#f4f5f7">KDR dos jogadores</div><div style="font-size:10.5px;color:#636d7e;margin-top:4px">Totais preservados mesmo após a eliminação · fase suíça + playoffs</div></div><span style="font-size:9.5px;color:#636d7e">KDR = TOTAL DE ABATES / TOTAL DE MORTES</span></div>
+            <div style="display:grid;grid-template-columns:minmax(150px,1fr) 100px 100px 90px;gap:10px;padding:10px 20px;background:#0c0f15;font-size:9px;font-weight:900;color:#596274;text-transform:uppercase"><span>Jogador</span><span style="text-align:center">Abates totais</span><span style="text-align:center">Mortes totais</span><span style="text-align:right">KDR</span></div>
+            <sc-for list="{{ campaignKdr }}" as="player" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(150px,1fr) 100px 100px 90px;gap:10px;align-items:center;padding:13px 20px;border-top:1px solid #202631"><span style="font-size:12.5px;font-weight:900;color:#e7eaf0">{{ player.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;text-align:center;color:#79aaff">{{ player.kills }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;text-align:center;color:#ef7d7d">{{ player.deaths }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:900;text-align:right;color:{{ player.color }}">{{ player.kd }}</span></div></sc-for>
+          </div>
+        </sc-if>
       </div>
     </sc-if>
 
@@ -1192,6 +1225,14 @@
             </div>
           </div>
         </sc-if>
+
+        <div style="text-align:left;margin-bottom:32px">
+          <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px"><div><div style="font-size:13px;font-weight:700;color:#e6e8ec">Desempenho dos jogadores</div><div style="font-size:10.5px;color:#636d7e;margin-top:3px">Estatísticas estimadas pela simulação da campanha</div></div><span style="font-size:9.5px;color:#636d7e">KDR = ABATES / MORTES</span></div>
+          <div style="background:#12151c;border:1px solid #242833;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:minmax(120px,1fr) 72px 72px 78px;gap:8px;padding:10px 16px;background:#0d0f14;font-size:9.5px;font-weight:800;color:#636d7e;text-transform:uppercase"><span>Jogador</span><span style="text-align:center">Abates</span><span style="text-align:center">Mortes</span><span style="text-align:right">KDR</span></div>
+            <sc-for list="{{ resultadoData.playerKdr }}" as="pk" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(120px,1fr) 72px 72px 78px;gap:8px;align-items:center;padding:12px 16px;border-top:1px solid #1a1e28"><span style="font-size:12.5px;font-weight:800;color:#e6e8ec">{{ pk.nick }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;color:#79aaff">{{ pk.kills }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;color:#ef7d7d">{{ pk.deaths }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;text-align:right;color:{{ pk.color }}">{{ pk.kdr }}</span></div></sc-for>
+          </div>
+        </div>
 
         <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
           <div onClick="{{ playAgain }}" style="background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14px;padding:13px 26px;border-radius:9px;cursor:pointer">Jogar novamente</div>
@@ -2030,6 +2071,7 @@ const OPPONENT_POOL = [
   {tag:'TRK', name:'Torque', hue:'#fb923c'}
 ];
 const ROUND_LABELS = ['Quartas de final','Semifinal','Final'];
+const CURRENT_MAP_POOL = ['Mirage','Inferno','Nuke','Ancient','Anubis'];
 
 const SCREEN_PATHS = {
   home:'/inicio', jogar:'/jogar', jogadores:'/jogadores', times:'/times', ranking:'/ranking', regras:'/regras',
@@ -2072,7 +2114,7 @@ class Component extends DCLogic {
     playerDrawerSlug:null, coachPickerOpen:false,
     simRound:0, simMatches:[], simEliminated:false, simChampion:false, simSkipAnim:false,
     swissTeams:[], swissRound:0, swissHistory:[], swissPendingMatches:null, swissUserRounds:[], swissUserRoundIndex:0, swissMode:'normal', swissLiveOpen:false, swissLiveFinished:false, swissLiveStatsView:'map-1', majorLiveContext:'swiss',
-    playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null,
+    playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null, majorChampionName:'',
     guessMatchId:null, guessTargetSlug:null, guessScore:1000, guessAttempts:[], guessRevealedHints:[], guessPendingHint:null, guessInput:'', guessAutocompleteOpen:false, guessSelectedSlug:null, guessOver:false, guessWon:false,
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
     rankingTab:'overall', userProfileTab:'visao', authName:'', authEmail:'', authPassword:'',
@@ -2389,7 +2431,7 @@ class Component extends DCLogic {
       {key:'final',label:'FINAL',matches:[{a:null,b:null,result:null}]}
     ];
     const params={id:this.state.draftId}; window.history.pushState({screen:'major-playoffs',params},'',pathForScreen('major-playoffs',params));
-    this.setState({screen:'major-playoffs',params,playoffBracket:bracket,playoffStage:'quarter',playoffPendingMatches:null,playoffEliminated:false,playoffChampion:null,majorLiveContext:'playoff'});
+    this.setState({screen:'major-playoffs',params,playoffBracket:bracket,playoffStage:'quarter',playoffPendingMatches:null,playoffEliminated:false,playoffChampion:null,majorChampionName:'',majorLiveContext:'playoff'});
     window.scrollTo(0,0);
   }
   startPlayoffRound = ()=>{
@@ -2404,10 +2446,24 @@ class Component extends DCLogic {
   _completePlayoffRound(){
     const s=this.state,pending=s.playoffPendingMatches; if(!pending) return;
     const bracket=s.playoffBracket.map(round=>({...round,matches:round.matches.map(match=>({...match}))})),current=bracket.find(round=>round.key===s.playoffStage);
-    current.matches=current.matches.map(match=>({...match,result:pending.find(result=>(result.aId===match.a?.id&&result.bId===match.b?.id)||(result.aId===match.b?.id&&result.bId===match.a?.id)) || null}));
-    const userResult=pending.find(match=>match.isUser),userWon=userResult?.winnerId==='user';
-    if(!userWon){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffEliminated:true,swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return; }
-    if(s.playoffStage==='final'){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffChampion:'user',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return; }
+    const completedPending=this._matchesWithUserStats(pending,s.swissUserRounds);
+    current.matches=current.matches.map(match=>({...match,result:completedPending.find(result=>(result.aId===match.a?.id&&result.bId===match.b?.id)||(result.aId===match.b?.id&&result.bId===match.a?.id)) || null}));
+    const userResult=completedPending.find(match=>match.isUser),userWon=userResult?.winnerId==='user';
+    if(!userWon){
+      const teamsById=new Map(s.swissTeams.map(team=>[team.id,team])),winnerTeams=completedPending.map(result=>teamsById.get(result.winnerId)).filter(Boolean);
+      let champion=teamsById.get(userResult?.winnerId);
+      if(s.playoffStage==='quarter'){
+        const semi=bracket.find(round=>round.key==='semi'),semiResults=[[winnerTeams[0],winnerTeams[1]],[winnerTeams[2],winnerTeams[3]]].map(([a,b],index)=>this._simulatePlayoffMatch(a,b,`post-user-semi-${index}`,'BO3'));
+        semi.matches=semiResults.map(result=>({a:teamsById.get(result.aId),b:teamsById.get(result.bId),result}));
+        const finalists=semiResults.map(result=>teamsById.get(result.winnerId)),finalResult=this._simulatePlayoffMatch(finalists[0],finalists[1],'post-user-final','MD5'),final=bracket.find(round=>round.key==='final');
+        final.matches=[{a:finalists[0],b:finalists[1],result:finalResult}];champion=teamsById.get(finalResult.winnerId);
+      } else if(s.playoffStage==='semi'){
+        const finalResult=this._simulatePlayoffMatch(winnerTeams[0],winnerTeams[1],'post-user-final','MD5'),final=bracket.find(round=>round.key==='final');
+        final.matches=[{a:winnerTeams[0],b:winnerTeams[1],result:finalResult}];champion=teamsById.get(finalResult.winnerId);
+      }
+      this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffEliminated:true,playoffChampion:champion?.id||null,majorChampionName:champion?.name||'Campeão definido',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return;
+    }
+    if(s.playoffStage==='final'){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffChampion:'user',majorChampionName:'SEU TIME · MISTO',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return; }
     const teamsById=new Map(s.swissTeams.map(team=>[team.id,team])),winners=pending.map(result=>teamsById.get(result.winnerId)).filter(Boolean);
     const nextKey=s.playoffStage==='quarter'?'semi':'final',next=bracket.find(round=>round.key===nextKey);
     next.matches=nextKey==='semi'?[{a:winners[0],b:winners[1],result:null},{a:winners[2],b:winners[3],result:null}]:[{a:winners[0],b:winners[1],result:null}];
@@ -2499,11 +2555,18 @@ class Component extends DCLogic {
   };
   setSwissLiveStatsView = (view)=>this.setState({swissLiveStatsView:view});
   closeSwissLive = ()=>{ if(!this.state.swissLiveFinished) return; const context=this.state.majorLiveContext; this.setState({swissLiveOpen:false},()=>context==='playoff'?this._completePlayoffRound():this._completeSwissRound()); };
+  _matchesWithUserStats(matches,frames){
+    const userMatch=matches?.find(match=>match.isUser); if(!userMatch) return matches;
+    const timeline=frames?.length?frames:this._userRoundTimeline(userMatch),finalFrame=timeline[timeline.length-1];
+    const stats=(finalFrame?.aggregateUserStats||[]).map(player=>({name:player.name,kills:player.kills,deaths:player.deaths,assists:player.assists}));
+    return matches.map(match=>match===userMatch?{...match,userStats:stats}:match);
+  }
   _completeSwissRound(){
     const s=this.state; if(!s.swissPendingMatches) return;
     const teams=s.swissTeams.map(t=>({...t}));
-    this._applySwissMatches(teams,s.swissPendingMatches);
-    let round=s.swissRound+1, history=[...s.swissHistory,{round:s.swissRound+1,matches:s.swissPendingMatches}];
+    const completedMatches=this._matchesWithUserStats(s.swissPendingMatches,s.swissUserRounds);
+    this._applySwissMatches(teams,completedMatches);
+    let round=s.swissRound+1, history=[...s.swissHistory,{round:s.swissRound+1,matches:completedMatches}];
     if(teams.find(t=>t.id==='user')?.status!=='playing'){
       while(round<5 && teams.some(t=>t.status==='playing')){ const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches}); }
     }
@@ -2513,9 +2576,9 @@ class Component extends DCLogic {
   simulateSwissFast = ()=>{
     clearTimeout(this._swissAutoTimer);
     let teams=this.state.swissTeams.map(t=>({...t})), round=this.state.swissRound, history=[...this.state.swissHistory];
-    if(this.state.swissPendingMatches){ const pending=this.state.swissPendingMatches; this._applySwissMatches(teams,pending); round++; history.push({round,matches:pending}); }
+    if(this.state.swissPendingMatches){ const pending=this._matchesWithUserStats(this.state.swissPendingMatches,this.state.swissUserRounds); this._applySwissMatches(teams,pending); round++; history.push({round,matches:pending}); }
     while(round<5 && teams.some(t=>t.status==='playing')){
-      const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches});
+      const matches=this._matchesWithUserStats(this._buildSwissRound(teams,round+1)); this._applySwissMatches(teams,matches); round++;history.push({round,matches});
     }
     const userStatus=teams.find(team=>team.id==='user')?.status;
     this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'fast',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'},()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); });
@@ -2915,7 +2978,9 @@ class Component extends DCLogic {
     const radarPoints = axes.map((a,i)=>{ const [x,y]=ptFor(i, R*Math.min(100,a.value)/100); return `${x.toFixed(1)},${y.toFixed(1)}`; }).join(' ');
     const radarRings = [0.25,0.5,0.75,1].map(f=>({points: axes.map((a,i)=>{ const [x,y]=ptFor(i, R*f); return `${x.toFixed(1)},${y.toFixed(1)}`; }).join(' ')}));
     const radarLabels = axes.map((a,i)=>{ const [x,y]=ptFor(i, R+18); return {label:a.label, x:x.toFixed(1), y:y.toFixed(1)}; });
-    const mapStrengths = (drawnSeason.maps||[]).slice(0,5).map(m=>{ const seed=hashStr(m+ (s.draftId||'')); const rng=mulberry32(seed); const v=Math.round(55+rng()*40); return {map:m, value:v, barStyle:`height:100%;width:${v}%;background:linear-gradient(90deg,#2fb8c6,#4f8dfd)`}; });
+    const seasonMapPool=(drawnSeason.maps||[]).length ? drawnSeason.maps : CURRENT_MAP_POOL;
+    const mapStrengths = seasonMapPool.slice(0,5).map(m=>{ const seed=hashStr(m+(s.draftId||'')); const rng=mulberry32(seed); const v=Math.round(Math.max(35,Math.min(96,teamEvaluation.strength+(rng()-.5)*18))); const color=v>=75?'#34c77b':v>=60?'#2fb8c6':'#f2b53d'; return {map:m,value:v,color,barStyle:`height:100%;width:${v}%;background:linear-gradient(90deg,${color}99,${color});border-radius:5px;box-shadow:0 0 12px ${color}22`}; });
+    const mapStrengthAverage=mapStrengths.length?Math.round(mapStrengths.reduce((sum,map)=>sum+map.value,0)/mapStrengths.length):0;
     const strengths = []; const weaknesses = [];
     const eliteFits=teamEvaluation.players.filter(item=>item.fit.score>=75),weakFits=teamEvaluation.players.filter(item=>item.fit.score<48);
     if(eliteFits.length) strengths.push(`${eliteFits.length} jogador(es) com encaixe excelente na posição.`);
@@ -2972,6 +3037,7 @@ class Component extends DCLogic {
     const swissPrimaryStyle=`text-align:center;font-size:13.5px;font-weight:800;color:${swissFinished||s.swissPendingMatches?'#9aa3b2':'#0a0c10'};background:${swissFinished||s.swissPendingMatches?'#1a1e28':'#ff5c1a'};border-radius:9px;padding:13px;cursor:${swissFinished||s.swissPendingMatches?'default':'pointer'}`;
     const swissCampaignRecord=`${swissUserTeam?.wins || 0} vitórias · ${swissUserTeam?.losses || 0} derrotas`;
     const swissEliminationNotice=swissUserTeam?.status==='eliminated';
+    const swissMatchKdr=s.swissHistory.map(entry=>{ const match=entry.matches.find(item=>item.isUser); if(!match?.userStats?.length) return null; const opponent=match.aId==='user'?match.teamB:match.teamA,userWon=match.winnerId==='user'; return {round:entry.round,format:match.format,opponent,score:match.score,result:userWon?'VITÓRIA':'DERROTA',resultColor:userWon?'#34c77b':'#ef5d68',players:match.userStats.map(player=>{ const kdr=player.kills/Math.max(1,player.deaths); return {...player,kdr:kdr.toFixed(2),color:kdr>=1.15?'#34c77b':kdr>=.95?'#f2b53d':'#ef7d7d'}; }).sort((a,b)=>Number(b.kdr)-Number(a.kdr))}; }).filter(Boolean);
     const swissNormalStyle=`font-size:11.5px;font-weight:800;color:${s.swissMode==='normal'?'#0a0c10':'#9aa3b2'};background:${s.swissMode==='normal'?'#2fb8c6':'#12151c'};border:1px solid ${s.swissMode==='normal'?'#2fb8c6':'#242833'};border-radius:8px;padding:9px 12px;cursor:pointer`;
     const swissFastStyle='font-size:11.5px;font-weight:800;color:#0a0c10;background:#f2b53d;border:1px solid #f2b53d;border-radius:8px;padding:9px 12px;cursor:pointer';
 
@@ -2982,10 +3048,16 @@ class Component extends DCLogic {
       const userMatch=match.a?.id==='user'||match.b?.id==='user',winnerId=result?.winnerId;
       return {teamA:match.a?.name || 'A DEFINIR',teamB:match.b?.name || 'A DEFINIR',scoreA:resultA,scoreB:resultB,status:result?`${winnerId===match.a?.id?match.a.name:match.b.name} AVANÇOU`:match.a&&match.b?(round.key===s.playoffStage?'PRÓXIMO CONFRONTO':'AGUARDANDO ETAPA'):'AGUARDANDO VENCEDORES',statusColor:result?'#34c77b':userMatch?'#ff5c1a':'#636d7e',teamAStyle:`font-size:11px;font-weight:${winnerId===match.a?.id?900:700};color:${winnerId===match.a?.id?'#34c77b':match.a?'#e5e8ee':'#596171'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,teamBStyle:`font-size:11px;font-weight:${winnerId===match.b?.id?900:700};color:${winnerId===match.b?.id?'#34c77b':match.b?'#e5e8ee':'#596171'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,scoreAStyle:`font-family:'JetBrains Mono',monospace;color:${winnerId===match.a?.id?'#34c77b':'#9aa3b2'}`,scoreBStyle:`font-family:'JetBrains Mono',monospace;color:${winnerId===match.b?.id?'#34c77b':'#9aa3b2'}`,style:`background:${userMatch?'rgba(255,92,26,.055)':'#0c0f15'};border:1px solid ${userMatch?'rgba(255,92,26,.5)':'#2a303d'};border-radius:10px;padding:12px;box-shadow:${userMatch?'0 0 0 1px rgba(255,92,26,.08)':'none'}`};
     })}));
+    const campaignStatMatches=[...s.swissHistory.flatMap(entry=>entry.matches.filter(match=>match.isUser)),...(s.playoffBracket||[]).flatMap(round=>round.matches.map(match=>match.result).filter(result=>result?.isUser))].map(match=>{ if(match.userStats?.length) return match; const timeline=this._userRoundTimeline(match),finalFrame=timeline[timeline.length-1]; return {...match,userStats:finalFrame?.aggregateUserStats||[]}; }).filter(match=>match.userStats.length);
+    const campaignStatTotals=new Map();
+    campaignStatMatches.forEach(match=>match.userStats.forEach(player=>{ const current=campaignStatTotals.get(player.name)||{name:player.name,kills:0,deaths:0,assists:0}; current.kills+=player.kills;current.deaths+=player.deaths;current.assists+=player.assists||0;campaignStatTotals.set(player.name,current); }));
+    const campaignKdr=[...campaignStatTotals.values()].map(player=>{ const kd=player.kills/Math.max(1,player.deaths); return {...player,kd:kd.toFixed(2),color:kd>=1.15?'#34c77b':kd>=.95?'#f2b53d':'#ef7d7d'}; }).sort((a,b)=>Number(b.kd)-Number(a.kd));
+    const swissUserMatchCount=s.swissHistory.reduce((total,entry)=>total+entry.matches.filter(match=>match.isUser).length,0);
+    const showSwissKdr=Boolean(swissEliminationNotice&&campaignKdr.length);
     const playoffCanPlay=s.screen==='major-playoffs'&&!s.playoffEliminated&&!s.playoffChampion&&!s.playoffPendingMatches;
     let playoffView={rounds:playoffRounds,canPlay:playoffCanPlay,primaryAction:this.startPlayoffRound,primaryLabel:`JOGAR ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,eyebrow:'VOCÊ ESTÁ NOS PLAYOFFS',title:`Próximo desafio: ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,description:'Analise os dois lados da chave e vença a série para continuar no Major.',bannerColor:'#2fb8c6',statusBg:'rgba(47,184,198,.1)',statusLabel:'AGUARDANDO',bannerStyle:'background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-left:4px solid #2fb8c6;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
-    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,showRestart:true,restartAction:this.restartMajorDraft,eyebrow:'FIM DE CAMPANHA',title:'Seu time foi eliminado nos playoffs',description:'O resultado permanece registrado no chaveamento acima.',bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:'ELIMINADO',bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
-    if(s.playoffChampion) playoffView={...playoffView,canPlay:false,eyebrow:'CAMPEÃO DO MAJOR',title:'Seu time conquistou o título!',description:'Você venceu quartas, semifinal e final do Major.',bannerColor:'#f2b53d',statusBg:'rgba(242,181,61,.12)',statusLabel:'CAMPEÃO',bannerStyle:'background:linear-gradient(135deg,rgba(242,181,61,.17),#10131a);border:1px solid rgba(242,181,61,.55);border-left:4px solid #f2b53d;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
+    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,showRestart:true,restartAction:this.restartMajorDraft,eyebrow:'FIM DE CAMPANHA',title:'Seu time foi eliminado nos playoffs',description:`O Major continuou após sua eliminação. Campeão: ${s.majorChampionName||'a definir'}.`,bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:`CAMPEÃO · ${s.majorChampionName||'A DEFINIR'}`,bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
+    if(s.playoffChampion==='user') playoffView={...playoffView,canPlay:false,eyebrow:'CAMPEÃO DO MAJOR',title:'Seu time conquistou o título!',description:'Você venceu quartas, semifinal e final do Major.',bannerColor:'#f2b53d',statusBg:'rgba(242,181,61,.12)',statusLabel:'CAMPEÃO',bannerStyle:'background:linear-gradient(135deg,rgba(242,181,61,.17),#10131a);border:1px solid rgba(242,181,61,.55);border-left:4px solid #f2b53d;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
 
     // ---- SIMULACAO / PARTIDA / RESULTADO ----
     const teamOvNow = Math.round(this._teamOverall());
@@ -3045,6 +3117,8 @@ class Component extends DCLogic {
       const mvpCounts = {}; allMvps.forEach(p=>{ mvpCounts[p.slug]=(mvpCounts[p.slug]||0)+1; });
       const topMvpSlug = Object.keys(mvpCounts).sort((a,b)=>mvpCounts[b]-mvpCounts[a])[0];
       const mvpCampaign = topMvpSlug ? this._draftPlayer(topMvpSlug) : null;
+      const campaignMaps=Math.max(1,matches.reduce((sum,match)=>sum+match.mapResults.length,0));
+      const playerKdr=s.draftRoster.filter(Boolean).map(entry=>{ const player=this._draftPlayer(entry.slug,entry.year); const rng=mulberry32(hashStr(`${s.draftId||'draft'}-kdr-${player.slug}`)); const impact=(statValue(player,'firepower')+statValue(player,'opening')+statValue(player,'trading'))/300; const deaths=Math.max(1,Math.round(campaignMaps*(11.5+rng()*3))); const kills=Math.max(0,Math.round(deaths*(.72+impact*.55+(rng()-.5)*.12))); const kdr=kills/deaths; return {nick:player.nick,kills,deaths,kdr:kdr.toFixed(2),color:kdr>=1.15?'#34c77b':kdr>=.95?'#f2b53d':'#ef7d7d'}; }).sort((a,b)=>Number(b.kdr)-Number(a.kdr));
       resultadoData = {
         emoji: s.simChampion ? '🏆' : '❌',
         title: s.simChampion ? 'Campeão do Major!' : `Eliminado — ${ROUND_LABELS[matches.length-1]||'Quartas'}`,
@@ -3054,7 +3128,8 @@ class Component extends DCLogic {
           {label:'PONTUAÇÃO', value: won*120 + mapsWon*30}
         ],
         timeline: matches.map(m=>({round:ROUND_LABELS[m.round], opp:m.opp.name, result:m.won?'Vitória':'Derrota', style:`font-size:12px;font-weight:700;color:${m.won?'#34c77b':'#ef4444'}`})),
-        mvpCampaign: mvpCampaign ? {avatarStyle:avatarStyle(teamOf(mvpCampaign.team).hue), initials:mvpCampaign.nick.slice(0,2).toUpperCase(), nick:mvpCampaign.nick} : null
+        mvpCampaign: mvpCampaign ? {avatarStyle:avatarStyle(teamOf(mvpCampaign.team).hue), initials:mvpCampaign.nick.slice(0,2).toUpperCase(), nick:mvpCampaign.nick} : null,
+        playerKdr
       };
     }
 
@@ -3309,11 +3384,11 @@ class Component extends DCLogic {
       openCoachPicker:this.openCoachPicker, closeCoachPicker:this.closeCoachPicker, removeCoach:this.removeCoach,
       compBars, draftWarnings, confirmButtonStyle, clearRoster:this.clearRoster, goResumo:this.goResumo,
       playerDrawer, closePlayerDrawer:this.closePlayerDrawer,
-      resumoPlayers, resumoCoach, radarPoints, radarRings, radarLabels, mapStrengths, strengths, weaknesses, classificationChance, classificationBarStyle,
+      resumoPlayers, resumoCoach, radarPoints, radarRings, radarLabels, mapStrengths, mapStrengthAverage, strengths, weaknesses, classificationChance, classificationBarStyle,
       teamPower:Math.round(teamEvaluation.strength),teamFit:averageFit,teamChemistry:teamEvaluation.chemistry,teamCompositionModifier:`${teamEvaluation.compositionBonus>=0?'+':''}${teamEvaluation.compositionBonus.toFixed(1)}`,
       isSimulacao: s.screen==='major-simulacao', isPartida: s.screen==='major-partida', isResultado: s.screen==='major-resultado',
-      isMajorGroups:s.screen==='major-groups', swissStageTitle:'Fase de grupos · 16 times', swissRoundLabel:`RODADA ${s.swissRound}/5`, swissCampaignRecord, swissEliminationNotice, swissBracketColumns, swissStandings, swissRoundMatches, swissUserMatch, swissLiveModal, closeSwissLive:this.closeSwissLive, swissPrimaryLabel, swissPrimaryAction, swissPrimaryStyle, swissNormalStyle, swissFastStyle, setSwissNormal:this.setSwissNormal, simulateSwissFast:this.simulateSwissFast,
-      playoffView,
+      isMajorGroups:s.screen==='major-groups', swissStageTitle:'Fase de grupos · 16 times', swissRoundLabel:`RODADA ${s.swissRound}/5`, swissCampaignRecord, swissEliminationNotice, showSwissKdr, swissBracketColumns, swissStandings, swissRoundMatches, swissMatchKdr, swissUserMatchCount, swissUserMatch, swissLiveModal, closeSwissLive:this.closeSwissLive, swissPrimaryLabel, swissPrimaryAction, swissPrimaryStyle, swissNormalStyle, swissFastStyle, setSwissNormal:this.setSwissNormal, simulateSwissFast:this.simulateSwissFast,
+      playoffView, campaignKdr,
       bracketRounds, currentMatchPreview, nextMatch:this.nextMatch, simulateAll:this.simulateAll,
       partidaDetail, backToSimulacao:this.backToSimulacao,
       resultadoData, playAgain:this.playAgain, shareResult:this.shareResult,
