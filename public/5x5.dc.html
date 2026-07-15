@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>5x5.gg</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23ff5c1a' d='M12 6h46L50 58H4z'/%3E%3Ctext x='31' y='40' text-anchor='middle' font-family='Arial' font-size='22' font-weight='700'%3E5x5%3C/text%3E%3C/svg%3E">
-<script src="./support.js"></script>
+<script src="/support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -29,6 +29,13 @@
   @keyframes toastin{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
   @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
   [data-mobile-toggle]{display:none}
+  [data-role-layout]{grid-template-columns:repeat(5,minmax(104px,1fr))}
+  [data-player-draft-screen]{height:calc(100dvh - 108px);overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box}
+  [data-player-draft-shell]{flex:1;min-height:0;align-items:stretch}
+  [data-player-pool]{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  [data-player-candidates]{flex:1;min-height:0;overflow-y:auto;padding-right:4px;scrollbar-gutter:stable}
+  [data-swiss-bracket-grid]{grid-template-columns:repeat(5,minmax(0,1fr))}
+  @media (max-width:1180px){[data-swiss-bracket-grid]{grid-template-columns:repeat(5,minmax(210px,1fr));min-width:1100px}}
   @media (max-width:1024px){
     [data-desktop-nav],[data-desktop-actions]{display:none !important}
     [data-mobile-toggle]{display:flex !important}
@@ -41,6 +48,10 @@
     [data-strategy-grid]{grid-template-columns:1fr !important}
     [data-strategy-slots]{grid-template-columns:1fr 1fr !important}
     [data-player-draft-grid]{grid-template-columns:1fr !important}
+    [data-player-draft-screen]{height:auto;min-height:calc(100dvh - 108px);overflow:visible}
+    [data-player-draft-shell]{display:grid !important}
+    [data-player-pool]{height:auto;overflow:visible}
+    [data-player-candidates]{flex:none;max-height:55vh}
     [data-catalog-grid]{grid-template-columns:1fr !important}
     [data-resumo-players]{grid-template-columns:repeat(2,1fr) !important}
     [data-resumo-grid],[data-resumo-grid2]{grid-template-columns:1fr !important}
@@ -61,7 +72,9 @@
     [data-players-grid],[data-platform-grid]{grid-template-columns:1fr 1fr !important}
     [data-footer-grid]{grid-template-columns:1fr !important}
     [data-strategy-slots]{grid-template-columns:1fr !important}
+    [data-role-layout]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
   }
+  @media (min-width:561px) and (max-width:760px){[data-role-layout]{grid-template-columns:repeat(3,minmax(0,1fr)) !important}}
 </style>
 </helmet>
 <div style="min-height:100vh;background:#0a0c10;display:flex;flex-direction:column;font-family:'Manrope',sans-serif">
@@ -494,26 +507,48 @@
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px">
               <div>
                 <div style="font-size:15px;font-weight:800;color:#f4f5f7">Seu layout</div>
-                <div style="font-size:12px;color:#636d7e;margin-top:3px">Defina a função principal de cada jogador</div>
+                <div style="font-size:12px;color:#636d7e;margin-top:3px">Clique em uma posição para trocar sua função</div>
               </div>
               <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#34c77b;background:rgba(52,199,123,.1);padding:5px 9px;border-radius:6px">5 POSIÇÕES</span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" data-strategy-slots="1">
+            <div style="display:grid;gap:11px;align-items:start" data-role-layout="1">
               <sc-for list="{{ strategySlots }}" as="slot" hint-placeholder-count="5">
-                <div style="background:#0d0f14;border:1px solid #242833;border-radius:10px;padding:13px">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-                    <div style="width:28px;height:28px;border-radius:7px;background:{{ slot.bg }};color:{{ slot.color }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700">{{ slot.number }}</div>
-                    <select value="{{ slot.role }}" onChange="{{ slot.onChange }}" style="flex:1;min-width:0;background:#171a22;border:1px solid #33394a;border-radius:7px;padding:8px;color:#f4f5f7;font-size:12.5px;font-weight:700;outline:none">
-                      <sc-for list="{{ strategyRoleOptions }}" as="option" hint-placeholder-count="6"><option value="{{ option.code }}">{{ option.label }}</option></sc-for>
-                    </select>
+                <div style="position:relative;min-width:0">
+                  <div onClick="{{ slot.onToggle }}" style="{{ slot.cardStyle }}">
+                    <div style="position:absolute;top:9px;left:10px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;color:#636d7e">0{{ slot.number }}</div>
+                    <div style="position:absolute;top:9px;right:10px;color:{{ slot.color }};font-size:11px">{{ slot.chevron }}</div>
+                    <div style="width:46px;height:46px;border-radius:13px;background:{{ slot.bg }};border:1px solid {{ slot.color }}55;color:{{ slot.color }};display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;box-shadow:0 0 22px {{ slot.color }}18">{{ slot.icon }}</div>
+                    <div style="font-size:12px;font-weight:800;color:#f4f5f7;text-align:center;line-height:1.2">{{ slot.label }}</div>
+                    <div style="font-size:8.5px;font-weight:800;color:{{ slot.color }};text-align:center;text-transform:uppercase;line-height:1.2">{{ slot.shortAttribute }}</div>
                   </div>
-                  <p style="font-size:11.5px;color:#9aa3b2;line-height:1.5;margin:0 0 9px;min-height:35px">{{ slot.description }}</p>
-                  <div style="font-size:10.5px;color:#636d7e">ATRIBUTO-CHAVE <b style="color:{{ slot.color }};margin-left:4px">{{ slot.attribute }}</b></div>
-                  <sc-if value="{{ slot.hasSecondaryEffect }}">
-                    <div style="font-size:10.5px;color:#9aa3b2;background:rgba(255,92,26,.07);border:1px solid rgba(255,92,26,.18);border-radius:6px;padding:7px 8px;margin-top:9px;line-height:1.45"><b style="color:#ff5c1a">FIREPOWER:</b> alto concede bônus; baixo reduz levemente o desempenho.</div>
+                  <sc-if value="{{ slot.isOpen }}">
+                    <div onClick="{{ slot.onPickerClick }}" style="{{ slot.pickerStyle }}">
+                      <div style="font-size:9px;font-weight:800;color:#636d7e;letter-spacing:.08em;text-transform:uppercase;margin:2px 3px 8px">Escolha a função</div>
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                        <sc-for list="{{ slot.options }}" as="option" hint-placeholder-count="6">
+                          <div onClick="{{ option.onSelect }}" style="{{ option.style }}">
+                            <span style="width:24px;height:24px;border-radius:7px;background:{{ option.bg }};color:{{ option.color }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ option.icon }}</span>
+                            <span style="font-size:10px;font-weight:800;color:{{ option.textColor }};white-space:nowrap">{{ option.label }}</span>
+                            <span style="margin-left:auto;font-size:10px;color:{{ option.color }}">{{ option.check }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
                   </sc-if>
                 </div>
               </sc-for>
+            </div>
+            <div style="font-size:10.5px;color:#636d7e;margin-top:13px;line-height:1.5"><span style="color:#9aa3b2;font-weight:700">DICA:</span> a cor e o símbolo identificam rapidamente a responsabilidade de cada jogador dentro da partida.</div>
+            <div style="border-top:1px solid #242833;margin-top:15px;padding-top:14px">
+              <div style="font-size:9.5px;font-weight:800;color:#636d7e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px">O que cada posição exige</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px" data-strategy-slots="1">
+                <sc-for list="{{ strategyRequirements }}" as="guide" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:9px;background:#0d0f14;border:1px solid #242833;border-radius:9px;padding:8px 10px">
+                    <span style="width:26px;height:26px;border-radius:7px;background:{{ guide.bg }};color:{{ guide.color }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">{{ guide.icon }}</span>
+                    <div style="min-width:0"><div style="font-size:10.5px;font-weight:800;color:#e6e8ec">POS. {{ guide.number }} · {{ guide.label }}</div><div style="font-size:9.5px;color:{{ guide.color }};margin-top:2px">{{ guide.targets }}</div></div>
+                  </div>
+                </sc-for>
+              </div>
             </div>
           </div>
 
@@ -543,19 +578,18 @@
     </sc-if>
 
     <sc-if value="{{ isPlayerDraft }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Seleção de jogadores" style="max-width:1240px;margin:0 auto;padding:28px 24px 90px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px">
+      <div data-screen-label="Seleção de jogadores" data-player-draft-screen="1" style="max-width:1360px;margin:0 auto;padding:10px 24px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:11px">
           <div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:#ff5c1a;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.28);border-radius:100px;padding:5px 11px">ETAPA 2 DE 3</span><span style="font-size:12px;color:#636d7e">Escolha {{ playerDraftFilledCount }} de 5</span></div>
-            <h1 style="font-family:'Chakra Petch',sans-serif;font-size:30px;font-weight:700;margin:0 0 6px">Monte sua lineup</h1>
-            <p style="font-size:13.5px;color:#9aa3b2;margin:0">A cada rodada, um ano e um time definem os jogadores disponíveis.</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:9.5px;font-weight:700;color:#ff5c1a;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.28);border-radius:100px;padding:3px 8px">ETAPA 2 DE 3</span><span style="font-size:10.5px;color:#636d7e">Escolha {{ playerDraftFilledCount }} de 5</span></div>
+            <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><h1 style="font-family:'Chakra Petch',sans-serif;font-size:25px;font-weight:700;margin:0">Monte sua lineup</h1><p style="font-size:11.5px;color:#9aa3b2;margin:0">Um ano e um time definem os cinco candidatos da rodada.</p></div>
           </div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9aa3b2;background:#12151c;border:1px solid #242833;border-radius:9px;padding:10px 14px">{{ playerDraftFilledCount }}/5 JOGADORES</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#9aa3b2;background:#12151c;border:1px solid #242833;border-radius:8px;padding:8px 11px">{{ playerDraftFilledCount }}/5 JOGADORES</div>
         </div>
 
-        <div style="display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;align-items:start" data-player-draft-grid="1">
-          <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:18px">
-            <div style="font-size:11px;font-weight:800;color:#636d7e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Sorteio da rodada</div>
+        <div style="display:grid;grid-template-columns:420px minmax(0,1fr);gap:14px" data-player-draft-grid="1" data-player-draft-shell="1">
+          <div data-player-pool="1" style="background:#12151c;border:1px solid #242833;border-radius:13px;padding:12px">
+            <div style="font-size:9.5px;font-weight:800;color:#636d7e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">Sorteio da rodada</div>
             <sc-if value="{{ playerDraftRolling }}">
               <div style="height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
                 <div style="width:54px;height:54px;border-radius:50%;border:3px solid #242833;border-top-color:#ff5c1a;animation:spin5x5 .8s linear infinite;margin-bottom:14px"></div>
@@ -565,42 +599,54 @@
               </div>
             </sc-if>
             <sc-if value="{{ !playerDraftRolling }}">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-                <div style="background:#0d0f14;border:1px solid #242833;border-radius:9px;padding:11px"><div style="font-size:9.5px;font-weight:700;color:#636d7e;margin-bottom:4px">ANO SORTEADO</div><div style="font-family:'Chakra Petch',sans-serif;font-size:21px;font-weight:700;color:#ff5c1a">{{ playerDraftYear }}</div></div>
-                <div style="background:#0d0f14;border:1px solid #242833;border-radius:9px;padding:11px"><div style="font-size:9.5px;font-weight:700;color:#636d7e;margin-bottom:4px">TIME SORTEADO</div><div style="font-size:13px;font-weight:800;color:#f4f5f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ playerDraftTeamName }}</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
+                <div style="background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:7px 9px"><div style="font-size:8.5px;font-weight:700;color:#636d7e;margin-bottom:2px">ANO SORTEADO</div><div style="font-family:'Chakra Petch',sans-serif;font-size:17px;font-weight:700;color:#ff5c1a">{{ playerDraftYear }}</div></div>
+                <div style="background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:7px 9px"><div style="font-size:8.5px;font-weight:700;color:#636d7e;margin-bottom:2px">TIME SORTEADO</div><div style="font-size:11.5px;font-weight:800;color:#f4f5f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ playerDraftTeamName }}</div></div>
               </div>
-              <div style="font-size:11px;color:#636d7e;margin-bottom:9px">Selecione um jogador deste elenco:</div>
-              <div style="display:flex;flex-direction:column;gap:8px">
+              <details style="background:rgba(47,184,198,.055);border:1px solid rgba(47,184,198,.2);border-radius:7px;padding:6px 8px;margin-bottom:7px;font-size:9px;color:#9aa3b2;line-height:1.4">
+                <summary style="cursor:pointer;color:#2fb8c6;font-weight:800">Como ler FIT e valor/meta?</summary>
+                <div style="padding-top:6px">
+                <div><b style="color:#e6e8ec">AWP 92/60</b> = atributo 92, meta da posição 60.</div>
+                <div><b style="color:#e6e8ec">FIT 68/100</b> = encaixe geral do jogador naquela função.</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><span style="color:#34c77b">● Excelente 75+</span><span style="color:#2fb8c6">● Bom 62–74</span><span style="color:#f2b53d">● Regular 48–61</span><span style="color:#ef6b6b">● Ruim &lt;48</span></div>
+                </div>
+              </details>
+              <div style="font-size:9.5px;color:#636d7e;margin-bottom:5px">Ordenados pelo melhor encaixe nas vagas livres:</div>
+              <div data-player-candidates="1" style="display:flex;flex-direction:column;gap:6px">
                 <sc-for list="{{ playerDraftCandidates }}" as="candidate" hint-placeholder-count="5">
                   <div onClick="{{ candidate.onSelect }}" style="{{ candidate.style }}">
                     <div style="{{ candidate.avatarStyle }}">{{ candidate.initials }}</div>
-                    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#f4f5f7">{{ candidate.nick }}</div><div style="font-size:10.5px;color:#636d7e">OVR {{ candidate.overall }} · {{ candidate.bestAttribute }}</div></div>
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:7px"><div style="font-size:13px;font-weight:800;color:#f4f5f7">{{ candidate.nick }}</div><span style="font-size:8.5px;font-weight:900;color:{{ candidate.bestFitColor }};background:{{ candidate.bestFitBg }};border-radius:4px;padding:2px 5px">FIT {{ candidate.bestFitScore }} · {{ candidate.bestFitStatus }}</span></div>
+                      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:7px"><sc-for list="{{ candidate.roleFits }}" as="roleFit" hint-placeholder-count="3"><span onClick="{{ roleFit.onPlace }}" title="Posicionar diretamente nesta vaga" style="{{ roleFit.style }}">{{ roleFit.rank }} {{ roleFit.icon }} {{ roleFit.label }} · {{ roleFit.score }}</span></sc-for></div>
+                    </div>
                     <div style="{{ candidate.checkStyle }}">✓</div>
                   </div>
                 </sc-for>
               </div>
-              <div onClick="{{ rerollPlayerDraft }}" style="text-align:center;font-size:11.5px;font-weight:700;color:#9aa3b2;border:1px solid #33394a;border-radius:8px;padding:9px;margin-top:12px;cursor:pointer">Sortear outro ano e time</div>
+              <div onClick="{{ rerollPlayerDraft }}" style="{{ playerDraftRerollStyle }}">{{ playerDraftRerollLabel }}</div>
             </sc-if>
           </div>
 
-          <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:20px">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px"><div><div style="font-size:15px;font-weight:800;color:#f4f5f7">Layout do time</div><div style="font-size:12px;color:#636d7e;margin-top:3px">{{ playerDraftActionText }}</div></div><div style="font-size:10.5px;color:#34c77b;background:rgba(52,199,123,.1);padding:5px 9px;border-radius:6px">{{ playerDraftSelectionHint }}</div></div>
+          <div style="background:#12151c;border:1px solid #242833;border-radius:13px;padding:14px;min-height:0;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px"><div><div style="font-size:14px;font-weight:800;color:#f4f5f7">Layout do time</div><div style="font-size:10.5px;color:#636d7e;margin-top:2px">{{ playerDraftActionText }}</div></div><div style="font-size:9px;color:#34c77b;background:rgba(52,199,123,.1);padding:4px 7px;border-radius:5px">{{ playerDraftSelectionHint }}</div></div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:11px" data-strategy-slots="1">
               <sc-for list="{{ playerDraftSlots }}" as="slot" hint-placeholder-count="5">
                 <div onClick="{{ slot.onPlace }}" style="{{ slot.style }}">
                   <div style="display:flex;align-items:center;gap:11px">
                     <div style="{{ slot.avatarStyle }}">{{ slot.avatarText }}</div>
                     <div style="flex:1;min-width:0">
-                      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12.5px;font-weight:800;color:#f4f5f7">{{ slot.roleLabel }}</span><span style="font-size:9px;font-weight:700;color:{{ slot.color }};background:{{ slot.bg }};border-radius:4px;padding:2px 5px">{{ slot.attribute }}</span></div>
+                      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:12.5px;font-weight:800;color:#f4f5f7">{{ slot.roleIcon }} {{ slot.roleLabel }}</span><span style="font-size:9px;font-weight:800;color:{{ slot.fitColor }};background:{{ slot.fitBg }};border-radius:4px;padding:2px 5px">{{ slot.fitLabel }}</span></div>
                       <div style="font-size:12px;color:{{ slot.playerColor }};margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ slot.playerName }}</div>
+                      <div style="font-size:9px;color:{{ slot.color }};margin-top:4px">PRECISA DE {{ slot.requirementText }}</div>
                     </div>
-                    <sc-if value="{{ slot.swapSelected }}"><div style="font-size:9px;font-weight:800;color:#0a0c10;background:#f2b53d;border-radius:5px;padding:4px 6px">TROCAR</div></sc-if>
+                    <sc-if value="{{ slot.swapSelected }}"><div style="font-size:9px;font-weight:800;color:#0a0c10;background:#f2b53d;border-radius:5px;padding:4px 6px">MOVER / TROCAR</div></sc-if>
                   </div>
                   <sc-if value="{{ slot.filled }}"><div style="display:flex;gap:10px;margin-top:11px;padding-top:9px;border-top:1px solid #242833;font-size:10.5px;color:#636d7e;flex-wrap:wrap"><span>ANO <b style="color:#c8ccd4">{{ slot.year }}</b></span><span>TIME <b style="color:#c8ccd4">{{ slot.teamName }}</b></span><span>OVR <b style="color:#c8ccd4">{{ slot.overall }}</b></span><span style="color:{{ slot.color }}">{{ slot.attribute }}</span></div></sc-if>
                 </div>
               </sc-for>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:17px;border-top:1px solid #242833">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #242833">
               <div onClick="{{ backToStrategy }}" style="font-size:12.5px;font-weight:700;color:#9aa3b2;cursor:pointer">← Voltar à estratégia</div>
               <div onClick="{{ finishPlayerDraft }}" style="{{ finishPlayerDraftStyle }}">Confirmar lineup →</div>
             </div>
@@ -861,7 +907,7 @@
               <div style="{{ rp.avatarStyle }}margin:0 auto 8px">{{ rp.initials }}</div>
               <div style="font-size:13.5px;font-weight:800;color:#f4f5f7;display:flex;align-items:center;justify-content:center;gap:4px">{{ rp.nick }}<sc-if value="{{ rp.isCaptain }}"><span style="color:#f2b53d;font-size:11px">★</span></sc-if></div>
               <div style="font-size:10.5px;color:#636d7e;margin-bottom:8px">{{ rp.roleLabel }}</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#f2b53d">{{ rp.overall }}</div>
+              <div style="display:flex;justify-content:center;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#f2b53d">OVR {{ rp.overall }}</span><span style="font-size:8.5px;font-weight:900;color:{{ rp.fitColor }};background:{{ rp.fitBg }};border-radius:4px;padding:3px 5px">FIT {{ rp.fitScore }}</span></div>
             </div>
           </sc-for>
         </div>
@@ -913,6 +959,9 @@
             <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#f2b53d">{{ classificationChance }}%</div>
           </div>
           <div style="height:10px;flex:1;min-width:180px;background:#0d0f14;border-radius:5px;overflow:hidden"><div style="{{ classificationBarStyle }}"></div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,auto);gap:14px;font-size:10px;color:#636d7e">
+            <span>FORÇA <b style="color:#f4f5f7">{{ teamPower }}</b></span><span>FIT <b style="color:#2fb8c6">{{ teamFit }}</b></span><span>ENTROSAMENTO <b style="color:#34c77b">{{ teamChemistry }}</b></span><span>COMPOSIÇÃO <b style="color:#f2b53d">{{ teamCompositionModifier }}</b></span>
+          </div>
         </div>
 
         <div style="display:flex;gap:14px;justify-content:flex-end">
@@ -982,11 +1031,17 @@
     </sc-if>
 
     <sc-if value="{{ isMajorGroups }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Fase Suíça do Major" style="max-width:1280px;margin:0 auto;padding:26px 24px 90px">
+      <div data-screen-label="Fase Suíça do Major" style="width:100%;max-width:1480px;box-sizing:border-box;margin:0 auto;padding:26px 24px 90px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px">
           <div><div style="font-size:11px;font-weight:800;color:#ff5c1a;margin-bottom:8px">MAJOR · FASE SUÍÇA</div><h1 style="font-family:'Chakra Petch',sans-serif;font-size:29px;margin:0 0 6px">{{ swissStageTitle }}</h1><p style="font-size:13px;color:#9aa3b2;margin:0">3 vitórias classificam · 3 derrotas eliminam · até 5 rodadas</p></div>
           <div style="display:flex;gap:8px"><div onClick="{{ setSwissNormal }}" style="{{ swissNormalStyle }}">Simulação normal</div><div onClick="{{ simulateSwissFast }}" style="{{ swissFastStyle }}">Simulação rápida</div></div>
         </div>
+        <sc-if value="{{ swissEliminationNotice }}">
+          <div style="background:linear-gradient(135deg,rgba(239,68,68,.16),rgba(80,18,24,.2));border:1px solid rgba(239,68,68,.55);border-left:4px solid #ef4444;border-radius:14px;padding:19px 21px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;box-shadow:0 12px 34px rgba(80,10,16,.22)">
+            <div><div style="font-family:'Chakra Petch',sans-serif;font-size:21px;font-weight:800;color:#ff7373">SEU TIME FOI ELIMINADO</div><div style="font-size:12px;color:#d4a2a8;margin-top:5px">A campanha terminou com {{ swissCampaignRecord }}. Revise o chaveamento e monte uma nova estratégia para o próximo Major.</div></div>
+            <div onClick="{{ backToMajorIntro }}" style="font-size:11.5px;font-weight:900;color:#fff;background:#b92f3b;border:1px solid #ef5d68;border-radius:8px;padding:10px 14px;cursor:pointer">VOLTAR AO JOGO</div>
+          </div>
+        </sc-if>
         <div style="background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)">
           <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 260px;gap:20px;align-items:center" data-player-draft-grid="1">
             <div><div style="font-size:10px;font-weight:800;color:#2fb8c6;margin-bottom:5px">SUA CAMPANHA</div><div style="font-size:12px;color:#9aa3b2">{{ swissCampaignRecord }}</div></div>
@@ -999,7 +1054,7 @@
         </div>
         <div style="background:#12151c;border:1px solid #33394a;border-radius:14px;padding:20px;margin-bottom:18px;overflow-x:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px"><div><b style="font-size:13px">Chaveamento suíço</b><div style="font-size:10.5px;color:#636d7e;margin-top:3px">Os próximos confrontos são definidos pelo record após cada rodada</div></div><span style="font-size:9.5px;font-weight:800;color:#2fb8c6">FORMATO HLTV · GROUP SWISS</span></div>
-          <div style="display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:12px;min-width:1240px">
+          <div data-swiss-bracket-grid="1" style="display:grid;gap:12px">
             <sc-for list="{{ swissBracketColumns }}" as="column" hint-placeholder-count="5">
               <div style="background:#0b0e13;border:1px solid #2c3240;border-radius:10px;padding:12px;align-self:start"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:11.5px;color:#f4f5f7">{{ column.title }}</b><span style="font-size:9.5px;color:#7b8598">{{ column.pools }}</span></div><div style="display:flex;flex-direction:column;gap:7px"><sc-for list="{{ column.matches }}" as="match" hint-placeholder-count="4"><div style="{{ match.style }}"><div style="{{ match.teamAStyle }}">{{ match.teamA }}</div><div style="display:flex;justify-content:space-between;color:#7b8598;font-size:9px;margin:4px 0"><span>{{ match.pool }}</span><b style="color:{{ match.scoreColor }}">{{ match.score }}</b></div><div style="{{ match.teamBStyle }}">{{ match.teamB }}</div><sc-if value="{{ match.showOutcome }}"><div style="{{ match.outcomeStyle }}">SEU TIME · {{ match.outcome }}</div></sc-if></div></sc-for><sc-if value="{{ column.waiting }}"><div style="border:1px dashed #33394a;border-radius:7px;padding:16px 8px;text-align:center;font-size:10px;color:#7b8598">Aguardando resultados anteriores</div></sc-if></div></div>
             </sc-for>
@@ -1016,6 +1071,42 @@
             </div>
             <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:17px"><div style="font-size:13px;font-weight:800;margin-bottom:12px">Resultados da rodada</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" data-strategy-slots="1"><sc-for list="{{ swissRoundMatches }}" as="match" hint-placeholder-count="8"><div style="{{ match.style }}"><div style="display:flex;justify-content:space-between;gap:8px"><span>{{ match.teamA }}</span><b style="color:{{ match.scoreColor }}">{{ match.score }}</b><span style="text-align:right">{{ match.teamB }}</span></div><div style="font-size:9.5px;color:#636d7e;text-align:center;margin-top:5px">{{ match.format }} · {{ match.state }}</div></div></sc-for></div></div>
           </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMajorPlayoffs }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Playoffs do Major" style="width:100%;max-width:1480px;box-sizing:border-box;margin:0 auto;padding:26px 24px 90px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:20px">
+          <div><div style="font-size:10.5px;font-weight:900;color:#f2b53d;margin-bottom:7px">MAJOR · PLAYOFFS</div><h1 style="font-family:'Chakra Petch',sans-serif;font-size:30px;margin:0 0 5px">Chaveamento final</h1><p style="font-size:12.5px;color:#9aa3b2;margin:0">Quartas e semifinais em MD3 · grande final em MD5</p></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#f2b53d;background:rgba(242,181,61,.1);border:1px solid rgba(242,181,61,.3);border-radius:7px;padding:8px 11px">8 CLASSIFICADOS</div>
+        </div>
+
+        <div style="{{ playoffView.bannerStyle }}">
+          <div><div style="font-size:10px;font-weight:900;color:{{ playoffView.bannerColor }};letter-spacing:.06em">{{ playoffView.eyebrow }}</div><div style="font-family:'Chakra Petch',sans-serif;font-size:21px;font-weight:800;color:#f4f5f7;margin-top:4px">{{ playoffView.title }}</div><div style="font-size:11.5px;color:#9aa3b2;margin-top:4px">{{ playoffView.description }}</div></div>
+          <sc-if value="{{ playoffView.canPlay }}"><div onClick="{{ playoffView.primaryAction }}" style="font-size:12px;font-weight:900;color:#0a0c10;background:#ff5c1a;border-radius:8px;padding:11px 17px;cursor:pointer;white-space:nowrap">{{ playoffView.primaryLabel }} →</div></sc-if>
+          <sc-if value="{{ !playoffView.canPlay }}"><div style="font-size:10.5px;font-weight:900;color:{{ playoffView.bannerColor }};background:{{ playoffView.statusBg }};border-radius:7px;padding:9px 12px;white-space:nowrap">{{ playoffView.statusLabel }}</div></sc-if>
+        </div>
+
+        <div style="background:#11151d;border:1px solid #33394a;border-radius:15px;padding:20px;overflow-x:auto;box-shadow:0 12px 35px rgba(0,0,0,.25)">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(280px,1fr));gap:34px;min-width:920px;align-items:stretch">
+            <sc-for list="{{ playoffView.rounds }}" as="round" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid #2a303d"><div style="font-size:12px;font-weight:900;color:#f4f5f7">{{ round.label }}</div><span style="font-size:9px;color:#636d7e">{{ round.format }}</span></div>
+                <div style="{{ round.matchesStyle }}">
+                  <sc-for list="{{ round.matches }}" as="match" hint-placeholder-count="4">
+                    <div style="{{ match.style }}">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="{{ match.teamAStyle }}">{{ match.teamA }}</span><b style="{{ match.scoreAStyle }}">{{ match.scoreA }}</b></div>
+                      <div style="height:1px;background:#252b37;margin:8px 0"></div>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="{{ match.teamBStyle }}">{{ match.teamB }}</span><b style="{{ match.scoreBStyle }}">{{ match.scoreB }}</b></div>
+                      <div style="font-size:8.5px;font-weight:900;color:{{ match.statusColor }};margin-top:8px">{{ match.status }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:9.5px;color:#636d7e;margin-top:15px;text-align:center">Os vencedores de cada bloco avançam para o confronto conectado na coluna seguinte.</div>
         </div>
       </div>
     </sc-if>
@@ -1722,6 +1813,7 @@
   </main>
 
   <!-- FOOTER -->
+  <sc-if value="{{ showFooter }}">
   <footer style="border-top:1px solid #1a1e28;background:#0d0f14;margin-top:64px">
     <div style="max-width:1360px;margin:0 auto;padding:48px 24px 24px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px" data-footer-grid="1">
       <div>
@@ -1759,6 +1851,46 @@
     </div>
     <div style="border-top:1px solid #1a1e28;padding:16px 24px;text-align:center;font-size:11.5px;color:#4a505e">© 2026 5x5.gg — projeto conceitual e não-oficial. Não afiliado à Valve.</div>
   </footer>
+  </sc-if>
+
+  <sc-if value="{{ swissLiveModal }}" hint-placeholder-val="{{ false }}">
+    <div data-swiss-live-modal="1" style="position:fixed;inset:0;z-index:95;background:rgba(4,6,10,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:18px">
+      <div style="width:100%;max-width:1100px;max-height:calc(100dvh - 36px);overflow-y:auto;background:#10131a;border:1px solid #33394a;border-radius:16px;box-shadow:0 28px 80px rgba(0,0,0,.7);padding:18px;animation:toastin .2s ease">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px">
+          <div><div style="font-size:9.5px;font-weight:900;color:#ff5c1a;letter-spacing:.08em">MAJOR · PARTIDA AO VIVO</div><div style="font-size:12px;color:#7b8598;margin-top:3px">{{ swissLiveModal.format }} · {{ swissLiveModal.mapLabel }} · {{ swissLiveModal.roundLabel }}</div></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ swissLiveModal.statusColor }};background:{{ swissLiveModal.statusBg }};border-radius:6px;padding:5px 8px">{{ swissLiveModal.status }}</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;background:#0a0d12;border:1px solid #242a36;border-radius:13px;padding:14px 20px;margin-bottom:12px">
+          <div style="text-align:right"><div style="font-size:15px;font-weight:900;color:#f4f5f7">SEU TIME</div><div style="font-size:10px;color:#34c77b;margin-top:3px">SÉRIE {{ swissLiveModal.seriesUs }}</div></div>
+          <div style="display:flex;align-items:center;gap:15px"><span style="font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:900;color:{{ swissLiveModal.userScoreColor }}">{{ swissLiveModal.us }}</span><span style="font-size:20px;color:#4f5868">:</span><span style="font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:900;color:{{ swissLiveModal.opponentScoreColor }}">{{ swissLiveModal.them }}</span></div>
+          <div><div style="font-size:15px;font-weight:900;color:#f4f5f7">{{ swissLiveModal.opponent }}</div><div style="font-size:10px;color:#ef6b6b;margin-top:3px">SÉRIE {{ swissLiveModal.seriesThem }}</div></div>
+        </div>
+
+        <div style="height:5px;background:#1a1e28;border-radius:4px;overflow:hidden;margin-bottom:12px"><div style="{{ swissLiveModal.progressStyle }}"></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px">
+          <div style="font-size:9.5px;font-weight:900;color:#7b8598;letter-spacing:.06em">{{ swissLiveModal.statsScope }}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><sc-for list="{{ swissLiveModal.statsTabs }}" as="tab" hint-placeholder-count="4"><div onClick="{{ tab.onClick }}" style="{{ tab.style }}">{{ tab.label }} <span style="opacity:.7">{{ tab.score }}</span></div></sc-for></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" data-player-draft-grid="1">
+          <div data-swiss-kda-side="user" style="background:#0d1016;border:1px solid #263044;border-radius:11px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:minmax(120px,1fr) 38px 38px 38px 50px;gap:4px;padding:8px 11px;background:rgba(79,141,253,.08);font-size:9px;font-weight:900;color:#7b93b8"><span>SEU TIME</span><span style="text-align:center">K</span><span style="text-align:center">D</span><span style="text-align:center">A</span><span style="text-align:center">K/D</span></div>
+            <sc-for list="{{ swissLiveModal.userRows }}" as="player" hint-placeholder-count="5"><div data-swiss-kda-row="1" data-kills="{{ player.kills }}" data-deaths="{{ player.deaths }}" data-assists="{{ player.assists }}" style="{{ player.style }}"><span style="font-size:11.5px;font-weight:800;color:#e6eaf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ player.name }}</span><b style="text-align:center;color:#79aaff">{{ player.kills }}</b><b style="text-align:center;color:#ef7d7d">{{ player.deaths }}</b><b style="text-align:center;color:#66d5a0">{{ player.assists }}</b><span style="text-align:center;color:#aeb7c8">{{ player.ratio }}</span></div></sc-for>
+          </div>
+          <div data-swiss-kda-side="opponent" style="background:#0d1016;border:1px solid #3a2830;border-radius:11px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:minmax(120px,1fr) 38px 38px 38px 50px;gap:4px;padding:8px 11px;background:rgba(239,107,107,.07);font-size:9px;font-weight:900;color:#b68a91"><span>{{ swissLiveModal.opponent }}</span><span style="text-align:center">K</span><span style="text-align:center">D</span><span style="text-align:center">A</span><span style="text-align:center">K/D</span></div>
+            <sc-for list="{{ swissLiveModal.opponentRows }}" as="player" hint-placeholder-count="5"><div data-swiss-kda-row="1" data-kills="{{ player.kills }}" data-deaths="{{ player.deaths }}" data-assists="{{ player.assists }}" style="{{ player.style }}"><span style="font-size:11.5px;font-weight:800;color:#e6eaf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ player.name }}</span><b style="text-align:center;color:#79aaff">{{ player.kills }}</b><b style="text-align:center;color:#ef7d7d">{{ player.deaths }}</b><b style="text-align:center;color:#66d5a0">{{ player.assists }}</b><span style="text-align:center;color:#aeb7c8">{{ player.ratio }}</span></div></sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding-top:11px;border-top:1px solid #242833">
+          <div><div style="font-size:11px;font-weight:800;color:{{ swissLiveModal.eventColor }}">{{ swissLiveModal.event }}</div><div style="font-size:9.5px;color:#636d7e;margin-top:3px">Kills e mortes são fechadas entre os times; no máximo 5 jogadores morrem por lado em cada round.</div></div>
+          <sc-if value="{{ swissLiveModal.finished }}"><div onClick="{{ closeSwissLive }}" style="white-space:nowrap;background:#ff5c1a;color:#0a0c10;border-radius:8px;padding:10px 16px;font-size:11.5px;font-weight:900;cursor:pointer">Ver resultado e continuar →</div></sc-if>
+          <sc-if value="{{ !swissLiveModal.finished }}"><div style="white-space:nowrap;background:#171b24;color:#7b8598;border-radius:8px;padding:10px 14px;font-size:10.5px;font-weight:800">SIMULANDO…</div></sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 
 </x-dc>
@@ -1775,13 +1907,86 @@ const ROLE_META = {
 };
 
 const STRATEGY_ROLES = {
-  awper:{label:'AWPer',attribute:'SNIPING alto',description:'Especialista na AWP, responsável por abates de longa distância e controle de linhas.',color:'#2fb8c6',bg:'rgba(47,184,198,.14)'},
-  entry:{label:'Entry Fragger',attribute:'ENTRYING alto',description:'Abre espaço para o time buscando o primeiro duelo e iniciando as entradas.',color:'#ff5c1a',bg:'rgba(255,92,26,.14)'},
-  support:{label:'Support',attribute:'UTILITY alta + FIREPOWER',description:'Potencializa o time com utilitárias. Firepower alto concede bônus e Firepower baixo prejudica levemente seu desempenho.',color:'#34c77b',bg:'rgba(52,199,123,.14)'},
-  lurker:{label:'Lurker',attribute:'CLUTCHING alto',description:'Joga separado, pune rotações e decide rounds em situações de clutch.',color:'#d65db1',bg:'rgba(214,93,177,.14)'},
-  rifler:{label:'Rifler',attribute:'FIREPOWER alto',description:'Garante poder de fogo consistente, trades e presença nos duelos de rifle.',color:'#4f8dfd',bg:'rgba(79,141,253,.14)'},
-  trader:{label:'Trader',attribute:'TRADING alto',description:'Acompanha a linha de frente e converte rapidamente as eliminações dos aliados.',color:'#f2b53d',bg:'rgba(242,181,61,.14)'}
+  awper:{label:'AWPer',icon:'⌖',attribute:'SNIPING + OPENING',description:'Controla linhas longas, encontra abates de abertura e precisa sobreviver para decidir rounds.',color:'#2fb8c6',bg:'rgba(47,184,198,.14)',weights:{sniping:.38,opening:.20,firepower:.15,clutching:.10,trading:.07,utility:.06,entrying:.04},requirements:[['sniping',60,30,85,9,4],['opening',50,25,75,4,2],['clutching',45,20,75,2,1]]},
+  entry:{label:'Entry Fragger',icon:'↯',attribute:'ENTRYING + OPENING + FIREPOWER',description:'Abre espaço vencendo o primeiro duelo; precisa combinar iniciativa, abertura e poder de fogo.',color:'#ff5c1a',bg:'rgba(255,92,26,.14)',weights:{entrying:.30,firepower:.25,opening:.20,trading:.10,utility:.07,clutching:.05,sniping:.03},requirements:[['entrying',55,25,80,6,3],['opening',55,25,80,5,3],['firepower',50,25,78,4,2]]},
+  support:{label:'Support',icon:'✚',attribute:'UTILITY + TRADING + FIREPOWER',description:'Prepara execuções e retakes, acompanha o entry e ainda precisa contribuir nos duelos.',color:'#34c77b',bg:'rgba(52,199,123,.14)',weights:{utility:.30,trading:.22,firepower:.15,clutching:.12,entrying:.08,opening:.08,sniping:.05},requirements:[['utility',55,25,80,6,3],['trading',50,25,75,4,2],['firepower',40,15,70,3,1]]},
+  lurker:{label:'Lurker',icon:'◈',attribute:'CLUTCHING + FIREPOWER + TRADING',description:'Joga isolado, lê rotações e precisa converter situações tardias sem apoio imediato.',color:'#d65db1',bg:'rgba(214,93,177,.14)',weights:{clutching:.28,firepower:.20,trading:.18,opening:.12,utility:.10,entrying:.07,sniping:.05},requirements:[['clutching',55,25,82,7,4],['firepower',48,22,75,4,2],['trading',45,20,72,3,1]]},
+  rifler:{label:'Rifler',icon:'▲',attribute:'FIREPOWER + TRADING + OPENING',description:'É a base mecânica do time, mantendo dano, trocas e consistência em diferentes momentos do round.',color:'#4f8dfd',bg:'rgba(79,141,253,.14)',weights:{firepower:.30,trading:.22,opening:.15,entrying:.13,clutching:.10,utility:.07,sniping:.03},requirements:[['firepower',55,25,82,7,4],['trading',50,25,76,4,2],['opening',42,18,72,3,1]]},
+  trader:{label:'Trader',icon:'⇄',attribute:'TRADING + FIREPOWER + ENTRYING',description:'Joga colado à linha de frente e precisa responder imediatamente às eliminações dos companheiros.',color:'#f2b53d',bg:'rgba(242,181,61,.14)',weights:{trading:.32,firepower:.22,entrying:.14,utility:.10,opening:.09,clutching:.08,sniping:.05},requirements:[['trading',55,25,82,8,4],['firepower',48,22,75,4,2],['entrying',42,18,72,3,1]]}
 };
+const SKILL_META = {
+  firepower:{label:'Firepower',short:'FIRE'}, entrying:{label:'Entrying',short:'ENTRY'}, trading:{label:'Trading',short:'TRADE'},
+  opening:{label:'Opening',short:'OPEN'}, clutching:{label:'Clutching',short:'CLUTCH'}, sniping:{label:'Sniping',short:'AWP'}, utility:{label:'Utility',short:'UTIL'}
+};
+const CORE_TEAM_ROLES = ['entry','awper','support'];
+const MATCH_BALANCE = {
+  curve:30,
+  userPressure:1.5,
+  matchFormSwing:5,
+  mapSwing:4,
+  bo1Min:.22,
+  bo1Max:.78,
+  bo3MapMin:.18,
+  bo3MapMax:.82,
+  expectedMajorStrength:68
+};
+const clampScore = value => Math.max(0,Math.min(100,value));
+function statValue(player,key){ return Number.isFinite(Number(player?.[key])) ? Number(player[key]) : 50; }
+function evaluateRole(player,roleCode){
+  const role=STRATEGY_ROLES[roleCode] || STRATEGY_ROLES.rifler;
+  const weighted=Object.entries(role.weights).reduce((total,[key,weight])=>total+statValue(player,key)*weight,0);
+  const effects=[];
+  let modifier=0;
+  for(const [key,target,critical,elite,penalty,bonus] of role.requirements){
+    const value=statValue(player,key); let delta=0;
+    if(value<target) delta=-penalty*Math.min(1,(target-value)/Math.max(1,target-critical));
+    else delta=bonus*Math.min(1,(value-target)/Math.max(1,elite-target));
+    modifier+=delta;
+    effects.push({key,label:SKILL_META[key].label,value,target,delta,status:value>=elite?'elite':value>=target?'good':value<=critical?'critical':'weak'});
+  }
+  const score=Math.round(clampScore(weighted+modifier));
+  const status=score>=75?'EXCELENTE':score>=62?'BOM':score>=48?'REGULAR':'RUIM';
+  return {score,weighted:Math.round(weighted),modifier:Number(modifier.toFixed(1)),status,effects,role};
+}
+function fitTone(score){
+  if(score>=75) return {color:'#34c77b',bg:'rgba(52,199,123,.13)'};
+  if(score>=62) return {color:'#2fb8c6',bg:'rgba(47,184,198,.13)'};
+  if(score>=48) return {color:'#f2b53d',bg:'rgba(242,181,61,.13)'};
+  return {color:'#ef6b6b',bg:'rgba(239,68,68,.13)'};
+}
+function playersSharedSeason(a,b){
+  const historyA=a?.teamHistory || [], historyB=b?.teamHistory || [];
+  return historyA.some(first=>historyB.some(second=>first.year===second.year&&first.teamSlug===second.teamSlug));
+}
+function evaluateTeam(assignments,{coach=false,fixedChemistry=null}={}){
+  const valid=assignments.filter(item=>item?.player);
+  if(!valid.length) return {strength:50,base:50,chemistry:25,chemistryBonus:-2,compositionBonus:-6,coachBonus:0,players:[]};
+  const players=valid.map(item=>{ const fit=evaluateRole(item.player,item.role); const overall=Number.isFinite(Number(item.player.overall))?Number(item.player.overall):50; return {...item,fit,contribution:overall*.35+fit.score*.65}; });
+  const base=players.reduce((sum,item)=>sum+item.contribution,0)/players.length;
+  let pairs=0,together=0;
+  for(let i=0;i<players.length;i++) for(let j=i+1;j<players.length;j++){ pairs++; if(playersSharedSeason(players[i].player,players[j].player)) together++; }
+  const chemistry=fixedChemistry==null?Math.round(25+75*(pairs?together/pairs:0)):fixedChemistry;
+  const chemistryBonus=(chemistry-50)*.08;
+  const roles=players.map(item=>item.role), uniqueRoles=new Set(roles).size;
+  let compositionBonus=CORE_TEAM_ROLES.reduce((sum,role)=>sum+(roles.includes(role) ? .65 : -2.25),0);
+  compositionBonus+=uniqueRoles>=5?1.25:uniqueRoles===4?.6:uniqueRoles<=2?-1.5:0;
+  const coachBonus=coach?4:0;
+  return {strength:base+chemistryBonus+compositionBonus+coachBonus,base,chemistry,chemistryBonus,compositionBonus,coachBonus,players};
+}
+function rolePermutations(values){
+  if(values.length<=1) return [values];
+  return values.flatMap((value,index)=>rolePermutations([...values.slice(0,index),...values.slice(index+1)]).map(rest=>[value,...rest]));
+}
+const BALANCED_ROLES=['entry','awper','support','rifler','lurker'];
+const BALANCED_ROLE_PERMUTATIONS=rolePermutations(BALANCED_ROLES);
+function bestLineupEvaluation(players){
+  let best=null;
+  for(const roles of BALANCED_ROLE_PERMUTATIONS){
+    const evaluation=evaluateTeam(players.slice(0,5).map((player,index)=>({player,role:roles[index]})),{fixedChemistry:100});
+    if(!best||evaluation.strength>best.strength) best=evaluation;
+  }
+  return best || evaluateTeam([]);
+}
 const STRATEGY_PRESETS = [
   {id:'balanced',name:'Equilibrado',tagline:'RECOMENDADO',description:'Uma composição segura para começar, cobrindo abertura, AWP, suporte e fim de round.',roles:['entry','awper','support','rifler','lurker'],accent:'#34c77b'},
   {id:'double-support',name:'Duplo suporte',tagline:'CONTROLE E CONSISTÊNCIA',description:'Mais utilitárias e preparação de jogadas, sacrificando parte do poder de fogo bruto.',roles:['entry','awper','support','support','lurker'],accent:'#2fb8c6'},
@@ -1825,15 +2030,49 @@ const OPPONENT_POOL = [
   {tag:'TRK', name:'Torque', hue:'#fb923c'}
 ];
 const ROUND_LABELS = ['Quartas de final','Semifinal','Final'];
+
+const SCREEN_PATHS = {
+  home:'/inicio', jogar:'/jogar', jogadores:'/jogadores', times:'/times', ranking:'/ranking', regras:'/regras',
+  temporadas:'/temporadas', login:'/entrar', cadastro:'/cadastro', perfil:'/perfil',
+  'major-intro':'/jogar/monte-seu-time', 'major-strategy':'/jogar/monte-seu-time/estrategia',
+  'major-sorteio':'/jogar/monte-seu-time/sorteio', 'major-player-draft':'/jogar/monte-seu-time/jogadores',
+  'major-draft':'/jogar/monte-seu-time/elenco', 'major-groups':'/jogar/monte-seu-time/grupos',
+  'major-playoffs':'/jogar/monte-seu-time/playoffs',
+  'major-simulacao':'/jogar/monte-seu-time/simulacao', 'major-partida':'/jogar/monte-seu-time/partida',
+  'major-resultado':'/jogar/monte-seu-time/resultado', 'major-resumo':'/jogar/monte-seu-time/resumo',
+  'adivinhar-intro':'/jogar/quem-e-o-jogador', 'adivinhar-partida':'/jogar/quem-e-o-jogador/partida',
+  'adivinhar-resultado':'/jogar/quem-e-o-jogador/resultado'
+};
+function cleanSegment(value){ return encodeURIComponent(String(value || '').toLowerCase()); }
+function pathForScreen(screen, params={}){
+  if(screen==='jogador-perfil') return `/jogadores/${cleanSegment(params.slug)}`;
+  if(screen==='time-perfil') return `/times/${cleanSegment(params.slug)}`;
+  if(screen==='temporada-detalhe') return `/temporadas/${cleanSegment(params.code)}`;
+  return SCREEN_PATHS[screen] || '/inicio';
+}
+function routeFromPath(pathname=window.location.pathname){
+  const path = decodeURIComponent(pathname).replace(/\/+$/, '') || '/';
+  if(path==='/' || path==='/5x5.dc.html') return {screen:'home',params:{}};
+  const player = path.match(/^\/jogadores\/([^/]+)$/i);
+  if(player) return {screen:'jogador-perfil',params:{slug:player[1].toUpperCase()}};
+  const team = path.match(/^\/times\/([^/]+)$/i);
+  if(team) return {screen:'time-perfil',params:{slug:team[1].toUpperCase()}};
+  const season = path.match(/^\/temporadas\/([^/]+)$/i);
+  if(season) return {screen:'temporada-detalhe',params:{code:season[1]}};
+  const entry = Object.entries(SCREEN_PATHS).find(([,candidate])=>candidate===path.toLowerCase());
+  return entry ? {screen:entry[0],params:{}} : {screen:'home',params:{}};
+}
+const INITIAL_ROUTE = routeFromPath();
 class Component extends DCLogic {
-  state = { screen:'home', params:{}, mobileNavOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, playerProfileYear:null, teamProfileYear:null, rouletteDone:false, drawnSeasonId:null, draftId:null,
+  state = { screen:INITIAL_ROUTE.screen, params:INITIAL_ROUTE.params, mobileNavOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, playerProfileYear:null, teamProfileYear:null, rouletteDone:false, drawnSeasonId:null, draftId:null,
     draftRoster:[null,null,null,null,null], draftCoach:null, draftCaptain:null,
-    strategyPreset:'balanced', strategyRoles:['entry','awper','support','rifler','lurker'],
-    playerDraftRolling:false, playerDraftYear:null, playerDraftTeamSlug:null, playerDraftCandidateSlugs:[], playerDraftSelectedSlug:null, playerDraftSwapIndex:null, playerDraftPreviewYear:'—', playerDraftPreviewTeam:'Preparando sorteio',
+    strategyPreset:'balanced', strategyRoles:['entry','awper','support','rifler','lurker'], openStrategySlot:null,
+    playerDraftRolling:false, playerDraftYear:null, playerDraftTeamSlug:null, playerDraftCandidateSlugs:[], playerDraftSelectedSlug:null, playerDraftSwapIndex:null, playerDraftRerolls:0, playerDraftPreviewYear:'—', playerDraftPreviewTeam:'Preparando sorteio',
     draftFilters:{search:'', team:'', role:'', sortBy:'overall', onlyEligible:true},
     playerDrawerSlug:null, coachPickerOpen:false,
     simRound:0, simMatches:[], simEliminated:false, simChampion:false, simSkipAnim:false,
-    swissTeams:[], swissRound:0, swissHistory:[], swissPendingMatches:null, swissUserRounds:[], swissUserRoundIndex:0, swissMode:'normal',
+    swissTeams:[], swissRound:0, swissHistory:[], swissPendingMatches:null, swissUserRounds:[], swissUserRoundIndex:0, swissMode:'normal', swissLiveOpen:false, swissLiveFinished:false, swissLiveStatsView:'map-1', majorLiveContext:'swiss',
+    playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null,
     guessMatchId:null, guessTargetSlug:null, guessScore:1000, guessAttempts:[], guessRevealedHints:[], guessPendingHint:null, guessInput:'', guessAutocompleteOpen:false, guessSelectedSlug:null, guessOver:false, guessWon:false,
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
     rankingTab:'overall', userProfileTab:'visao', authName:'', authEmail:'', authPassword:'',
@@ -1844,9 +2083,14 @@ class Component extends DCLogic {
       if((e.metaKey||e.ctrlKey) && e.key==='k'){ e.preventDefault(); this.setState({searchOpen:true}); }
       if(e.key==='Escape') this.setState({searchOpen:false});
     });
+    window.addEventListener('popstate', this._onPopState = ()=>{
+      const route=routeFromPath();
+      this.setState({screen:route.screen,params:route.params,mobileNavOpen:false,playerProfileYear:null,teamProfileYear:null});
+      window.scrollTo(0,0);
+    });
     this.loadCatalog();
   }
-  componentWillUnmount(){ document.removeEventListener('keydown', this._onKey); clearInterval(this._playerDraftTicker); clearTimeout(this._playerDraftTimer); clearTimeout(this._swissAutoTimer); }
+  componentWillUnmount(){ document.removeEventListener('keydown', this._onKey); window.removeEventListener('popstate', this._onPopState); clearInterval(this._playerDraftTicker); clearTimeout(this._playerDraftTimer); clearTimeout(this._swissAutoTimer); }
 
   loadCatalog = async () => {
     try {
@@ -1901,6 +2145,8 @@ class Component extends DCLogic {
 
   nav = (screen, params={}) => {
     const localYearReset = screen==='jogador-perfil' ? {playerProfileYear:null} : screen==='time-perfil' ? {teamProfileYear:null} : {};
+    const nextPath=pathForScreen(screen,params);
+    if(window.location.pathname!==nextPath) window.history.pushState({screen,params},'',nextPath);
     this.setState({screen, params, mobileNavOpen:false, ...localYearReset});
     window.scrollTo(0,0);
     if(screen==='major-sorteio'){
@@ -1915,16 +2161,18 @@ class Component extends DCLogic {
   };
   selectStrategyPreset = (id) => {
     const preset = STRATEGY_PRESETS.find(item=>item.id===id);
-    if(preset) this.setState({strategyPreset:id, strategyRoles:[...preset.roles]});
+    if(preset) this.setState({strategyPreset:id, strategyRoles:[...preset.roles], openStrategySlot:null});
   };
   setStrategyRole = (idx, role) => this.setState(s=>{
     const strategyRoles=[...s.strategyRoles]; strategyRoles[idx]=role;
     const matched=STRATEGY_PRESETS.find(p=>p.roles.every((value,index)=>value===strategyRoles[index]));
-    return {strategyRoles, strategyPreset:matched?.id || 'custom'};
+    return {strategyRoles, strategyPreset:matched?.id || 'custom', openStrategySlot:null};
   });
+  toggleStrategySlot = (idx) => this.setState(s=>({openStrategySlot:s.openStrategySlot===idx?null:idx}));
   confirmStrategy = () => {
     const id='d'+Date.now().toString(36);
-    this.setState({screen:'major-player-draft',params:{id},draftId:id,draftRoster:[null,null,null,null,null],playerDraftSelectedSlug:null,playerDraftSwapIndex:null});
+    window.history.pushState({screen:'major-player-draft',params:{id}},'',pathForScreen('major-player-draft',{id}));
+    this.setState({screen:'major-player-draft',params:{id},draftId:id,draftRoster:[null,null,null,null,null],playerDraftSelectedSlug:null,playerDraftSwapIndex:null,playerDraftRerolls:0});
     window.scrollTo(0,0);
     setTimeout(()=>this._drawPlayerPool(),80);
   };
@@ -1956,6 +2204,14 @@ class Component extends DCLogic {
       this.setState({playerDraftRolling:false,playerDraftYear:pool.year,playerDraftTeamSlug:pool.teamSlug,playerDraftCandidateSlugs:pool.slugs,drawnSeasonId:`s${pool.year}`});
     },1400);
   };
+  rerollPlayerDraft = () => {
+    if(this.state.playerDraftRolling) return;
+    if(this.state.playerDraftRerolls>=2){
+      this.showToast({icon:'!',title:'Limite de sorteios',desc:'Você já usou os 2 novos sorteios permitidos nesta partida.',accent:'#f2b53d',border:'#33394a'});
+      return;
+    }
+    this.setState(s=>({playerDraftRerolls:s.playerDraftRerolls+1}),()=>this._drawPlayerPool());
+  };
   selectPlayerDraftCandidate = (slug) => this.setState({playerDraftSelectedSlug:slug,playerDraftSwapIndex:null});
   placePlayerDraftCandidate = (idx) => {
     const s=this.state;
@@ -1965,19 +2221,32 @@ class Component extends DCLogic {
     this.setState({draftRoster:roster,playerDraftSelectedSlug:null});
     if(roster.filter(Boolean).length<5) setTimeout(()=>this._drawPlayerPool(),250);
   };
+  placePlayerDraftCandidateAt = (slug,idx) => {
+    const s=this.state;
+    if(s.draftRoster[idx] || !(s.playerDraftCandidateSlugs || []).includes(slug)) return;
+    const roster=[...s.draftRoster];
+    roster[idx]={slug,role:s.strategyRoles[idx],year:s.playerDraftYear,teamSlug:s.playerDraftTeamSlug};
+    this.setState({draftRoster:roster,playerDraftSelectedSlug:null,playerDraftSwapIndex:null});
+    if(roster.filter(Boolean).length<5) setTimeout(()=>this._drawPlayerPool(),250);
+  };
   handlePlayerDraftSlot = (idx) => {
     const s=this.state;
-    if(!s.draftRoster[idx]){ this.placePlayerDraftCandidate(idx); return; }
-    if(s.playerDraftSelectedSlug) return;
-    if(s.playerDraftSwapIndex===null){ this.setState({playerDraftSwapIndex:idx}); return; }
+    if(s.playerDraftSelectedSlug){ if(!s.draftRoster[idx]) this.placePlayerDraftCandidate(idx); return; }
+    if(s.playerDraftSwapIndex===null){ if(s.draftRoster[idx]) this.setState({playerDraftSwapIndex:idx}); return; }
     if(s.playerDraftSwapIndex===idx){ this.setState({playerDraftSwapIndex:null}); return; }
     const roster=[...s.draftRoster];
     const first=s.playerDraftSwapIndex;
-    [roster[first],roster[idx]]=[roster[idx],roster[first]];
-    roster[first]={...roster[first],role:s.strategyRoles[first]};
+    const destinationOccupied=!!roster[idx];
+    if(destinationOccupied){
+      [roster[first],roster[idx]]=[roster[idx],roster[first]];
+      roster[first]={...roster[first],role:s.strategyRoles[first]};
+    } else {
+      roster[idx]=roster[first];
+      roster[first]=null;
+    }
     roster[idx]={...roster[idx],role:s.strategyRoles[idx]};
     this.setState({draftRoster:roster,playerDraftSwapIndex:null});
-    this.showToast({icon:'↔',title:'Posições alteradas',desc:'Os jogadores trocaram de função no layout.',accent:'#2fb8c6',border:'#33394a'});
+    this.showToast({icon:destinationOccupied?'↔':'→',title:destinationOccupied?'Posições alteradas':'Jogador movido',desc:destinationOccupied?'Os jogadores trocaram de função no layout.':'O jogador foi colocado na posição vazia.',accent:'#2fb8c6',border:'#33394a'});
   };
   finishPlayerDraft = () => {
     if(this.state.draftRoster.filter(Boolean).length<5){
@@ -2023,17 +2292,26 @@ class Component extends DCLogic {
   };
   backToDraft = ()=> this.nav('major-draft', {id:this.state.draftId});
   disputarMajor = ()=> {
-    const used=new Set(); const entrants=[];
-    const pools=[];
-    for(const team of TEAMS) for(const lineup of team.lineups || []) if((lineup.players || []).length>=5) pools.push({team,lineup});
-    while(entrants.length<15 && pools.length){
-      const idx=Math.floor(Math.random()*pools.length); const pick=pools.splice(idx,1)[0];
-      if(used.has(pick.team.slug)) continue; used.add(pick.team.slug);
-      const values=(pick.lineup.players || []).map(p=>p.overall).filter(Number.isFinite);
-      entrants.push({id:pick.team.slug,name:`${pick.team.name.toUpperCase()} · ${pick.lineup.year}`,tag:pick.team.tag,year:pick.lineup.year,strength:values.length?values.reduce((a,b)=>a+b,0)/values.length:70,wins:0,losses:0,status:'playing',opponents:[]});
+    const entrants=[],candidates=[];
+    for(const team of TEAMS){
+      let best=null;
+      for(const lineup of team.lineups || []){
+        if((lineup.players || []).length<5) continue;
+        const evaluation=bestLineupEvaluation(lineup.players || []);
+        if(!best||evaluation.strength>best.evaluation.strength) best={team,lineup,evaluation};
+      }
+      if(best) candidates.push(best);
+    }
+    candidates.sort((a,b)=>b.evaluation.strength-a.evaluation.strength);
+    const rng=mulberry32(hashStr(`${this.state.draftId || 'major'}-field`));
+    while(entrants.length<15&&candidates.length){
+      const eliteWindow=Math.min(6,candidates.length),index=Math.min(eliteWindow-1,Math.floor(Math.pow(rng(),1.7)*eliteWindow));
+      const pick=candidates.splice(index,1)[0],lineupEvaluation=pick.evaluation;
+      entrants.push({id:pick.team.slug,name:`${pick.team.name.toUpperCase()} · ${pick.lineup.year}`,tag:pick.team.tag,year:pick.lineup.year,strength:lineupEvaluation.strength,evaluation:lineupEvaluation,wins:0,losses:0,status:'playing',opponents:[]});
     }
     const teams=[{id:'user',name:'SEU TIME · MISTO',tag:'VOCÊ',year:'MISTO',strength:this._teamOverall(),wins:0,losses:0,status:'playing',isUser:true,opponents:[]},...entrants];
-    this.setState({screen:'major-groups',params:{id:this.state.draftId},swissTeams:teams,swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal'});
+    window.history.pushState({screen:'major-groups',params:{id:this.state.draftId}},'',pathForScreen('major-groups',{id:this.state.draftId}));
+    this.setState({screen:'major-groups',params:{id:this.state.draftId},swissTeams:teams,swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'});
     window.scrollTo(0,0);
   };
   _buildSwissRound(teams,round){
@@ -2050,10 +2328,23 @@ class Component extends DCLogic {
       const b=available.splice(opponentIndex,1)[0];
       const deciding=a.wins===2||a.losses===2||b.wins===2||b.losses===2;
       const seed=hashStr(`${this.state.draftId}-${round}-${a.id}-${b.id}`); const rng=mulberry32(seed);
-      const chance=1/(1+Math.pow(10,(b.strength-a.strength)/18)); const aWon=rng()<chance;
-      const winner=aWon?a:b, loser=aWon?b:a;
       const format=deciding?'BO3':'BO1';
-      matches.push({aId:a.id,bId:b.id,teamA:a.name,teamB:b.name,pool:`${a.wins}–${a.losses}`,winnerId:winner.id,loserId:loser.id,format,score:format==='BO3'?(aWon?'2–'+(rng()>.55?'0':'1'):(rng()>.55?'0':'1')+'–2'):(aWon?'13–'+Math.floor(5+rng()*7):Math.floor(5+rng()*7)+'–13'),isUser:a.isUser||b.isUser});
+      const formA=(rng()+rng()-1)*MATCH_BALANCE.matchFormSwing,formB=(rng()+rng()-1)*MATCH_BALANCE.matchFormSwing;
+      const effectiveA=a.strength+formA-(a.isUser?MATCH_BALANCE.userPressure:0),effectiveB=b.strength+formB-(b.isUser?MATCH_BALANCE.userPressure:0);
+      const rawChance=1/(1+Math.pow(10,(effectiveB-effectiveA)/MATCH_BALANCE.curve));
+      const chance=Math.max(format==='BO1'?MATCH_BALANCE.bo1Min:MATCH_BALANCE.bo3MapMin,Math.min(format==='BO1'?MATCH_BALANCE.bo1Max:MATCH_BALANCE.bo3MapMax,rawChance));
+      let aMaps=0,bMaps=0;
+      if(format==='BO3'){
+        while(aMaps<2&&bMaps<2){
+          const mapFormA=(rng()+rng()-1)*MATCH_BALANCE.mapSwing,mapFormB=(rng()+rng()-1)*MATCH_BALANCE.mapSwing;
+          const mapChance=Math.max(MATCH_BALANCE.bo3MapMin,Math.min(MATCH_BALANCE.bo3MapMax,1/(1+Math.pow(10,((effectiveB+mapFormB)-(effectiveA+mapFormA))/MATCH_BALANCE.curve))));
+          if(rng()<mapChance) aMaps++; else bMaps++;
+        }
+      } else if(rng()<chance) aMaps=1; else bMaps=1;
+      const aWon=aMaps>bMaps;
+      const winner=aWon?a:b, loser=aWon?b:a;
+      const loserRounds=Math.floor(5+rng()*7);
+      matches.push({aId:a.id,bId:b.id,teamA:a.name,teamB:b.name,pool:`${a.wins}–${a.losses}`,winnerId:winner.id,loserId:loser.id,format,score:format==='BO3'?`${aMaps}–${bMaps}`:(aWon?`13–${loserRounds}`:`${loserRounds}–13`),chanceA:chance,effectiveA,effectiveB,isUser:a.isUser||b.isUser});
       }
     }
     return matches;
@@ -2066,26 +2357,140 @@ class Component extends DCLogic {
       if(winner.wins>=3) winner.status='qualified'; if(loser.losses>=3) loser.status='eliminated';
     }
   }
+  _simulatePlayoffMatch(a,b,salt,format='BO3'){
+    const rng=mulberry32(hashStr(`${this.state.draftId}-playoff-${salt}-${a.id}-${b.id}`));
+    const formA=(rng()+rng()-1)*MATCH_BALANCE.matchFormSwing,formB=(rng()+rng()-1)*MATCH_BALANCE.matchFormSwing;
+    const effectiveA=a.strength+formA-(a.isUser?MATCH_BALANCE.userPressure:0),effectiveB=b.strength+formB-(b.isUser?MATCH_BALANCE.userPressure:0);
+    const mapsToWin=format==='MD5'?3:2;
+    let aMaps=0,bMaps=0;
+    while(aMaps<mapsToWin&&bMaps<mapsToWin){
+      const mapFormA=(rng()+rng()-1)*MATCH_BALANCE.mapSwing,mapFormB=(rng()+rng()-1)*MATCH_BALANCE.mapSwing;
+      const chance=Math.max(MATCH_BALANCE.bo3MapMin,Math.min(MATCH_BALANCE.bo3MapMax,1/(1+Math.pow(10,((effectiveB+mapFormB)-(effectiveA+mapFormA))/MATCH_BALANCE.curve))));
+      if(rng()<chance) aMaps++; else bMaps++;
+    }
+    const aWon=aMaps>bMaps;
+    return {aId:a.id,bId:b.id,teamA:a.name,teamB:b.name,pool:'PLAYOFFS',winnerId:aWon?a.id:b.id,loserId:aWon?b.id:a.id,format,score:`${aMaps}–${bMaps}`,chanceA:1/(1+Math.pow(10,(effectiveB-effectiveA)/MATCH_BALANCE.curve)),effectiveA,effectiveB,isUser:a.isUser||b.isUser};
+  }
+  _startPlayoffs(teams){
+    const qualified=teams.filter(team=>team.status==='qualified').sort((a,b)=>b.wins-a.wins||a.losses-b.losses||b.strength-a.strength).slice(0,8);
+    if(!qualified.some(team=>team.id==='user')||qualified.length<8) return;
+    const pairs=[[qualified[0],qualified[7]],[qualified[3],qualified[4]],[qualified[1],qualified[6]],[qualified[2],qualified[5]]];
+    const bracket=[
+      {key:'quarter',label:'QUARTAS DE FINAL',matches:pairs.map(([a,b])=>({a,b,result:null}))},
+      {key:'semi',label:'SEMIFINAIS',matches:[{a:null,b:null,result:null},{a:null,b:null,result:null}]},
+      {key:'final',label:'FINAL',matches:[{a:null,b:null,result:null}]}
+    ];
+    const params={id:this.state.draftId}; window.history.pushState({screen:'major-playoffs',params},'',pathForScreen('major-playoffs',params));
+    this.setState({screen:'major-playoffs',params,playoffBracket:bracket,playoffStage:'quarter',playoffPendingMatches:null,playoffEliminated:false,playoffChampion:null,majorLiveContext:'playoff'});
+    window.scrollTo(0,0);
+  }
+  startPlayoffRound = ()=>{
+    if(this.state.playoffPendingMatches||this.state.playoffEliminated||this.state.playoffChampion) return;
+    const round=this.state.playoffBracket.find(item=>item.key===this.state.playoffStage); if(!round) return;
+    const format=round.key==='final'?'MD5':'BO3';
+    const results=round.matches.filter(match=>match.a&&match.b).map((match,index)=>this._simulatePlayoffMatch(match.a,match.b,`${round.key}-${index}`,format));
+    const userMatch=results.find(match=>match.isUser); if(!userMatch) return;
+    this.setState({playoffPendingMatches:results,swissUserRounds:this._userRoundTimeline(userMatch),swissUserRoundIndex:0,swissLiveOpen:true,swissLiveFinished:false,swissLiveStatsView:'map-1',majorLiveContext:'playoff'});
+    clearTimeout(this._swissAutoTimer); this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),650);
+  };
+  _completePlayoffRound(){
+    const s=this.state,pending=s.playoffPendingMatches; if(!pending) return;
+    const bracket=s.playoffBracket.map(round=>({...round,matches:round.matches.map(match=>({...match}))})),current=bracket.find(round=>round.key===s.playoffStage);
+    current.matches=current.matches.map(match=>({...match,result:pending.find(result=>(result.aId===match.a?.id&&result.bId===match.b?.id)||(result.aId===match.b?.id&&result.bId===match.a?.id)) || null}));
+    const userResult=pending.find(match=>match.isUser),userWon=userResult?.winnerId==='user';
+    if(!userWon){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffEliminated:true,swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return; }
+    if(s.playoffStage==='final'){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffChampion:'user',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return; }
+    const teamsById=new Map(s.swissTeams.map(team=>[team.id,team])),winners=pending.map(result=>teamsById.get(result.winnerId)).filter(Boolean);
+    const nextKey=s.playoffStage==='quarter'?'semi':'final',next=bracket.find(round=>round.key===nextKey);
+    next.matches=nextKey==='semi'?[{a:winners[0],b:winners[1],result:null},{a:winners[2],b:winners[3],result:null}]:[{a:winners[0],b:winners[1],result:null}];
+    this.setState({playoffBracket:bracket,playoffStage:nextKey,playoffPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false});
+  }
+  _swissLivePlayers(teamId,side){
+    let source=[];
+    if(teamId==='user'){
+      source=this.state.draftRoster.filter(Boolean).map(item=>this._draftPlayer(item.slug,item.year)).filter(Boolean);
+    } else {
+      const team=this.state.swissTeams.find(item=>item.id===teamId);
+      source=(team?.evaluation?.players || []).map(item=>item.player).filter(Boolean);
+    }
+    const players=source.slice(0,5).map((player,index)=>({
+      id:`${side}-${player.slug || index}`,name:(player.nick || player.nickname || player.name || player.slug || `JOGADOR ${index+1}`).toUpperCase(),
+      kills:0,deaths:0,assists:0,killWeight:Math.max(10,statValue(player,'firepower')+statValue(player,'opening')*.25),assistWeight:Math.max(10,statValue(player,'utility')+statValue(player,'trading')*.35)
+    }));
+    while(players.length<5){ const index=players.length; players.push({id:`${side}-reserve-${index}`,name:`JOGADOR ${index+1}`,kills:0,deaths:0,assists:0,killWeight:50,assistWeight:50}); }
+    return players;
+  }
   _userRoundTimeline(match){
-    const userWon=match.winnerId==='user'; const seed=hashStr(`${this.state.draftId}-live-${this.state.swissRound}`); const rng=mulberry32(seed);
-    let us=0,them=0; const frames=[]; const target=13;
-    while(us<target&&them<target){ const userRound=rng()<(userWon ? 0.58 : 0.42); if(userRound) us++; else them++; frames.push({us,them}); }
-    if((us===target)!==userWon){ const finalLoser=Math.min(11,Math.max(us,them)); us=userWon?13:finalLoser; them=userWon?finalLoser:13; frames.push({us,them}); }
+    const seed=hashStr(`${this.state.draftId}-live-${this.state.swissRound}-${match.aId}-${match.bId}`),rng=mulberry32(seed);
+    const userIsA=match.aId==='user',opponentId=userIsA?match.bId:match.aId;
+    const userTemplate=this._swissLivePlayers('user','us'),opponentTemplate=this._swissLivePlayers(opponentId,'them');
+    const freshStats=template=>template.map(player=>({...player,kills:0,deaths:0,assists:0}));
+    let userStats=freshStats(userTemplate),opponentStats=freshStats(opponentTemplate);
+    const aggregateUser=freshStats(userTemplate),aggregateOpponent=freshStats(opponentTemplate);
+    const cloneStats=players=>players.map(({id,name,kills,deaths,assists})=>({id,name,kills,deaths,assists}));
+    const combinedStats=(aggregate,current)=>aggregate.map((player,index)=>({id:player.id,name:player.name,kills:player.kills+current[index].kills,deaths:player.deaths+current[index].deaths,assists:player.assists+current[index].assists}));
+    const mergeStats=(aggregate,current)=>aggregate.forEach((player,index)=>{player.kills+=current[index].kills;player.deaths+=current[index].deaths;player.assists+=current[index].assists;});
+    const weightedPick=(players,key)=>{ const total=players.reduce((sum,p)=>sum+p[key],0); let roll=rng()*total; for(const player of players){ roll-=player[key]; if(roll<=0) return player; } return players[players.length-1]; };
+    const addDeaths=(players,count)=>{ const available=[...players]; for(let i=0;i<count&&available.length;i++){ const index=Math.floor(rng()*available.length); available.splice(index,1)[0].deaths++; } };
+    const addKills=(players,count)=>{ for(let i=0;i<count;i++) weightedPick(players,'killWeight').kills++; };
+    const addAssists=(players,count)=>{ for(let i=0;i<count;i++) weightedPick(players,'assistWeight').assists++; };
+    const scoreParts=String(match.score).split(/[–-]/).map(Number);
+    const isMapSeries=match.format==='BO3'||match.format==='MD5';
+    let userMapTarget=1,opponentMapTarget=0;
+    if(isMapSeries){
+      userMapTarget=userIsA?scoreParts[0]:scoreParts[1]; opponentMapTarget=userIsA?scoreParts[1]:scoreParts[0];
+    } else if(match.winnerId!=='user'){ userMapTarget=0; opponentMapTarget=1; }
+    const mapWinners=[];
+    if(isMapSeries){
+      const userWonSeries=userMapTarget>opponentMapTarget;
+      const winnerMaps=Math.max(userMapTarget,opponentMapTarget),loserMaps=Math.min(userMapTarget,opponentMapTarget);
+      const beforeFinal=Array(Math.max(0,winnerMaps-1)).fill(userWonSeries).concat(Array(loserMaps).fill(!userWonSeries));
+      for(let i=beforeFinal.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [beforeFinal[i],beforeFinal[j]]=[beforeFinal[j],beforeFinal[i]]; }
+      mapWinners.push(...beforeFinal,userWonSeries);
+    } else mapWinners.push(match.winnerId==='user');
+    const frames=[],completedMaps=[]; let seriesUs=0,seriesThem=0,totalRounds=0;
+    frames.push({us:0,them:0,map:1,totalMaps:mapWinners.length,mapRound:0,seriesUs,seriesThem,totalRounds,userStats:cloneStats(userStats),opponentStats:cloneStats(opponentStats),aggregateUserStats:cloneStats(aggregateUser),aggregateOpponentStats:cloneStats(aggregateOpponent),mapStats:[],roundWinner:'Aguardando primeiro round'});
+    mapWinners.forEach((userWinsMap,mapIndex)=>{
+      if(mapIndex>0){
+        userStats=freshStats(userTemplate);opponentStats=freshStats(opponentTemplate);
+        frames.push({us:0,them:0,map:mapIndex+1,totalMaps:mapWinners.length,mapRound:0,seriesUs,seriesThem,totalRounds,userStats:cloneStats(userStats),opponentStats:cloneStats(opponentStats),aggregateUserStats:cloneStats(aggregateUser),aggregateOpponentStats:cloneStats(aggregateOpponent),mapStats:[...completedMaps],roundWinner:`MAPA ${mapIndex+1} iniciado · K/D/A zerado`});
+      }
+      const savedLoserRounds=match.format==='BO1'?(userWinsMap?(userIsA?scoreParts[1]:scoreParts[0]):(userIsA?scoreParts[0]:scoreParts[1])):null;
+      const loserRounds=Number.isFinite(savedLoserRounds)?Math.max(0,Math.min(11,savedLoserRounds)):5+Math.floor(rng()*7),outcomes=Array(12).fill(userWinsMap).concat(Array(loserRounds).fill(!userWinsMap));
+      for(let i=outcomes.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [outcomes[i],outcomes[j]]=[outcomes[j],outcomes[i]]; }
+      outcomes.push(userWinsMap);
+      let mapUs=0,mapThem=0;
+      outcomes.forEach(userWonRound=>{
+        if(userWonRound) mapUs++; else mapThem++;
+        const losingDeaths=3+Math.floor(rng()*3),winningDeaths=Math.floor(rng()*Math.min(5,losingDeaths));
+        if(userWonRound){ addDeaths(opponentStats,losingDeaths);addKills(userStats,losingDeaths);addAssists(userStats,Math.floor(rng()*(Math.min(5,losingDeaths)+1)));addDeaths(userStats,winningDeaths);addKills(opponentStats,winningDeaths);addAssists(opponentStats,Math.floor(rng()*(Math.min(5,winningDeaths)+1))); }
+        else { addDeaths(userStats,losingDeaths);addKills(opponentStats,losingDeaths);addAssists(opponentStats,Math.floor(rng()*(Math.min(5,losingDeaths)+1)));addDeaths(opponentStats,winningDeaths);addKills(userStats,winningDeaths);addAssists(userStats,Math.floor(rng()*(Math.min(5,winningDeaths)+1))); }
+        totalRounds++;
+        const mapComplete=mapUs===13||mapThem===13,nextSeriesUs=seriesUs+(mapComplete&&userWinsMap?1:0),nextSeriesThem=seriesThem+(mapComplete&&!userWinsMap?1:0);
+        const currentMapSnapshot={map:mapIndex+1,us:mapUs,them:mapThem,userStats:cloneStats(userStats),opponentStats:cloneStats(opponentStats)};
+        frames.push({us:mapUs,them:mapThem,map:mapIndex+1,totalMaps:mapWinners.length,mapRound:mapUs+mapThem,seriesUs:nextSeriesUs,seriesThem:nextSeriesThem,totalRounds,mapComplete,userStats:cloneStats(userStats),opponentStats:cloneStats(opponentStats),aggregateUserStats:combinedStats(aggregateUser,userStats),aggregateOpponentStats:combinedStats(aggregateOpponent,opponentStats),mapStats:mapComplete?[...completedMaps,currentMapSnapshot]:[...completedMaps],roundWinner:mapComplete?`MAPA ${mapIndex+1} encerrado · ${mapUs} a ${mapThem}`:userWonRound?'SEU TIME venceu o round':'ADVERSÁRIO venceu o round'});
+      });
+      completedMaps.push({map:mapIndex+1,us:mapUs,them:mapThem,userStats:cloneStats(userStats),opponentStats:cloneStats(opponentStats)});
+      mergeStats(aggregateUser,userStats);mergeStats(aggregateOpponent,opponentStats);
+      if(userWinsMap) seriesUs++; else seriesThem++;
+    });
     return frames;
   }
   startSwissRound = ()=>{
     if(this.state.swissPendingMatches) return;
     const matches=this._buildSwissRound(this.state.swissTeams,this.state.swissRound+1);
     const userMatch=matches.find(m=>m.isUser);
-    this.setState({swissPendingMatches:matches,swissUserRounds:userMatch?this._userRoundTimeline(userMatch):[],swissUserRoundIndex:0});
+    this.setState({swissPendingMatches:matches,swissUserRounds:userMatch?this._userRoundTimeline(userMatch):[],swissUserRoundIndex:0,swissLiveOpen:!!userMatch,swissLiveFinished:false,swissLiveStatsView:'map-1',majorLiveContext:'swiss'});
     clearTimeout(this._swissAutoTimer);
-    this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),1000);
+    this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),650);
   };
   advanceSwissUserRound = ()=>{
     const s=this.state;
-    if(s.swissUserRoundIndex<s.swissUserRounds.length-1){ this.setState({swissUserRoundIndex:s.swissUserRoundIndex+1}); this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),1000); return; }
-    this._completeSwissRound();
+    if(s.swissUserRoundIndex<s.swissUserRounds.length-1){ const nextIndex=s.swissUserRoundIndex+1,nextFrame=s.swissUserRounds[nextIndex],currentFrame=s.swissUserRounds[s.swissUserRoundIndex]; this.setState({swissUserRoundIndex:nextIndex,...(nextFrame.map!==currentFrame.map?{swissLiveStatsView:`map-${nextFrame.map}`}:{})}); this._swissAutoTimer=setTimeout(()=>this.advanceSwissUserRound(),650); return; }
+    this.setState({swissLiveFinished:true,swissLiveStatsView:'aggregate'});
   };
+  setSwissLiveStatsView = (view)=>this.setState({swissLiveStatsView:view});
+  closeSwissLive = ()=>{ if(!this.state.swissLiveFinished) return; const context=this.state.majorLiveContext; this.setState({swissLiveOpen:false},()=>context==='playoff'?this._completePlayoffRound():this._completeSwissRound()); };
   _completeSwissRound(){
     const s=this.state; if(!s.swissPendingMatches) return;
     const teams=s.swissTeams.map(t=>({...t}));
@@ -2094,7 +2499,8 @@ class Component extends DCLogic {
     if(teams.find(t=>t.id==='user')?.status!=='playing'){
       while(round<5 && teams.some(t=>t.status==='playing')){ const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches}); }
     }
-    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0});
+    const userStatus=teams.find(team=>team.id==='user')?.status;
+    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false},()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); });
   }
   simulateSwissFast = ()=>{
     clearTimeout(this._swissAutoTimer);
@@ -2103,26 +2509,17 @@ class Component extends DCLogic {
     while(round<5 && teams.some(t=>t.status==='playing')){
       const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches});
     }
-    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'fast'});
+    const userStatus=teams.find(team=>team.id==='user')?.status;
+    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'fast',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'},()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); });
   };
   setSwissNormal = ()=>this.setState({swissMode:'normal'});
 
-  _teamOverall(){
+  _teamEvaluation(){
     const s = this.state;
-    const filled = s.draftRoster.map((r,index)=>r ? {player:this._draftPlayer(r.slug,r.year),strategyRole:s.strategyRoles[index]} : null).filter(item=>item?.player);
-    const avg = filled.length? filled.reduce((total,item)=>{
-      const p=item.player;
-      let roleBonus=0;
-      if(item.strategyRole==='support'){
-        const utility=Number.isFinite(p.utility)?p.utility:50;
-        const firepower=Number.isFinite(p.firepower)?p.firepower:50;
-        roleBonus=((utility-50)*0.06)+((firepower-50)*0.03);
-      }
-      return total+p.overall+roleBonus;
-    },0)/filled.length : 75;
-    const coachBonus = s.draftCoach ? 4 : 0;
-    return avg + coachBonus;
+    const assignments=s.draftRoster.map((item,index)=>item?{player:this._draftPlayer(item.slug,item.year),role:s.strategyRoles[index]}:null).filter(item=>item?.player);
+    return evaluateTeam(assignments,{coach:!!s.draftCoach});
   }
+  _teamOverall(){ return this._teamEvaluation().strength; }
   _simulateOneMatch(round){
     const s = this.state;
     const seed = hashStr((s.draftId||'x') + '-r' + round);
@@ -2349,8 +2746,15 @@ class Component extends DCLogic {
     }));
     const strategySlots = s.strategyRoles.map((code,index)=>{
       const role=STRATEGY_ROLES[code];
-      return {number:index+1,role:code,description:role.description,attribute:role.attribute,color:role.color,bg:role.bg,hasSecondaryEffect:code==='support',onChange:(e)=>this.setStrategyRole(index,e.target.value)};
+      const isOpen=s.openStrategySlot===index;
+      const opensLeft=index>=3;
+      const options=Object.entries(STRATEGY_ROLES).map(([optionCode,optionRole])=>{
+        const selected=optionCode===code;
+        return {label:optionRole.label,icon:optionRole.icon,color:optionRole.color,bg:optionRole.bg,textColor:selected?'#f4f5f7':'#9aa3b2',check:selected?'✓':'',onSelect:(event)=>{event.stopPropagation();this.setStrategyRole(index,optionCode)},style:`display:flex;align-items:center;gap:7px;padding:7px;background:${selected?optionRole.bg:'#0d0f14'};border:1px solid ${selected?`${optionRole.color}66`:'#242833'};border-radius:9px;cursor:pointer;transition:border-color .16s ease,background .16s ease`};
+      });
+      return {number:index+1,role:code,label:role.label,icon:role.icon,description:role.description,attribute:role.attribute,shortAttribute:role.attribute.replace(' alto','').replace(' alta + FIREPOWER',' + FIRE'),color:role.color,bg:role.bg,isOpen,chevron:isOpen?'▲':'▼',options,onToggle:()=>this.toggleStrategySlot(index),onPickerClick:(event)=>event.stopPropagation(),cardStyle:`position:relative;aspect-ratio:1/1;background:${isOpen?role.bg:'#0d0f14'};border:1px solid ${isOpen?role.color:'#2a2f3b'};border-radius:18px;padding:22px 9px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:${isOpen?`0 0 0 1px ${role.color}22,0 12px 30px rgba(0,0,0,.28)`:'inset 0 1px 0 rgba(255,255,255,.02)'};transition:transform .16s ease,border-color .16s ease,background .16s ease`,pickerStyle:`position:absolute;top:calc(100% + 9px);${opensLeft?'right:0':'left:0'};z-index:35;width:300px;background:#151922;border:1px solid #33394a;border-radius:13px;padding:10px;box-shadow:0 18px 50px rgba(0,0,0,.55);animation:toastin .16s ease`};
     });
+    const strategyRequirements=s.strategyRoles.map((code,index)=>{ const role=STRATEGY_ROLES[code]; return {number:index+1,label:role.label,icon:role.icon,color:role.color,bg:role.bg,targets:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · ')}; });
     const supportCount=s.strategyRoles.filter(role=>role==='support').length;
     const entryCount=s.strategyRoles.filter(role=>role==='entry').length;
     const hasAwper=s.strategyRoles.includes('awper');
@@ -2366,22 +2770,39 @@ class Component extends DCLogic {
 
     // ---- SEQUENTIAL PLAYER DRAFT ----
     const playerDraftTeam=teamOf(s.playerDraftTeamSlug);
+    const openStrategySlots=s.strategyRoles.map((roleCode,index)=>({roleCode,index})).filter(slot=>!s.draftRoster[slot.index]);
     const playerDraftCandidates=(s.playerDraftCandidateSlugs || []).map(slug=>playerInYear(playerOf(slug),s.playerDraftYear)).filter(Boolean).map(p=>{
       const selected=s.playerDraftSelectedSlug===p.slug;
-      const stats=[['Firepower',p.firepower],['Entrying',p.entrying],['Trading',p.trading],['Clutching',p.clutching],['Sniping',p.sniping],['Utility',p.utility]].filter(([,value])=>Number.isFinite(value)).sort((a,b)=>b[1]-a[1]);
-      return {nick:p.nick,initials:p.nick.slice(0,2).toUpperCase(),overall:p.overall,bestAttribute:stats.length?`${stats[0][0]} ${stats[0][1]}`:'Sem stats',onSelect:()=>this.selectPlayerDraftCandidate(p.slug),avatarStyle:`width:36px;height:36px;border-radius:8px;background:${playerDraftTeam.hue}22;color:${playerDraftTeam.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px`,style:`display:flex;align-items:center;gap:10px;background:${selected?'rgba(255,92,26,.08)':'#0d0f14'};border:1px solid ${selected?'#ff5c1a':'#242833'};border-radius:9px;padding:9px 10px;cursor:pointer`,checkStyle:`width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${selected?'#0a0c10':'transparent'};background:${selected?'#ff5c1a':'#1a1e28'}`};
-    });
+      const candidateSlots=openStrategySlots.length?openStrategySlots:s.strategyRoles.map((roleCode,index)=>({roleCode,index}));
+      const fits=candidateSlots.map(slot=>({...slot,...evaluateRole(p,slot.roleCode)})).sort((a,b)=>b.score-a.score||a.index-b.index);
+      const bestFit=fits[0] || {roleCode:'rifler',...evaluateRole(p,'rifler')}; const tone=fitTone(bestFit.score);
+      const roleFits=fits.slice(0,3).map((fit,rank)=>{const fitColor=fitTone(fit.score),isBest=rank===0,shortRole=fit.role.label.replace(' Fragger','');return {rank:`${rank+1}ª`,icon:fit.role.icon,label:`${shortRole} · P${fit.index+1}`,score:fit.score,onPlace:(event)=>{event.stopPropagation();this.placePlayerDraftCandidateAt(p.slug,fit.index)},style:`font-size:8.5px;font-weight:800;color:${fitColor.color};background:${isBest?fitColor.bg:'#171a22'};border:1px solid ${isBest?`${fitColor.color}55`:'#242833'};border-radius:4px;padding:2px 5px;cursor:pointer`};});
+      return {nick:p.nick,initials:p.nick.slice(0,2).toUpperCase(),bestFitScore:bestFit.score,bestFitStatus:bestFit.status,bestFitColor:tone.color,bestFitBg:tone.bg,roleFits,onSelect:()=>this.selectPlayerDraftCandidate(p.slug),avatarStyle:`width:40px;height:40px;border-radius:9px;background:${playerDraftTeam.hue}22;color:${playerDraftTeam.hue};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;flex-shrink:0`,style:`min-height:82px;box-sizing:border-box;display:flex;align-items:center;gap:10px;background:${selected?'rgba(255,92,26,.08)':'#0d0f14'};border:1px solid ${selected?'#ff5c1a':'#242833'};border-radius:9px;padding:8px 9px;cursor:pointer`,checkStyle:`width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${selected?'#0a0c10':'transparent'};background:${selected?'#ff5c1a':'#1a1e28'};flex-shrink:0`};
+    }).sort((a,b)=>b.bestFitScore-a.bestFitScore||b.overall-a.overall);
+    const selectedDraftPreview=s.playerDraftSelectedSlug?playerInYear(playerOf(s.playerDraftSelectedSlug),s.playerDraftYear):null;
+    const selectedSlotRanking=selectedDraftPreview?openStrategySlots.map(slot=>({...slot,score:evaluateRole(selectedDraftPreview,slot.roleCode).score})).sort((a,b)=>b.score-a.score||a.index-b.index):[];
+    const selectedSlotRankByIndex=new Map(selectedSlotRanking.map((slot,rank)=>[slot.index,rank+1]));
     const playerDraftSlots=s.strategyRoles.map((roleCode,index)=>{
       const role=STRATEGY_ROLES[roleCode]; const rosterItem=s.draftRoster[index];
       const p=rosterItem?this._draftPlayer(rosterItem.slug,rosterItem.year):null;
       const team=rosterItem?teamOf(rosterItem.teamSlug || p?.team):null;
       const canPlace=!rosterItem && !!s.playerDraftSelectedSlug && !s.playerDraftRolling;
+      const canReceiveMove=!rosterItem && s.playerDraftSwapIndex!==null;
       const swapSelected=s.playerDraftSwapIndex===index;
-      return {filled:!!p,swapSelected,roleLabel:role.label,attribute:role.attribute,color:role.color,bg:role.bg,playerName:p?p.nick:(canPlace?'Clique para posicionar':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():index+1,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':'#0d0f14'};border:1px solid ${swapSelected?'#f2b53d':canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace?'pointer':'default'};min-height:105px`,year:rosterItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
+      const movingItem=canReceiveMove?s.draftRoster[s.playerDraftSwapIndex]:null;
+      const previewPlayer=p || (canPlace?playerInYear(playerOf(s.playerDraftSelectedSlug),s.playerDraftYear):movingItem?this._draftPlayer(movingItem.slug,movingItem.year):null);
+      const fit=previewPlayer?evaluateRole(previewPlayer,roleCode):null; const tone=fitTone(fit?.score || 0);
+      const recommendationRank=canPlace?selectedSlotRankByIndex.get(index):null;
+      const recommendationLabel=recommendationRank?`${recommendationRank}ª ${recommendationRank===1?'MELHOR VAGA':'ALTERNATIVA'} · `:'';
+      return {filled:!!p,swapSelected,roleLabel:role.label,roleIcon:role.icon,attribute:role.attribute,color:role.color,bg:role.bg,fitLabel:fit?`${recommendationLabel}FIT ${fit.score}/100 · ${fit.status}`:'SEM JOGADOR',fitColor:fit?tone.color:'#636d7e',fitBg:fit?tone.bg:'#171a22',requirementText:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · '),playerName:p?p.nick:(canPlace?'Clique para posicionar':canReceiveMove?'Clique para mover aqui':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':canReceiveMove?'#f2b53d':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():role.icon,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:${p?'12px':'20px'};font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':canReceiveMove?'rgba(242,181,61,.045)':recommendationRank===1?tone.bg:'#0d0f14'};border:1px solid ${swapSelected||canReceiveMove?'#f2b53d':recommendationRank===1?tone.color:canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace||canReceiveMove?'pointer':'default'};min-height:118px`,year:rosterItem?.year || movingItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
     });
     const playerDraftFilledCount=s.draftRoster.filter(Boolean).length;
+    const playerDraftRerollsRemaining=Math.max(0,2-s.playerDraftRerolls);
+    const playerDraftRerollLocked=playerDraftRerollsRemaining===0;
+    const playerDraftRerollLabel=playerDraftRerollLocked?'Limite de 2 novos sorteios atingido':`Sortear outro ano e time · ${playerDraftRerollsRemaining} ${playerDraftRerollsRemaining===1?'uso restante':'usos restantes'}`;
+    const playerDraftRerollStyle=`text-align:center;font-size:10px;font-weight:700;color:${playerDraftRerollLocked?'#4f5868':'#9aa3b2'};background:${playerDraftRerollLocked?'#11141a':'transparent'};border:1px solid ${playerDraftRerollLocked?'#242833':'#33394a'};border-radius:7px;padding:6px;margin-top:7px;cursor:${playerDraftRerollLocked?'not-allowed':'pointer'}`;
     const playerDraftSelectionHint=s.playerDraftSwapIndex!==null?'SELECIONE A NOVA POSIÇÃO':s.playerDraftSelectedSlug?'JOGADOR SELECIONADO':'CLIQUE PARA TROCAR POSIÇÕES';
-    const playerDraftActionText=s.playerDraftSwapIndex!==null?'Agora clique em outro jogador para trocar as posições.':s.playerDraftSelectedSlug?'Clique em uma posição vazia para colocar o jogador.':'Clique em um jogador escalado e depois em outro para trocar suas funções.';
+    const playerDraftActionText=s.playerDraftSwapIndex!==null?'Clique numa posição vazia para mover ou em outro jogador para trocar.':s.playerDraftSelectedSlug?'Clique em uma posição vazia para colocar o jogador.':'Clique em um jogador escalado para mover ou trocar sua função.';
     const finishPlayerDraftStyle=`font-size:13px;font-weight:800;color:${playerDraftFilledCount===5?'#0a0c10':'#636d7e'};background:${playerDraftFilledCount===5?'#ff5c1a':'#1a1e28'};border-radius:8px;padding:11px 19px;cursor:${playerDraftFilledCount===5?'pointer':'default'}`;
 
     // ---- DRAFT SCREEN ----
@@ -2448,11 +2869,13 @@ class Component extends DCLogic {
 
     const filledPlayers = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug,r.year)).filter(Boolean);
     const avg = (arr)=> arr.length? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+    const teamEvaluation=this._teamEvaluation();
+    const averageFit=teamEvaluation.players.length?Math.round(teamEvaluation.players.reduce((sum,item)=>sum+item.fit.score,0)/teamEvaluation.players.length):0;
     const compBars = [
-      {label:'Força ofensiva', value: avg(filledPlayers.map(p=>p.overall))},
-      {label:'AWP', value: avg(filledPlayers.filter(p=>p.roles.includes('awper')).map(p=>p.overall)) || 0},
-      {label:'Liderança', value: avg(filledPlayers.filter(p=>p.roles.includes('igl')).map(p=>p.overall)) || 0},
-      {label:'Entrosamento', value: filledPlayers.length? Math.min(96, 55 + filledPlayers.filter(p=>p.team===filledPlayers[0].team).length*9) : 0}
+      {label:'Força calculada', value: Math.round(teamEvaluation.strength)},
+      {label:'Encaixe posicional', value: averageFit},
+      {label:'Entrosamento', value: teamEvaluation.chemistry},
+      {label:'Composição', value: Math.round(clampScore(50+teamEvaluation.compositionBonus*10))}
     ].map(cb=>({...cb, barStyle:`height:100%;width:${cb.value}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d)`}));
 
     const draftWarnings = [];
@@ -2466,18 +2889,19 @@ class Component extends DCLogic {
     const confirmButtonStyle = `font-size:13px;font-weight:700;color:#0a0c10;background:#ff5c1a;border-radius:8px;padding:10px 18px;cursor:pointer`;
 
     // ---- RESUMO SCREEN ----
-    const resumoPlayers = s.draftRoster.filter(Boolean).map(r=>{
+    const resumoPlayers = s.draftRoster.map((r,index)=>r?{r,index}:null).filter(Boolean).map(({r,index})=>{
       const p = this._draftPlayer(r.slug,r.year); const team = teamOf(p.team);
-      return { avatarStyle:avatarStyle(team.hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick, isCaptain:s.draftCaptain===r.slug, roleLabel:ROLE_META[r.role]?.label||r.role, overall:p.overall };
+      const roleCode=s.strategyRoles[index],fit=evaluateRole(p,roleCode),tone=fitTone(fit.score);
+      return { avatarStyle:avatarStyle(team.hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick, isCaptain:s.draftCaptain===r.slug, roleLabel:STRATEGY_ROLES[roleCode]?.label||roleCode, overall:p.overall,fitScore:fit.score,fitStatus:fit.status,fitColor:tone.color,fitBg:tone.bg };
     });
     const resumoCoach = coach || {name:'Nenhum coach selecionado', leadership:'—', tatica:'—', avatarStyle:coachAvatarStyle};
     if(coach) resumoCoach.avatarStyle = coachAvatarStyle;
     const axes = [
-      {label:'OFENSIVA', value: avg(filledPlayers.map(p=>p.overall))},
-      {label:'AWP', value: avg(filledPlayers.filter(p=>p.roles.includes('awper')).map(p=>p.overall)) || 35},
-      {label:'LIDERANÇA', value: avg(filledPlayers.filter(p=>p.roles.includes('igl')).map(p=>p.overall)) || 35},
-      {label:'SUPORTE', value: avg(filledPlayers.filter(p=>p.roles.includes('support')).map(p=>p.overall)) || 35},
-      {label:'ENTROSAMENTO', value: filledPlayers.length? Math.min(96, 55 + teamsInRoster.size*0 + (5-teamsInRoster.size)*9) : 0}
+      {label:'FORÇA', value: Math.round(teamEvaluation.strength)},
+      {label:'ENCAIXE', value: averageFit},
+      {label:'OVERALL', value: avg(filledPlayers.map(p=>p.overall))},
+      {label:'COMPOSIÇÃO', value: Math.round(clampScore(50+teamEvaluation.compositionBonus*10))},
+      {label:'ENTROSAMENTO', value: teamEvaluation.chemistry}
     ];
     const cx=120, cy=120, R=90;
     const angleFor = (i)=> (Math.PI*2*i/5) - Math.PI/2;
@@ -2487,15 +2911,21 @@ class Component extends DCLogic {
     const radarLabels = axes.map((a,i)=>{ const [x,y]=ptFor(i, R+18); return {label:a.label, x:x.toFixed(1), y:y.toFixed(1)}; });
     const mapStrengths = (drawnSeason.maps||[]).slice(0,5).map(m=>{ const seed=hashStr(m+ (s.draftId||'')); const rng=mulberry32(seed); const v=Math.round(55+rng()*40); return {map:m, value:v, barStyle:`height:100%;width:${v}%;background:linear-gradient(90deg,#2fb8c6,#4f8dfd)`}; });
     const strengths = []; const weaknesses = [];
-    if(filledPlayers.some(p=>p.roles.includes('awper')) && avg(filledPlayers.filter(p=>p.roles.includes('awper')).map(p=>p.overall))>=88) strengths.push('AWP de elite na linha de frente.');
-    if(teamsInRoster.size<=2) strengths.push('Alto entrosamento — maioria vinda do mesmo elenco.');
-    if(filledPlayers.some(p=>p.roles.includes('igl'))) strengths.push('Liderança tática definida com IGL claro.');
-    if(!strengths.length) strengths.push('Elenco equilibrado sem destaques extremos.');
-    if(!filledPlayers.some(p=>p.roles.includes('igl'))) weaknesses.push('Falta um IGL claro para chamadas táticas.');
-    if(!filledPlayers.some(p=>p.roles.includes('awper'))) weaknesses.push('Nenhum AWPer dedicado na escalação.');
-    if(teamsInRoster.size===filledPlayers.length && filledPlayers.length>=3) weaknesses.push('Baixo entrosamento — jogadores nunca competiram juntos.');
+    const eliteFits=teamEvaluation.players.filter(item=>item.fit.score>=75),weakFits=teamEvaluation.players.filter(item=>item.fit.score<48);
+    if(eliteFits.length) strengths.push(`${eliteFits.length} jogador(es) com encaixe excelente na posição.`);
+    if(teamEvaluation.chemistry>=70) strengths.push('Entrosamento alto por temporadas disputadas em conjunto.');
+    if(teamEvaluation.compositionBonus>1) strengths.push('Composição cobre abertura, AWP e suporte com boa diversidade.');
+    if(!strengths.length) strengths.push('Elenco sem bônus forte, mas com estrutura funcional.');
+    if(weakFits.length) weaknesses.push(`${weakFits.length} jogador(es) fora do perfil exigido pela posição.`);
+    if(teamEvaluation.chemistry<45) weaknesses.push('Baixo entrosamento: poucos jogadores já atuaram juntos no mesmo ano.');
+    if(teamEvaluation.compositionBonus<0) weaknesses.push('Composição incompleta ou com funções importantes repetidas/ausentes.');
     if(!weaknesses.length) weaknesses.push('Nenhuma fraqueza crítica identificada.');
-    const classificationChance = Math.max(8, Math.min(92, Math.round(avg(filledPlayers.map(p=>p.overall)) - 40 + (coach?6:0))));
+    const expectedOpponentStrength=MATCH_BALANCE.expectedMajorStrength;
+    const adjustedUserStrength=teamEvaluation.strength-MATCH_BALANCE.userPressure;
+    const rawSingleMatchChance=1/(1+Math.pow(10,(expectedOpponentStrength-adjustedUserStrength)/MATCH_BALANCE.curve));
+    const singleMatchChance=Math.max(MATCH_BALANCE.bo1Min,Math.min(MATCH_BALANCE.bo1Max,rawSingleMatchChance));
+    const missChance=1-singleMatchChance;
+    const classificationChance=Math.round(Math.max(3,Math.min(97,100*Math.pow(singleMatchChance,3)*(1+3*missChance+6*Math.pow(missChance,2)))));
     const classificationBarStyle = `height:100%;width:${classificationChance}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d)`;
 
     // ---- MAJOR SWISS STAGE ----
@@ -2504,9 +2934,23 @@ class Component extends DCLogic {
     const swissVisibleMatches=s.swissPendingMatches || s.swissHistory[s.swissHistory.length-1]?.matches || [];
     const swissRoundMatches=swissVisibleMatches.map(match=>({teamA:match.teamA,teamB:match.teamB,format:match.format,score:s.swissPendingMatches?(match.isUser?'AO VIVO':'•••'):match.score,state:s.swissPendingMatches?(match.isUser?'seu jogo':'simulando em segundo plano'):'encerrado',scoreColor:match.isUser?'#ff5c1a':'#9aa3b2',style:`background:#0d0f14;border:1px solid ${match.isUser?'rgba(255,92,26,.35)':'#242833'};border-radius:8px;padding:10px;font-size:11px;color:#c8ccd4`}));
     const swissPendingUser=s.swissPendingMatches?.find(match=>match.isUser);
+    const playoffPendingUser=s.playoffPendingMatches?.find(match=>match.isUser);
+    const livePendingUser=s.majorLiveContext==='playoff'?playoffPendingUser:swissPendingUser;
     const swissUserTeam=s.swissTeams.find(team=>team.id==='user');
     let swissUserMatch=null;
     if(swissPendingUser){ const frame=s.swissUserRounds[Math.min(s.swissUserRoundIndex,s.swissUserRounds.length-1)] || {us:0,them:0}; const opponent=swissPendingUser.aId==='user'?swissPendingUser.teamB:swissPendingUser.teamA; swissUserMatch={format:swissPendingUser.format,record:`Campanha ${swissUserTeam?.wins || 0}–${swissUserTeam?.losses || 0}`,opponent,score:`${frame.us} : ${frame.them}`,message:`Round ${Math.min(s.swissUserRoundIndex+1,s.swissUserRounds.length)} de ${s.swissUserRounds.length}`,progressStyle:`height:100%;width:${s.swissUserRounds.length?((s.swissUserRoundIndex+1)/s.swissUserRounds.length)*100:0}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d);transition:width .25s ease`}; }
+    let swissLiveModal=null;
+    if(s.swissLiveOpen&&livePendingUser&&s.swissUserRounds.length){
+      const frame=s.swissUserRounds[Math.min(s.swissUserRoundIndex,s.swissUserRounds.length-1)],opponent=livePendingUser.aId==='user'?livePendingUser.teamB:livePendingUser.teamA;
+      const makeRows=rows=>{ const topKills=Math.max(...rows.map(player=>player.kills),0); return rows.map(player=>({name:player.name,kills:player.kills,deaths:player.deaths,assists:player.assists,ratio:(player.kills/Math.max(1,player.deaths)).toFixed(2),style:`display:grid;grid-template-columns:minmax(120px,1fr) 38px 38px 38px 50px;gap:4px;align-items:center;padding:8px 11px;border-top:1px solid #1d222d;background:${player.kills===topKills&&topKills>0?'rgba(242,181,61,.045)':'transparent'};font-family:'JetBrains Mono',monospace;font-size:10.5px`})); };
+      const statsView=s.swissLiveStatsView || `map-${frame.map}`,isAggregate=statsView==='aggregate',selectedMap=Number(statsView.replace('map-',''))||frame.map;
+      const savedMap=(frame.mapStats || []).find(item=>item.map===selectedMap),viewingCurrentMap=selectedMap===frame.map;
+      const selectedUserStats=isAggregate?frame.aggregateUserStats:viewingCurrentMap?frame.userStats:savedMap?.userStats || frame.userStats;
+      const selectedOpponentStats=isAggregate?frame.aggregateOpponentStats:viewingCurrentMap?frame.opponentStats:savedMap?.opponentStats || frame.opponentStats;
+      const statsTabs=[...Array.from({length:frame.map},(_,index)=>{ const map=index+1,key=`map-${map}`,active=statsView===key,mapData=(frame.mapStats || []).find(item=>item.map===map); return {label:`MAPA ${map}`,score:mapData?`${mapData.us}:${mapData.them}`:map===frame.map?`${frame.us}:${frame.them}`:'',onClick:()=>this.setSwissLiveStatsView(key),style:`font-size:9.5px;font-weight:900;color:${active?'#0a0c10':'#9aa3b2'};background:${active?'#2fb8c6':'#171b24'};border:1px solid ${active?'#2fb8c6':'#2a303d'};border-radius:6px;padding:6px 9px;cursor:pointer`};}),{label:'AGREGADO',score:`${frame.seriesUs}:${frame.seriesThem}`,onClick:()=>this.setSwissLiveStatsView('aggregate'),style:`font-size:9.5px;font-weight:900;color:${isAggregate?'#0a0c10':'#f2b53d'};background:${isAggregate?'#f2b53d':'rgba(242,181,61,.08)'};border:1px solid ${isAggregate?'#f2b53d':'rgba(242,181,61,.3)'};border-radius:6px;padding:6px 9px;cursor:pointer`}];
+      const finished=s.swissLiveFinished, userLeading=frame.us>frame.them,opponentLeading=frame.them>frame.us;
+      swissLiveModal={format:livePendingUser.format,opponent,mapLabel:`MAPA ${frame.map} DE ${frame.totalMaps}`,roundLabel:finished?'SÉRIE ENCERRADA':frame.mapRound?`ROUND ${frame.mapRound}`:'NOVO MAPA',us:frame.us,them:frame.them,seriesUs:frame.seriesUs,seriesThem:frame.seriesThem,status:finished?'PARTIDA ENCERRADA':'AO VIVO',statusColor:finished?'#34c77b':'#ef6b6b',statusBg:finished?'rgba(52,199,123,.12)':'rgba(239,107,107,.12)',userScoreColor:userLeading?'#34c77b':'#f4f5f7',opponentScoreColor:opponentLeading?'#ef6b6b':'#f4f5f7',progressStyle:`height:100%;width:${Math.round((s.swissUserRoundIndex/Math.max(1,s.swissUserRounds.length-1))*100)}%;background:linear-gradient(90deg,#ff5c1a,#f2b53d);transition:width .3s ease`,statsTabs,statsScope:isAggregate?'K/D/A AGREGADO DA SÉRIE':`K/D/A DO MAPA ${selectedMap}`,userRows:makeRows(selectedUserStats),opponentRows:makeRows(selectedOpponentStats),event:finished?(livePendingUser.winnerId==='user'?'VITÓRIA · confira cada mapa e o agregado antes de continuar':'DERROTA · confira cada mapa e o agregado antes de continuar'):frame.roundWinner,eventColor:finished?(livePendingUser.winnerId==='user'?'#34c77b':'#ef6b6b'):frame.roundWinner.startsWith('SEU')?'#34c77b':frame.roundWinner.startsWith('MAPA')?'#2fb8c6':'#ef6b6b',finished};
+    }
     const swissFinished=swissUserTeam && swissUserTeam.status!=='playing';
     const swissPoolLabels=['0–0','1–0 / 0–1','2–0 / 1–1 / 0–2','2–1 / 1–2','2–2'];
     const swissBracketColumns=Array.from({length:5},(_,index)=>{
@@ -2517,8 +2961,21 @@ class Component extends DCLogic {
     const swissPrimaryAction=swissFinished||s.swissPendingMatches?()=>{}:this.startSwissRound;
     const swissPrimaryStyle=`text-align:center;font-size:13.5px;font-weight:800;color:${swissFinished||s.swissPendingMatches?'#9aa3b2':'#0a0c10'};background:${swissFinished||s.swissPendingMatches?'#1a1e28':'#ff5c1a'};border-radius:9px;padding:13px;cursor:${swissFinished||s.swissPendingMatches?'default':'pointer'}`;
     const swissCampaignRecord=`${swissUserTeam?.wins || 0} vitórias · ${swissUserTeam?.losses || 0} derrotas`;
+    const swissEliminationNotice=swissUserTeam?.status==='eliminated';
     const swissNormalStyle=`font-size:11.5px;font-weight:800;color:${s.swissMode==='normal'?'#0a0c10':'#9aa3b2'};background:${s.swissMode==='normal'?'#2fb8c6':'#12151c'};border:1px solid ${s.swissMode==='normal'?'#2fb8c6':'#242833'};border-radius:8px;padding:9px 12px;cursor:pointer`;
     const swissFastStyle='font-size:11.5px;font-weight:800;color:#0a0c10;background:#f2b53d;border:1px solid #f2b53d;border-radius:8px;padding:9px 12px;cursor:pointer';
+
+    // ---- PLAYOFFS ----
+    const playoffStageLabels={quarter:'QUARTAS DE FINAL',semi:'SEMIFINAL',final:'FINAL'};
+    const playoffRounds=(s.playoffBracket || []).map(round=>({label:round.label,format:round.key==='final'?'MD5':'MD3',matchesStyle:'display:flex;flex:1;flex-direction:column;justify-content:space-around;gap:12px',matches:round.matches.map(match=>{
+      const result=match.result,parts=result?String(result.score).split(/[–-]/):[],resultA=result?(result.aId===match.a?.id?parts[0]:parts[1]):'–',resultB=result?(result.bId===match.b?.id?parts[1]:parts[0]):'–';
+      const userMatch=match.a?.id==='user'||match.b?.id==='user',winnerId=result?.winnerId;
+      return {teamA:match.a?.name || 'A DEFINIR',teamB:match.b?.name || 'A DEFINIR',scoreA:resultA,scoreB:resultB,status:result?`${winnerId===match.a?.id?match.a.name:match.b.name} AVANÇOU`:match.a&&match.b?(round.key===s.playoffStage?'PRÓXIMO CONFRONTO':'AGUARDANDO ETAPA'):'AGUARDANDO VENCEDORES',statusColor:result?'#34c77b':userMatch?'#ff5c1a':'#636d7e',teamAStyle:`font-size:11px;font-weight:${winnerId===match.a?.id?900:700};color:${winnerId===match.a?.id?'#34c77b':match.a?'#e5e8ee':'#596171'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,teamBStyle:`font-size:11px;font-weight:${winnerId===match.b?.id?900:700};color:${winnerId===match.b?.id?'#34c77b':match.b?'#e5e8ee':'#596171'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,scoreAStyle:`font-family:'JetBrains Mono',monospace;color:${winnerId===match.a?.id?'#34c77b':'#9aa3b2'}`,scoreBStyle:`font-family:'JetBrains Mono',monospace;color:${winnerId===match.b?.id?'#34c77b':'#9aa3b2'}`,style:`background:${userMatch?'rgba(255,92,26,.055)':'#0c0f15'};border:1px solid ${userMatch?'rgba(255,92,26,.5)':'#2a303d'};border-radius:10px;padding:12px;box-shadow:${userMatch?'0 0 0 1px rgba(255,92,26,.08)':'none'}`};
+    })}));
+    const playoffCanPlay=s.screen==='major-playoffs'&&!s.playoffEliminated&&!s.playoffChampion&&!s.playoffPendingMatches;
+    let playoffView={rounds:playoffRounds,canPlay:playoffCanPlay,primaryAction:this.startPlayoffRound,primaryLabel:`JOGAR ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,eyebrow:'VOCÊ ESTÁ NOS PLAYOFFS',title:`Próximo desafio: ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,description:'Analise os dois lados da chave e vença a série para continuar no Major.',bannerColor:'#2fb8c6',statusBg:'rgba(47,184,198,.1)',statusLabel:'AGUARDANDO',bannerStyle:'background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-left:4px solid #2fb8c6;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
+    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,eyebrow:'FIM DE CAMPANHA',title:'Seu time foi eliminado nos playoffs',description:'O resultado permanece registrado no chaveamento acima.',bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:'ELIMINADO',bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
+    if(s.playoffChampion) playoffView={...playoffView,canPlay:false,eyebrow:'CAMPEÃO DO MAJOR',title:'Seu time conquistou o título!',description:'Você venceu quartas, semifinal e final do Major.',bannerColor:'#f2b53d',statusBg:'rgba(242,181,61,.12)',statusLabel:'CAMPEÃO',bannerStyle:'background:linear-gradient(135deg,rgba(242,181,61,.17),#10131a);border:1px solid rgba(242,181,61,.55);border-left:4px solid #f2b53d;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
 
     // ---- SIMULACAO / PARTIDA / RESULTADO ----
     const teamOvNow = Math.round(this._teamOverall());
@@ -2826,11 +3283,13 @@ class Component extends DCLogic {
 
     return {
       catalogLoading:s.catalogLoading, catalogError:s.catalogError,
+      showFooter:s.screen!=='major-player-draft',
       isHome: s.screen==='home',
       isJogarHub: s.screen==='jogar',
       isMajorIntro: s.screen==='major-intro',
       isMajorStrategy: s.screen==='major-strategy',
       isPlayerDraft: s.screen==='major-player-draft',
+      isMajorPlayoffs:s.screen==='major-playoffs',
       isMajorSorteio: s.screen==='major-sorteio',
       isDraft: s.screen==='major-draft',
       isResumo: s.screen==='major-resumo',
@@ -2841,8 +3300,10 @@ class Component extends DCLogic {
       compBars, draftWarnings, confirmButtonStyle, clearRoster:this.clearRoster, goResumo:this.goResumo,
       playerDrawer, closePlayerDrawer:this.closePlayerDrawer,
       resumoPlayers, resumoCoach, radarPoints, radarRings, radarLabels, mapStrengths, strengths, weaknesses, classificationChance, classificationBarStyle,
+      teamPower:Math.round(teamEvaluation.strength),teamFit:averageFit,teamChemistry:teamEvaluation.chemistry,teamCompositionModifier:`${teamEvaluation.compositionBonus>=0?'+':''}${teamEvaluation.compositionBonus.toFixed(1)}`,
       isSimulacao: s.screen==='major-simulacao', isPartida: s.screen==='major-partida', isResultado: s.screen==='major-resultado',
-      isMajorGroups:s.screen==='major-groups', swissStageTitle:'Fase de grupos · 16 times', swissRoundLabel:`RODADA ${s.swissRound}/5`, swissCampaignRecord, swissBracketColumns, swissStandings, swissRoundMatches, swissUserMatch, swissPrimaryLabel, swissPrimaryAction, swissPrimaryStyle, swissNormalStyle, swissFastStyle, setSwissNormal:this.setSwissNormal, simulateSwissFast:this.simulateSwissFast,
+      isMajorGroups:s.screen==='major-groups', swissStageTitle:'Fase de grupos · 16 times', swissRoundLabel:`RODADA ${s.swissRound}/5`, swissCampaignRecord, swissEliminationNotice, swissBracketColumns, swissStandings, swissRoundMatches, swissUserMatch, swissLiveModal, closeSwissLive:this.closeSwissLive, swissPrimaryLabel, swissPrimaryAction, swissPrimaryStyle, swissNormalStyle, swissFastStyle, setSwissNormal:this.setSwissNormal, simulateSwissFast:this.simulateSwissFast,
+      playoffView,
       bracketRounds, currentMatchPreview, nextMatch:this.nextMatch, simulateAll:this.simulateAll,
       partidaDetail, backToSimulacao:this.backToSimulacao,
       resultadoData, playAgain:this.playAgain, shareResult:this.shareResult,
@@ -2864,9 +3325,9 @@ class Component extends DCLogic {
       isUserProfile: s.screen==='perfil', userProfileTabs, userTabVisao: s.userProfileTab==='visao', userTabHistorico: s.userProfileTab==='historico', userTabConquistas: s.userProfileTab==='conquistas',
       userStats, userHistorico, userAchievements,
       majorRules, majorHistory, rouletteDone:s.rouletteDone, drawnSeason, startDraft:this.startDraft,
-      strategyPresets, strategySlots, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro,
-      playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftSelectionHint, playerDraftActionText, finishPlayerDraftStyle,
-      rerollPlayerDraft:this._drawPlayerPool, backToStrategy:this.backToStrategy, finishPlayerDraft:this.finishPlayerDraft,
+      strategyPresets, strategySlots, strategyRequirements, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro,
+      playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftSelectionHint, playerDraftActionText, playerDraftRerollLabel, playerDraftRerollStyle, finishPlayerDraftStyle,
+      rerollPlayerDraft:this.rerollPlayerDraft, backToStrategy:this.backToStrategy, finishPlayerDraft:this.finishPlayerDraft,
       goMajor: ()=>this.nav('major-intro'), goGuess:()=>this.nav('adivinhar-intro'),
       goJogadoresLink:()=>this.nav('jogadores'), goRankingLink:()=>this.nav('ranking'), goCadastroLink:()=>this.nav('cadastro'), goSorteio:()=>this.nav('major-strategy'),
       onFooterJogar:(e)=>{e.preventDefault();this.nav('jogar')}, onFooterMajorIntro:(e)=>{e.preventDefault();this.nav('major-intro')}, onFooterAdivinhar:(e)=>{e.preventDefault();this.nav('adivinhar-intro')}, onFooterRanking:(e)=>{e.preventDefault();this.nav('ranking')},
