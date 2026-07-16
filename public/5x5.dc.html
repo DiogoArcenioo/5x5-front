@@ -35,8 +35,28 @@
   [data-player-pool]{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}
   [data-player-candidates]{flex:1;min-height:0;overflow-y:auto;padding-right:4px;scrollbar-gutter:stable}
   [data-swiss-bracket-grid]{grid-template-columns:repeat(5,minmax(0,1fr))}
-  @media (max-width:1180px){[data-swiss-bracket-grid]{grid-template-columns:repeat(5,minmax(210px,1fr));min-width:1100px}}
+  [data-swiss-screen]{position:relative;isolation:isolate;background:radial-gradient(circle at 82% 4%,rgba(47,184,198,.08),transparent 25%),radial-gradient(circle at 12% 18%,rgba(255,92,26,.07),transparent 22%)}
+  [data-swiss-screen]::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.14;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,#000,transparent 72%)}
+  [data-swiss-kicker]{display:flex;align-items:center;gap:7px;letter-spacing:.09em}
+  [data-swiss-kicker]::before{content:"";width:7px;height:7px;border-radius:50%;background:#ff5c1a;box-shadow:0 0 0 4px rgba(255,92,26,.12),0 0 14px rgba(255,92,26,.55)}
+  [data-swiss-viewport]{height:calc(100dvh - 32px);min-height:640px;display:flex;flex-direction:column}
+  [data-swiss-command]{position:relative;overflow:hidden;flex:0 0 auto}
+  [data-swiss-command]::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(#2fb8c6,#ff5c1a)}
+  [data-swiss-bracket-shell]{position:relative;flex:1 1 auto;min-height:0}
+  [data-swiss-bracket-shell]::after{content:"";position:absolute;top:0;right:22px;width:70px;height:2px;background:linear-gradient(90deg,transparent,#2fb8c6)}
+  [data-expand-card]{background:#12151c;border:1px solid #2c3240;border-radius:12px;margin-bottom:12px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.16)}
+  [data-expand-card] summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 15px;user-select:none;transition:background .18s ease,border-color .18s ease}
+  [data-expand-card] summary::-webkit-details-marker{display:none}
+  [data-expand-card] summary:hover{background:#171c25}
+  [data-expand-card] summary:focus-visible{outline:2px solid #2fb8c6;outline-offset:-2px}
+  [data-expand-card] summary::after{content:"+";flex:0 0 auto;width:25px;height:25px;border:1px solid #343c4c;border-radius:6px;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:15px;color:#9aa3b2;background:#0b0e13}
+  [data-expand-card][open] summary{background:#151a23;border-bottom:1px solid #292f3b}
+  [data-expand-card][open] summary::after{content:"\2212";color:#2fb8c6;border-color:rgba(47,184,198,.42)}
+  [data-expand-meta]{display:flex;align-items:center;gap:8px;color:#697488;font-size:9.5px;white-space:nowrap}
+  [data-expand-meta] b{font-family:'JetBrains Mono',monospace;font-size:10px;color:#aeb7c8;background:#0b0e13;border:1px solid #292f3b;border-radius:5px;padding:4px 6px}
+  @media (max-width:760px){[data-swiss-viewport]{height:auto;min-height:0}[data-swiss-bracket-grid]{grid-template-columns:repeat(5,minmax(235px,1fr));min-width:1185px}[data-swiss-bracket-shell]{min-height:0}}
   @media (max-width:1024px){
+    [data-ranking-hero]{grid-template-columns:1fr !important}
     [data-desktop-nav],[data-desktop-actions]{display:none !important}
     [data-mobile-toggle]{display:flex !important}
     [data-hero-inner]{grid-template-columns:1fr !important}
@@ -70,6 +90,10 @@
     h1{font-size:34px !important}
   }
   @media (max-width:560px){
+    [data-swiss-screen]{padding:14px 12px 48px !important}
+    [data-expand-card] summary{padding:11px 12px;gap:9px}
+    [data-expand-meta] span{display:none}
+    [data-swiss-bracket-shell]{padding:10px !important}
     [data-players-grid],[data-platform-grid]{grid-template-columns:1fr 1fr !important}
     [data-footer-grid]{grid-template-columns:1fr !important}
     [data-strategy-slots]{grid-template-columns:1fr !important}
@@ -88,14 +112,11 @@
         <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;letter-spacing:.02em;color:#f4f5f7">5x5<span style="color:#ff5c1a">.gg</span></span>
       </div>
       <nav style="display:flex;align-items:center;gap:4px;flex:1" data-desktop-nav="1">
-        <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="7">
+        <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="4">
           <div onClick="{{ link.onClick }}" style="{{ link.style }}">{{ link.label }}</div>
         </sc-for>
       </nav>
       <div style="display:flex;align-items:center;gap:10px" data-desktop-actions="1">
-        <div onClick="{{ openSearch }}" title="Buscar" style="width:36px;height:36px;border-radius:8px;background:#12151c;border:1px solid #242833;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9aa3b2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </div>
         <div style="position:relative">
           <div onClick="{{ toggleNotifMenu }}" style="width:36px;height:36px;border-radius:8px;background:#12151c;border:1px solid #242833;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9aa3b2;position:relative">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
@@ -116,10 +137,17 @@
             </div>
           </sc-if>
         </div>
-        <div onClick="{{ goPerfil }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 6px;border-radius:8px;cursor:pointer;background:#12151c;border:1px solid #242833">
-          <div style="width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#2fb8c6,#4f8dfd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0a0c10">{{ user.initials }}</div>
-          <span style="font-size:12.5px;font-weight:600;color:#d8dce3;padding-right:4px">{{ user.name }}</span>
-        </div>
+        <sc-if value="{{ !authUser }}">
+          <div onClick="{{ goLogin }}" style="height:36px;padding:0 13px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#c8cdd6;font-size:12.5px;font-weight:700;border:1px solid #2a303c;background:#12151c">Entrar</div>
+          <div onClick="{{ goCadastro }}" style="height:36px;padding:0 14px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#0a0c10;font-size:12.5px;font-weight:800;background:#ff5c1a">Criar conta</div>
+        </sc-if>
+        <sc-if value="{{ authUser }}">
+          <div onClick="{{ goPerfil }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 7px 0 6px;border-radius:8px;cursor:pointer;background:#12151c;border:1px solid #242833">
+            <div style="width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#2fb8c6,#4f8dfd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0a0c10">{{ user.initials }}</div>
+            <span style="font-size:12.5px;font-weight:600;color:#d8dce3">{{ user.name }}</span>
+          </div>
+          <div onClick="{{ doLogout }}" title="Sair" style="height:36px;padding:0 10px;border-radius:8px;display:flex;align-items:center;cursor:pointer;color:#7f899a;font-size:11.5px;font-weight:700;border:1px solid #242833;background:#10131a">Sair</div>
+        </sc-if>
       </div>
       <div onClick="{{ toggleMobileNav }}" data-mobile-toggle="1" style="width:36px;height:36px;border-radius:8px;background:#12151c;border:1px solid #242833;align-items:center;justify-content:center;cursor:pointer;color:#d8dce3">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -135,9 +163,18 @@
         <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:16px">Menu</span>
         <div onClick="{{ toggleMobileNav }}" style="cursor:pointer;color:#9aa3b2">✕</div>
       </div>
-      <sc-for list="{{ mobileNavLinks }}" as="link" hint-placeholder-count="8">
+      <sc-for list="{{ mobileNavLinks }}" as="link" hint-placeholder-count="4">
         <div onClick="{{ link.onClick }}" style="{{ link.mstyle }}">{{ link.label }}</div>
       </sc-for>
+      <div style="height:1px;background:#242833;margin:14px 0"></div>
+      <sc-if value="{{ !authUser }}">
+        <div onClick="{{ goLogin }}" style="padding:11px 10px;border-radius:8px;font-size:14px;font-weight:700;color:#d8dce3;cursor:pointer">Entrar</div>
+        <div onClick="{{ goCadastro }}" style="padding:11px 10px;border-radius:8px;font-size:14px;font-weight:800;color:#0a0c10;background:#ff5c1a;text-align:center;cursor:pointer">Criar conta</div>
+      </sc-if>
+      <sc-if value="{{ authUser }}">
+        <div onClick="{{ goPerfil }}" style="padding:11px 10px;border-radius:8px;font-size:14px;font-weight:700;color:#d8dce3;cursor:pointer">Minha conta</div>
+        <div onClick="{{ doLogout }}" style="padding:11px 10px;border-radius:8px;font-size:14px;font-weight:700;color:#ef7d7d;cursor:pointer">Sair</div>
+      </sc-if>
     </div>
   </sc-if>
 
@@ -173,11 +210,11 @@
 
   <!-- TOASTS -->
   <sc-if value="{{ toast }}">
-    <div style="position:fixed;bottom:24px;right:24px;z-index:90;background:#12151c;border:1px solid {{ toast.border }};border-left:3px solid {{ toast.accent }};border-radius:10px;padding:14px 18px;box-shadow:0 12px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;animation:toastin .25s ease;min-width:260px">
+    <div style="position:fixed;bottom:24px;right:24px;z-index:90;background:{{ toast.background }};border:1px solid {{ toast.border }};border-left:4px solid {{ toast.accent }};border-radius:10px;padding:15px 18px;box-shadow:0 14px 36px rgba(0,0,0,.55);display:flex;align-items:center;gap:11px;animation:toastin .25s ease;min-width:280px">
       <span style="font-size:18px">{{ toast.icon }}</span>
       <div>
         <div style="font-size:13px;font-weight:700;color:#f4f5f7">{{ toast.title }}</div>
-        <sc-if value="{{ toast.desc }}"><div style="font-size:11.5px;color:#9aa3b2;margin-top:2px">{{ toast.desc }}</div></sc-if>
+        <sc-if value="{{ toast.desc }}"><div style="font-size:11.5px;color:{{ toast.descColor }};margin-top:3px">{{ toast.desc }}</div></sc-if>
       </div>
     </div>
   </sc-if>
@@ -277,41 +314,8 @@
         </div>
       </section>
 
-      <!-- JOGADORES POPULARES -->
+      <!-- RESULTADOS RECENTES -->
       <section style="max-width:1360px;margin:0 auto;padding:0 24px 72px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:22px">
-          <h2 style="font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700;margin:0">Jogadores em alta</h2>
-          <span onClick="{{ goJogadoresLink }}" style="font-size:13px;font-weight:700;color:#2fb8c6;cursor:pointer">Ver todos →</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px" data-players-grid="1">
-          <sc-for list="{{ popularPlayers }}" as="p" hint-placeholder-count="4">
-            <div onClick="{{ p.onClick }}" style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:18px;cursor:pointer" style-hover="border-color:#33394a;background:#151922">
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-                <div style="{{ p.avatarStyle }}">{{ p.initials }}</div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:15px;font-weight:800;color:#f4f5f7">{{ p.nick }}</div>
-                  <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#636d7e">
-                    <span style="border:1px solid #262b36;border-radius:3px;padding:0 4px;font-weight:700">{{ p.countryCode }}</span>
-                    <span>{{ p.teamName }}</span>
-                  </div>
-                </div>
-              </div>
-              <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
-                <sc-for list="{{ p.roles }}" as="r" hint-placeholder-count="2">
-                  <span style="{{ r.style }}">{{ r.label }}</span>
-                </sc-for>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #1a1e28">
-                <div><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#f4f5f7">{{ p.rating }}</div><div style="font-size:10px;color:#636d7e">RATING</div></div>
-                <div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#f2b53d">{{ p.overall }}</div><div style="font-size:10px;color:#636d7e">OVERALL</div></div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </section>
-
-      <!-- RESULTADOS RECENTES + RANKING SEMANAL -->
-      <section style="max-width:1360px;margin:0 auto;padding:0 24px 72px;display:grid;grid-template-columns:1.3fr 1fr;gap:24px" data-recent-grid="1">
         <div>
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px">
             <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;margin:0">Resultados recentes</h2>
@@ -338,22 +342,6 @@
             <sc-if value="{{ !recentResults.length }}" hint-placeholder-val="{{ true }}">
               <div style="background:#12151c;border:1px dashed #242833;border-radius:12px;padding:34px 18px;text-align:center;color:#636d7e;font-size:13px">Nenhum resultado cadastrado ainda.</div>
             </sc-if>
-          </div>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px">
-            <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;margin:0">Ranking de jogadores</h2>
-            <span onClick="{{ goRankingLink }}" style="font-size:13px;font-weight:700;color:#2fb8c6;cursor:pointer">Ver mais →</span>
-          </div>
-          <div style="background:#12151c;border:1px solid #242833;border-radius:12px;overflow:hidden">
-            <sc-for list="{{ weeklyRanking }}" as="u" hint-placeholder-count="5">
-              <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #1a1e28">
-                <span style="{{ u.rankStyle }}">{{ u.rank }}</span>
-                <div style="width:28px;height:28px;border-radius:7px;background:#1a1e28;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#9aa3b2">{{ u.initials }}</div>
-                <span style="flex:1;font-size:13.5px;font-weight:600;color:#e6e8ec">{{ u.name }}</span>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#f2b53d">{{ u.points }}</span>
-              </div>
-            </sc-for>
           </div>
         </div>
       </section>
@@ -389,11 +377,7 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7z"></path></svg>
             </div>
             <h3 style="font-family:'Chakra Petch',sans-serif;font-size:20px;font-weight:700;margin:0 0 8px">Monte seu time e dispute um Major</h3>
-            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 18px;flex:1">Sorteie a temporada, drafte sua lineup e simule a campanha.</p>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#636d7e;margin-bottom:18px">
-              <span>Melhor campanha: <b style="color:#f2b53d">Semifinal</b></span>
-              <span>3 tentativas</span>
-            </div>
+            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 24px;flex:1">Sorteie a temporada, drafte sua lineup e simule a campanha.</p>
             <div onClick="{{ goMajor }}" style="text-align:center;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:13.5px;padding:12px;border-radius:9px;cursor:pointer">Jogar</div>
           </div>
           <div style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:28px;display:flex;flex-direction:column">
@@ -401,36 +385,17 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             </div>
             <h3 style="font-family:'Chakra Petch',sans-serif;font-size:20px;font-weight:700;margin:0 0 8px">Quem é o jogador?</h3>
-            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 18px;flex:1">Descubra o jogador misterioso do dia usando o mínimo de dicas possível.</p>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#636d7e;margin-bottom:18px">
-              <span>Recorde pessoal: <b style="color:#f2b53d">890 pts</b></span>
-              <span>Desafio diário disponível</span>
-            </div>
+            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 24px;flex:1">Descubra um jogador misterioso usando o mínimo de dicas possível.</p>
             <div onClick="{{ goGuess }}" style="text-align:center;background:#2fb8c6;color:#0a0c10;font-weight:700;font-size:13.5px;padding:12px;border-radius:9px;cursor:pointer">Jogar</div>
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" data-hub-lower="1">
-          <div>
-            <h3 style="font-size:15px;font-weight:700;color:#e6e8ec;margin:0 0 14px">Partidas recentes</h3>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="background:#12151c;border:1px solid #242833;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:13px;color:#e6e8ec">Major · Ascensão 2024B</span>
-                <span style="font-size:11.5px;font-weight:700;color:#f2b53d">Semifinal</span>
-              </div>
-              <div style="background:#12151c;border:1px solid #242833;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:13px;color:#e6e8ec">Quem é o jogador? · #482</span>
-                <span style="font-size:11.5px;font-weight:700;color:#34c77b">Acertou em 3</span>
-              </div>
-            </div>
-          </div>
-          <div>
+        <div style="max-width:660px">
             <h3 style="font-size:15px;font-weight:700;color:#e6e8ec;margin:0 0 14px">Em breve</h3>
             <div style="background:#12151c;border:1px dashed #33394a;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px">
               <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#9aa3b2">Modo difícil — Adivinhação</span><span style="font-size:10.5px;font-weight:700;color:#636d7e;background:#1a1e28;padding:2px 8px;border-radius:5px">EM BREVE</span></div>
               <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#9aa3b2">Draft cooperativo (2 jogadores)</span><span style="font-size:10.5px;font-weight:700;color:#636d7e;background:#1a1e28;padding:2px 8px;border-radius:5px">EM BREVE</span></div>
             </div>
-          </div>
         </div>
       </div>
     </sc-if>
@@ -516,11 +481,8 @@
               <sc-for list="{{ strategySlots }}" as="slot" hint-placeholder-count="5">
                 <div style="position:relative;min-width:0">
                   <div onClick="{{ slot.onToggle }}" style="{{ slot.cardStyle }}">
-                    <div style="position:absolute;top:9px;left:10px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;color:#636d7e">0{{ slot.number }}</div>
-                    <div style="position:absolute;top:9px;right:10px;color:{{ slot.color }};font-size:11px">{{ slot.chevron }}</div>
-                    <div style="width:46px;height:46px;border-radius:13px;background:{{ slot.bg }};border:1px solid {{ slot.color }}55;color:{{ slot.color }};display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;box-shadow:0 0 22px {{ slot.color }}18">{{ slot.icon }}</div>
-                    <div style="font-size:12px;font-weight:800;color:#f4f5f7;text-align:center;line-height:1.2">{{ slot.label }}</div>
-                    <div style="font-size:8.5px;font-weight:800;color:{{ slot.color }};text-align:center;text-transform:uppercase;line-height:1.2">{{ slot.shortAttribute }}</div>
+                    <div style="width:52px;height:52px;border-radius:15px;background:{{ slot.bg }};border:1px solid {{ slot.color }}66;color:{{ slot.color }};display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:800;box-shadow:0 0 24px {{ slot.color }}1f">{{ slot.icon }}</div>
+                    <div style="font-size:13px;font-weight:800;color:#f4f5f7;text-align:center;line-height:1.2">{{ slot.label }}</div>
                   </div>
                   <sc-if value="{{ slot.isOpen }}">
                     <div onClick="{{ slot.onPickerClick }}" style="{{ slot.pickerStyle }}">
@@ -538,18 +500,6 @@
                   </sc-if>
                 </div>
               </sc-for>
-            </div>
-            <div style="font-size:10.5px;color:#636d7e;margin-top:13px;line-height:1.5"><span style="color:#9aa3b2;font-weight:700">DICA:</span> a cor e o símbolo identificam rapidamente a responsabilidade de cada jogador dentro da partida.</div>
-            <div style="border-top:1px solid #242833;margin-top:15px;padding-top:14px">
-              <div style="font-size:9.5px;font-weight:800;color:#636d7e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px">O que cada posição exige</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px" data-strategy-slots="1">
-                <sc-for list="{{ strategyRequirements }}" as="guide" hint-placeholder-count="5">
-                  <div style="display:flex;align-items:center;gap:9px;background:#0d0f14;border:1px solid #242833;border-radius:9px;padding:8px 10px">
-                    <span style="width:26px;height:26px;border-radius:7px;background:{{ guide.bg }};color:{{ guide.color }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">{{ guide.icon }}</span>
-                    <div style="min-width:0"><div style="font-size:10.5px;font-weight:800;color:#e6e8ec">POS. {{ guide.number }} · {{ guide.label }}</div><div style="font-size:9.5px;color:{{ guide.color }};margin-top:2px">{{ guide.targets }}</div></div>
-                  </div>
-                </sc-for>
-              </div>
             </div>
           </div>
 
@@ -1035,9 +985,10 @@
     </sc-if>
 
     <sc-if value="{{ isMajorGroups }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Fase Suíça do Major" style="width:100%;max-width:1480px;box-sizing:border-box;margin:0 auto;padding:26px 24px 90px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px">
-          <div><div style="font-size:11px;font-weight:800;color:#ff5c1a;margin-bottom:8px">MAJOR · FASE SUÍÇA</div><h1 style="font-family:'Chakra Petch',sans-serif;font-size:29px;margin:0 0 6px">{{ swissStageTitle }}</h1><p style="font-size:13px;color:#9aa3b2;margin:0">3 vitórias classificam · 3 derrotas eliminam · até 5 rodadas</p></div>
+      <div data-screen-label="Fase Suíça do Major" data-swiss-screen="1" style="width:100%;max-width:1480px;box-sizing:border-box;margin:0 auto;padding:16px 24px 64px">
+        <div data-swiss-viewport="1">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div><div data-swiss-kicker="1" style="font-size:10px;font-weight:800;color:#ff6b2f;margin-bottom:5px">MAJOR · FASE SUÍÇA</div><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><h1 style="font-family:'Chakra Petch',sans-serif;font-size:27px;margin:0">{{ swissStageTitle }}</h1><p style="font-size:11px;color:#7f899a;margin:0">3 vitórias classificam · 3 derrotas eliminam · até 5 rodadas</p></div></div>
           <div style="display:flex;gap:8px"><div onClick="{{ setSwissNormal }}" style="{{ swissNormalStyle }}">Simulação normal</div><div onClick="{{ simulateSwissFast }}" style="{{ swissFastStyle }}">Simulação rápida</div></div>
         </div>
         <sc-if value="{{ swissEliminationNotice }}">
@@ -1046,15 +997,7 @@
             <div onClick="{{ restartMajorDraft }}" style="font-size:11.5px;font-weight:900;color:#fff;background:#b92f3b;border:1px solid #ef5d68;border-radius:8px;padding:10px 14px;cursor:pointer">INICIAR NOVO DRAFT</div>
           </div>
         </sc-if>
-        <sc-if value="{{ showSwissKdr }}" hint-placeholder-val="{{ false }}">
-          <div style="background:linear-gradient(135deg,#131821,#0d1118);border:1px solid #343b49;border-radius:14px;margin-bottom:18px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.24)">
-            <div style="padding:15px 18px;border-bottom:1px solid #292f3b;display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><div style="font-family:'Chakra Petch',sans-serif;font-size:16px;font-weight:900;color:#f4f5f7">DESEMPENHO DA SUA LINEUP</div><div style="font-size:10.5px;color:#788295;margin-top:3px">KDR consolidado das {{ swissUserMatchCount }} partidas disputadas</div></div><span style="font-size:9px;font-weight:800;color:#ff7b45;background:rgba(255,92,26,.1);border:1px solid rgba(255,92,26,.28);border-radius:6px;padding:6px 8px">KDR = KILLS ÷ DEATHS</span></div>
-            <div style="display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:1px;background:#252b36" data-kdr-summary-grid="1">
-              <sc-for list="{{ campaignKdr }}" as="player" hint-placeholder-count="5"><div style="background:#10141b;padding:14px 15px"><div style="font-size:11.5px;font-weight:900;color:#e9ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:11px">{{ player.name }}</div><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px"><div style="display:flex;gap:11px"><div><b style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#79aaff">{{ player.kills }}</b><div style="font-size:8px;color:#596274;margin-top:2px">KILLS</div></div><div><b style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ef7d7d">{{ player.deaths }}</b><div style="font-size:8px;color:#596274;margin-top:2px">DEATHS</div></div></div><div style="text-align:right"><b style="font-family:'JetBrains Mono',monospace;font-size:20px;color:{{ player.color }}">{{ player.kd }}</b><div style="font-size:8px;color:#596274">KDR</div></div></div></div></sc-for>
-            </div>
-          </div>
-        </sc-if>
-        <div style="background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)">
+        <div data-swiss-command="1" style="background:linear-gradient(100deg,#151a23,#10141b);border:1px solid #33394a;border-radius:11px;padding:11px 16px;margin-bottom:12px;box-shadow:0 10px 28px rgba(0,0,0,.18)">
           <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 260px;gap:20px;align-items:center" data-player-draft-grid="1">
             <div><div style="font-size:10px;font-weight:800;color:#2fb8c6;margin-bottom:5px">SUA CAMPANHA</div><div style="font-size:12px;color:#9aa3b2">{{ swissCampaignRecord }}</div></div>
             <div>
@@ -1064,18 +1007,27 @@
             <div><div onClick="{{ swissPrimaryAction }}" style="{{ swissPrimaryStyle }}">{{ swissPrimaryLabel }}</div><div style="font-size:9.5px;color:#636d7e;text-align:center;margin-top:7px">1 segundo por round</div></div>
           </div>
         </div>
-        <div style="background:#12151c;border:1px solid #33394a;border-radius:14px;padding:20px;margin-bottom:18px;overflow-x:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px"><div><b style="font-size:13px">Chaveamento suíço</b><div style="font-size:10.5px;color:#636d7e;margin-top:3px">Os próximos confrontos são definidos pelo record após cada rodada</div></div><span style="font-size:9.5px;font-weight:800;color:#2fb8c6">FORMATO HLTV · GROUP SWISS</span></div>
-          <div data-swiss-bracket-grid="1" style="display:grid;gap:12px">
+        <div data-swiss-bracket-shell="1" style="background:linear-gradient(180deg,#121720,#0f131a);border:1px solid #33394a;border-radius:12px;padding:13px;overflow-x:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><div style="display:flex;align-items:center;gap:9px"><div style="width:3px;height:27px;background:#2fb8c6;border-radius:2px"></div><div><b style="font-family:'Chakra Petch',sans-serif;font-size:13px;letter-spacing:.02em">CHAVEAMENTO SUÍÇO</b><div style="font-size:9.5px;color:#697488;margin-top:1px">Pareamento dinâmico por record</div></div></div><span style="font-size:9px;font-weight:800;color:#2fb8c6;background:rgba(47,184,198,.07);border:1px solid rgba(47,184,198,.2);padding:5px 7px;border-radius:5px">HLTV · GROUP SWISS</span></div>
+          <div data-swiss-bracket-grid="1" style="display:grid;gap:8px">
             <sc-for list="{{ swissBracketColumns }}" as="column" hint-placeholder-count="5">
-              <div style="background:#0b0e13;border:1px solid #2c3240;border-radius:10px;padding:12px;align-self:start"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:11.5px;color:#f4f5f7">{{ column.title }}</b><span style="font-size:9.5px;color:#7b8598">{{ column.pools }}</span></div><div style="display:flex;flex-direction:column;gap:7px"><sc-for list="{{ column.matches }}" as="match" hint-placeholder-count="4"><div style="{{ match.style }}"><div style="{{ match.teamAStyle }}">{{ match.teamA }}</div><div style="display:flex;justify-content:space-between;color:#7b8598;font-size:9px;margin:4px 0"><span>{{ match.pool }}</span><b style="color:{{ match.scoreColor }}">{{ match.score }}</b></div><div style="{{ match.teamBStyle }}">{{ match.teamB }}</div><sc-if value="{{ match.showOutcome }}"><div style="{{ match.outcomeStyle }}">SEU TIME · {{ match.outcome }}</div></sc-if></div></sc-for><sc-if value="{{ column.waiting }}"><div style="border:1px dashed #33394a;border-radius:7px;padding:16px 8px;text-align:center;font-size:10px;color:#7b8598">Aguardando resultados anteriores</div></sc-if></div></div>
+              <div style="background:#0a0e14;border:1px solid #293140;border-radius:8px;padding:10px;align-self:start"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 1px"><b style="font-family:'Chakra Petch',sans-serif;font-size:11.5px;color:#f4f5f7;letter-spacing:.03em">{{ column.title }}</b><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#7b8598">{{ column.pools }}</span></div><div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ column.matches }}" as="match" hint-placeholder-count="4"><div style="{{ match.style }}"><div style="display:grid;grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr);align-items:center;gap:5px"><div style="{{ match.teamAStyle }};text-align:right">{{ match.teamA }}</div><div style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:800;text-align:center;color:#596274">×</div><div style="{{ match.teamBStyle }}">{{ match.teamB }}</div></div><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;color:#697488;font-size:8.5px;margin-top:5px;padding-top:4px;border-top:1px solid #252c39"><span>{{ match.pool }}</span><b style="font-family:'JetBrains Mono',monospace;font-size:11px;color:{{ match.scoreColor }};white-space:nowrap">{{ match.score }}</b><span style="text-align:right"><sc-if value="{{ match.showOutcome }}"><b style="{{ match.outcomeStyle }}">{{ match.outcome }}</b></sc-if></span></div></div></sc-for><sc-if value="{{ column.waiting }}"><div style="border:1px dashed #33394a;border-radius:6px;padding:15px 8px;text-align:center;font-size:10px;color:#7b8598">Aguardando rodada anterior</div></sc-if></div></div>
             </sc-for>
           </div>
         </div>
+        </div>
+        <sc-if value="{{ showSwissKdr }}" hint-placeholder-val="{{ false }}">
+          <details data-expand-card="kdr-summary">
+            <summary><div><div style="font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:900;color:#f4f5f7">DESEMPENHO DA SUA LINEUP</div><div style="font-size:10px;color:#788295;margin-top:2px">KDR consolidado da campanha</div></div><div data-expand-meta="1"><b>{{ swissUserMatchCount }} PARTIDAS</b><span>VER DETALHES</span></div></summary>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:1px;background:#252b36" data-kdr-summary-grid="1">
+              <sc-for list="{{ campaignKdr }}" as="player" hint-placeholder-count="5"><div style="background:#10141b;padding:14px 15px"><div style="font-size:11.5px;font-weight:900;color:#e9ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:11px">{{ player.name }}</div><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px"><div style="display:flex;gap:11px"><div><b style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#79aaff">{{ player.kills }}</b><div style="font-size:8px;color:#596274;margin-top:2px">KILLS</div></div><div><b style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ef7d7d">{{ player.deaths }}</b><div style="font-size:8px;color:#596274;margin-top:2px">DEATHS</div></div></div><div style="text-align:right"><b style="font-family:'JetBrains Mono',monospace;font-size:20px;color:{{ player.color }}">{{ player.kd }}</b><div style="font-size:8px;color:#596274">KDR</div></div></div></div></sc-for>
+            </div>
+          </details>
+        </sc-if>
         <sc-if value="{{ swissMatchKdr.length }}">
-          <div style="background:#12151c;border:1px solid #33394a;border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,.18)">
-            <div style="display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap;margin-bottom:14px"><div><b style="font-size:13px">KDR do seu time por partida</b><div style="font-size:10.5px;color:#636d7e;margin-top:3px">Abates e mortes registrados em cada confronto da campanha</div></div><span style="font-size:9.5px;color:#636d7e">KDR = ABATES / MORTES</span></div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px">
+          <details data-expand-card="match-kdr">
+            <summary><div><b style="font-family:'Chakra Petch',sans-serif;font-size:13px;letter-spacing:.02em">KDR POR PARTIDA</b><div style="font-size:10px;color:#697488;margin-top:2px">Abates e mortes da sua lineup em cada confronto</div></div><div data-expand-meta="1"><b>{{ swissUserMatchCount }} JOGOS</b><span>EXPANDIR</span></div></summary>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px;padding:12px">
               <sc-for list="{{ swissMatchKdr }}" as="game" hint-placeholder-count="3">
                 <div style="background:#0b0e13;border:1px solid #2c3240;border-radius:10px;overflow:hidden">
                   <div style="padding:11px 13px;border-bottom:1px solid #242a35;display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-size:9px;font-weight:900;color:#2fb8c6">RODADA {{ game.round }} · {{ game.format }}</div><div style="font-size:12px;font-weight:800;color:#f4f5f7;margin-top:3px">vs {{ game.opponent }}</div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:900;color:{{ game.resultColor }}">{{ game.score }}</div><div style="font-size:8.5px;font-weight:900;color:{{ game.resultColor }}">{{ game.result }}</div></div></div>
@@ -1084,17 +1036,17 @@
                 </div>
               </sc-for>
             </div>
-          </div>
+          </details>
         </sc-if>
         <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:18px" data-player-draft-grid="1">
           <div>
-            <div style="background:#12151c;border:1px solid #242833;border-radius:14px;overflow:hidden;margin-bottom:16px">
-              <div style="padding:14px 17px;border-bottom:1px solid #242833;display:flex;justify-content:space-between"><b style="font-size:13px">Classificação geral</b><span style="font-size:11px;color:#636d7e">{{ swissRoundLabel }}</span></div>
+            <details data-expand-card="standings">
+              <summary><div><b style="font-family:'Chakra Petch',sans-serif;font-size:13px;letter-spacing:.02em">CLASSIFICAÇÃO GERAL</b><div style="font-size:10px;color:#697488;margin-top:2px">Tabela completa dos 16 times</div></div><div data-expand-meta="1"><b>{{ swissRoundLabel }}</b><span>EXPANDIR</span></div></summary>
               <div style="display:grid;grid-template-columns:34px 1fr 74px 68px;padding:8px 14px;font-size:9.5px;font-weight:800;color:#636d7e"><span>#</span><span>TIME / TEMPORADA</span><span>RECORD</span><span>STATUS</span></div>
               <sc-for list="{{ swissStandings }}" as="team" hint-placeholder-count="16">
                 <div style="{{ team.style }}"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#636d7e">{{ team.rank }}</span><div><div style="font-size:12.5px;font-weight:800;color:#f4f5f7">{{ team.name }}</div><div style="font-size:10px;color:#636d7e">{{ team.tag }}</div></div><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ team.recordColor }}">{{ team.record }}</span><span style="{{ team.statusStyle }}">{{ team.status }}</span></div>
               </sc-for>
-            </div>
+            </details>
             <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:17px"><div style="font-size:13px;font-weight:800;margin-bottom:12px">Resultados da rodada</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" data-strategy-slots="1"><sc-for list="{{ swissRoundMatches }}" as="match" hint-placeholder-count="8"><div style="{{ match.style }}"><div style="display:flex;justify-content:space-between;gap:8px"><span>{{ match.teamA }}</span><b style="color:{{ match.scoreColor }}">{{ match.score }}</b><span style="text-align:right">{{ match.teamB }}</span></div><div style="font-size:9.5px;color:#636d7e;text-align:center;margin-top:5px">{{ match.format }} · {{ match.state }}</div></div></sc-for></div></div>
           </div>
         </div>
@@ -1732,23 +1684,33 @@
     </sc-if>
 
     <sc-if value="{{ isRanking }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Ranking" style="max-width:900px;margin:0 auto;padding:24px 24px 90px">
-        <h1 style="font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin:0 0 20px">Ranking</h1>
-        <div style="display:flex;gap:4px;border-bottom:1px solid #242833;margin-bottom:20px;overflow-x:auto">
-          <sc-for list="{{ rankingTabs }}" as="rt" hint-placeholder-count="5">
-            <div onClick="{{ rt.onClick }}" style="{{ rt.style }}">{{ rt.label }}</div>
-          </sc-for>
+      <div data-screen-label="Ranking" style="max-width:1040px;margin:0 auto;padding:38px 24px 90px">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:stretch;margin-bottom:24px" data-ranking-hero="1">
+          <div style="background:linear-gradient(135deg,rgba(255,92,26,.12),#12151c 58%);border:1px solid #33394a;border-left:4px solid #ff5c1a;border-radius:14px;padding:26px">
+            <div style="font-size:10px;font-weight:900;color:#ff6b2f;letter-spacing:.08em;margin-bottom:8px">RANKING DIÁRIO</div>
+            <h1 style="font-family:'Chakra Petch',sans-serif;font-size:31px;font-weight:800;margin:0 0 8px">Uma campanha. Uma chance por dia.</h1>
+            <p style="font-size:13px;line-height:1.65;color:#9aa3b2;max-width:620px;margin:0">Entre no Major ranqueado, some pontos a cada vitória e dispute o topo com outros jogadores.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><span style="font-size:10px;font-weight:800;color:#34c77b;background:rgba(52,199,123,.08);border:1px solid rgba(52,199,123,.2);border-radius:6px;padding:6px 8px">SUÍÇO +10</span><span style="font-size:10px;font-weight:800;color:#2fb8c6;background:rgba(47,184,198,.08);border:1px solid rgba(47,184,198,.2);border-radius:6px;padding:6px 8px">QUARTAS +30</span><span style="font-size:10px;font-weight:800;color:#7c8cf8;background:rgba(124,140,248,.08);border:1px solid rgba(124,140,248,.2);border-radius:6px;padding:6px 8px">SEMI +30</span><span style="font-size:10px;font-weight:800;color:#f2b53d;background:rgba(242,181,61,.08);border:1px solid rgba(242,181,61,.2);border-radius:6px;padding:6px 8px">FINAL +50</span></div>
+          </div>
+          <div style="background:#12151c;border:1px solid #33394a;border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:center">
+            <div style="font-size:11px;font-weight:800;color:#636d7e;letter-spacing:.05em;margin-bottom:7px">SUA PARTIDA DE HOJE</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:{{ rankedPointsColor }};margin-bottom:4px">{{ rankedPoints }} PTS</div>
+            <div style="font-size:11.5px;color:#7f899a;line-height:1.5;margin-bottom:16px">{{ rankedAvailabilityText }}</div>
+            <div onClick="{{ startRanked }}" style="{{ rankedButtonStyle }}">{{ rankedButtonLabel }}</div>
+          </div>
         </div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px"><div><h2 style="font-family:'Chakra Petch',sans-serif;font-size:20px;margin:0 0 3px">Classificação geral</h2><div style="font-size:11px;color:#636d7e">Pontos acumulados em campanhas ranqueadas</div></div><div style="font-size:10px;color:#636d7e">ATUALIZAÇÃO EM TEMPO REAL</div></div>
         <div style="background:#12151c;border:1px solid #242833;border-radius:12px;overflow:hidden">
           <sc-for list="{{ rankingItems }}" as="ri" hint-placeholder-count="6">
             <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid #1a1e28">
               <span style="{{ ri.rankStyle }}">{{ ri.rank }}</span>
               <span style="flex:1;font-size:13.5px;font-weight:700;color:#e6e8ec">{{ ri.name }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:700;color:#f2b53d">{{ ri.value }}</span>
+              <span style="font-size:10px;color:#636d7e">{{ ri.attempts }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:800;color:#f2b53d">{{ ri.value }}</span>
             </div>
           </sc-for>
-          <sc-if value="{{ !rankingItems.length && !catalogLoading }}" hint-placeholder-val="{{ false }}">
-            <div style="text-align:center;padding:48px 20px;color:#636d7e">Nenhum jogador disponível para este ranking.</div>
+          <sc-if value="{{ !rankingItems.length && !rankedLoading }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;padding:48px 20px;color:#636d7e">Ainda não há pontuações. Jogue a primeira partida ranqueada.</div>
           </sc-if>
         </div>
       </div>
@@ -1771,19 +1733,44 @@
       </div>
     </sc-if>
 
+    <sc-if value="{{ isSobre }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Sobre o 5x5" style="max-width:960px;margin:0 auto;padding:48px 24px 90px">
+        <div style="position:relative;overflow:hidden;background:radial-gradient(circle at 85% 15%,rgba(47,184,198,.13),transparent 32%),linear-gradient(135deg,#151922,#10131a);border:1px solid #2d3442;border-radius:18px;padding:48px;box-shadow:0 18px 50px rgba(0,0,0,.22)">
+          <div style="position:absolute;top:0;left:48px;width:84px;height:3px;background:linear-gradient(90deg,#ff5c1a,#f2b53d)"></div>
+          <div style="font-size:10px;font-weight:900;color:#ff6b2f;letter-spacing:.1em;margin-bottom:13px">SOBRE O 5X5</div>
+          <h1 style="font-family:'Chakra Petch',sans-serif;font-size:34px;line-height:1.15;max-width:650px;margin:0 0 20px">Dois amigos, código e uma paixão por Counter-Strike.</h1>
+          <p style="font-size:16px;color:#aeb6c5;line-height:1.75;max-width:760px;margin:0">Somos dois amigos desenvolvedores que gostam de CS e decidiram criar um jogo totalmente gratuito para a comunidade. A ideia é ter algo divertido e rápido para jogar enquanto a fila não encontra uma partida — ou simplesmente quando você está sem nada para fazer.</p>
+          <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:28px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#2fb8c6;background:rgba(47,184,198,.09);border:1px solid rgba(47,184,198,.25);border-radius:6px;padding:7px 9px">2 AMIGOS DEVS</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#34c77b;background:rgba(52,199,123,.09);border:1px solid rgba(52,199,123,.25);border-radius:6px;padding:7px 9px">100% GRATUITO</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#f2b53d;background:rgba(242,181,61,.09);border:1px solid rgba(242,181,61,.25);border-radius:6px;padding:7px 9px">FEITO PARA A COMUNIDADE</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px">
+          <div style="background:#12151c;border:1px solid #242833;border-radius:13px;padding:22px"><div style="font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:800;color:#f4f5f7;margin-bottom:7px">Por que criamos</div><p style="font-size:12.5px;color:#808a9c;line-height:1.65;margin:0">Para transformar aqueles minutos entre partidas em mais um jeito de curtir o universo competitivo de CS.</p></div>
+          <div style="background:#12151c;border:1px solid #242833;border-radius:13px;padding:22px"><div style="font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:800;color:#f4f5f7;margin-bottom:7px">Nossa proposta</div><p style="font-size:12.5px;color:#808a9c;line-height:1.65;margin:0">Um jogo leve, acessível e gratuito, feito por fãs para quem também gosta de Counter-Strike.</p></div>
+        </div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Login" style="max-width:400px;margin:0 auto;padding:64px 24px 90px">
         <h1 style="font-family:'Chakra Petch',sans-serif;font-size:26px;font-weight:700;margin:0 0 24px;text-align:center">Entrar</h1>
         <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:14px">
+          <sc-if value="{{ googleAuthEnabled }}">
+            <div onClick="{{ doGoogleAuth }}" style="height:42px;border-radius:8px;background:#fff;color:#1f1f1f;border:1px solid #dadce0;display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:700;cursor:pointer"><svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.715v2.259h2.909c1.702-1.567 2.684-3.874 2.684-6.615Z"/><path fill="#34A853" d="M9 18c2.43 0 4.468-.806 5.956-2.18l-2.91-2.259c-.806.54-1.835.86-3.046.86-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.963 10.707A5.41 5.41 0 0 1 3.681 9c0-.592.102-1.167.282-1.707V4.961H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.039l3.007-2.332Z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.507.454 3.441 1.346l2.582-2.582C13.464.892 11.426 0 9 0A9 9 0 0 0 .956 4.961l3.007 2.332C4.672 5.165 6.656 3.58 9 3.58Z"/></svg>Continuar com o Google</div>
+            <div style="display:flex;align-items:center;gap:10px;color:#535c6d;font-size:10px"><span style="height:1px;background:#242833;flex:1"></span>OU<span style="height:1px;background:#242833;flex:1"></span></div>
+          </sc-if>
           <div>
-            <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">E-mail</label>
-            <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="voce@email.com" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
+            <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">Usuário</label>
+            <input value="{{ authName }}" onChange="{{ onAuthName }}" autocomplete="username" placeholder="seu_usuario" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
           </div>
           <div>
             <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">Senha</label>
-            <input type="password" value="{{ authPassword }}" onChange="{{ onAuthPassword }}" placeholder="••••••••" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
+            <input type="password" value="{{ authPassword }}" onChange="{{ onAuthPassword }}" autocomplete="current-password" placeholder="Mínimo de 8 caracteres" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
           </div>
-          <div onClick="{{ doLogin }}" style="text-align:center;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14px;padding:12px;border-radius:8px;cursor:pointer;margin-top:8px">Entrar</div>
+          <sc-if value="{{ authError }}"><div style="font-size:11.5px;line-height:1.5;color:#ef7d7d;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:7px;padding:9px 10px">{{ authError }}</div></sc-if>
+          <div onClick="{{ doLogin }}" style="text-align:center;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14px;padding:12px;border-radius:8px;cursor:pointer;margin-top:8px">{{ loginButtonLabel }}</div>
           <div style="text-align:center;font-size:12.5px;color:#636d7e">Não tem conta? <span onClick="{{ goCadastroLink }}" style="color:#2fb8c6;cursor:pointer;font-weight:700">Cadastre-se</span></div>
         </div>
       </div>
@@ -1793,62 +1780,40 @@
       <div data-screen-label="Cadastro" style="max-width:400px;margin:0 auto;padding:64px 24px 90px">
         <h1 style="font-family:'Chakra Petch',sans-serif;font-size:26px;font-weight:700;margin:0 0 24px;text-align:center">Criar conta</h1>
         <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:14px">
+          <sc-if value="{{ googleAuthEnabled }}">
+            <div onClick="{{ doGoogleAuth }}" style="height:42px;border-radius:8px;background:#fff;color:#1f1f1f;border:1px solid #dadce0;display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:700;cursor:pointer"><svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.715v2.259h2.909c1.702-1.567 2.684-3.874 2.684-6.615Z"/><path fill="#34A853" d="M9 18c2.43 0 4.468-.806 5.956-2.18l-2.91-2.259c-.806.54-1.835.86-3.046.86-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.963 10.707A5.41 5.41 0 0 1 3.681 9c0-.592.102-1.167.282-1.707V4.961H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.039l3.007-2.332Z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.507.454 3.441 1.346l2.582-2.582C13.464.892 11.426 0 9 0A9 9 0 0 0 .956 4.961l3.007 2.332C4.672 5.165 6.656 3.58 9 3.58Z"/></svg>Cadastrar com o Google</div>
+            <div style="display:flex;align-items:center;gap:10px;color:#535c6d;font-size:10px"><span style="height:1px;background:#242833;flex:1"></span>OU<span style="height:1px;background:#242833;flex:1"></span></div>
+          </sc-if>
           <div>
-            <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">Nome</label>
-            <input value="{{ authName }}" onChange="{{ onAuthName }}" placeholder="Seu nome" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
+            <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">Usuário</label>
+            <input value="{{ authName }}" onChange="{{ onAuthName }}" autocomplete="username" placeholder="Letras, números, ponto, hífen ou _" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
           </div>
           <div>
             <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">E-mail</label>
-            <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="voce@email.com" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
+            <input type="email" value="{{ authEmail }}" onChange="{{ onAuthEmail }}" autocomplete="email" placeholder="Opcional" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
           </div>
           <div>
             <label style="font-size:12px;color:#9aa3b2;display:block;margin-bottom:6px">Senha</label>
-            <input type="password" value="{{ authPassword }}" onChange="{{ onAuthPassword }}" placeholder="••••••••" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
+            <input type="password" value="{{ authPassword }}" onChange="{{ onAuthPassword }}" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" style="width:100%;background:#0d0f14;border:1px solid #242833;border-radius:8px;padding:11px 14px;color:#f4f5f7;font-size:14px;outline:none"></input>
           </div>
-          <div onClick="{{ doCadastro }}" style="text-align:center;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14px;padding:12px;border-radius:8px;cursor:pointer;margin-top:8px">Criar conta</div>
+          <sc-if value="{{ authError }}"><div style="font-size:11.5px;line-height:1.5;color:#ef7d7d;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:7px;padding:9px 10px">{{ authError }}</div></sc-if>
+          <div onClick="{{ doCadastro }}" style="text-align:center;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14px;padding:12px;border-radius:8px;cursor:pointer;margin-top:8px">{{ registerButtonLabel }}</div>
+          <div style="text-align:center;font-size:12.5px;color:#636d7e">Já tem conta? <span onClick="{{ goLogin }}" style="color:#2fb8c6;cursor:pointer;font-weight:700">Entrar</span></div>
         </div>
       </div>
     </sc-if>
 
     <sc-if value="{{ isUserProfile }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Perfil do Usuário" style="max-width:900px;margin:0 auto;padding:24px 24px 90px">
-        <div style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-          <div style="width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,#2fb8c6,#4f8dfd);display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;color:#0a0c10">VC</div>
+        <div style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,#2fb8c6,#4f8dfd);display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;color:#0a0c10">{{ user.initials }}</div>
           <div style="flex:1;min-width:200px">
-            <h1 style="font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700;margin:0 0 6px">Você</h1>
-            <div style="font-size:12.5px;color:#9aa3b2">Nível 12 · Top 200 no ranking semanal</div>
-            <div style="height:6px;background:#0d0f14;border-radius:3px;overflow:hidden;margin-top:8px;max-width:260px"><div style="height:100%;width:64%;background:linear-gradient(90deg,#2fb8c6,#4f8dfd)"></div></div>
+            <h1 style="font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700;margin:0 0 6px">{{ user.name }}</h1>
+            <div style="font-size:12.5px;color:#9aa3b2">{{ user.email }}</div>
+            <div style="display:inline-flex;margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;color:{{ user.roleColor }};background:{{ user.roleBg }};border-radius:5px;padding:4px 7px">{{ user.roleLabel }}</div>
           </div>
+          <div onClick="{{ doLogout }}" style="font-size:12px;font-weight:800;color:#ef7d7d;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:9px 13px;cursor:pointer">SAIR DA CONTA</div>
         </div>
-        <div style="display:flex;gap:4px;border-bottom:1px solid #242833;margin-bottom:22px">
-          <sc-for list="{{ userProfileTabs }}" as="ut" hint-placeholder-count="3">
-            <div onClick="{{ ut.onClick }}" style="{{ ut.style }}">{{ ut.label }}</div>
-          </sc-for>
-        </div>
-        <sc-if value="{{ userTabVisao }}" hint-placeholder-val="{{ true }}">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px" data-user-stats="1">
-            <sc-for list="{{ userStats }}" as="us" hint-placeholder-count="4">
-              <div style="background:#12151c;border:1px solid #242833;border-radius:12px;padding:16px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#f4f5f7">{{ us.value }}</div><div style="font-size:10.5px;color:#636d7e">{{ us.label }}</div></div>
-            </sc-for>
-          </div>
-        </sc-if>
-        <sc-if value="{{ userTabHistorico }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <sc-for list="{{ userHistorico }}" as="uh" hint-placeholder-count="3">
-              <div style="background:#12151c;border:1px solid #242833;border-radius:10px;padding:13px 18px;display:flex;justify-content:space-between"><span style="font-size:13px;color:#e6e8ec">{{ uh.label }}</span><span style="{{ uh.style }}">{{ uh.result }}</span></div>
-            </sc-for>
-          </div>
-        </sc-if>
-        <sc-if value="{{ userTabConquistas }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" data-user-achievements="1">
-            <sc-for list="{{ userAchievements }}" as="ua" hint-placeholder-count="3">
-              <div style="background:#12151c;border:1px solid #242833;border-radius:12px;padding:18px;text-align:center;opacity:{{ ua.opacity }}">
-                <div style="font-size:26px;margin-bottom:8px">{{ ua.icon }}</div>
-                <div style="font-size:12.5px;font-weight:700;color:#f4f5f7">{{ ua.label }}</div>
-              </div>
-            </sc-for>
-          </div>
-        </sc-if>
       </div>
     </sc-if>
   </main>
@@ -2074,7 +2039,7 @@ const ROUND_LABELS = ['Quartas de final','Semifinal','Final'];
 const CURRENT_MAP_POOL = ['Mirage','Inferno','Nuke','Ancient','Anubis'];
 
 const SCREEN_PATHS = {
-  home:'/inicio', jogar:'/jogar', jogadores:'/jogadores', times:'/times', ranking:'/ranking', regras:'/regras',
+  home:'/inicio', jogar:'/jogar', sobre:'/sobre', jogadores:'/jogadores', times:'/times', ranking:'/ranking', regras:'/regras',
   temporadas:'/temporadas', login:'/entrar', cadastro:'/cadastro', perfil:'/perfil',
   'major-intro':'/jogar/monte-seu-time', 'major-strategy':'/jogar/monte-seu-time/estrategia',
   'major-sorteio':'/jogar/monte-seu-time/sorteio', 'major-player-draft':'/jogar/monte-seu-time/jogadores',
@@ -2105,6 +2070,7 @@ function routeFromPath(pathname=window.location.pathname){
   return entry ? {screen:entry[0],params:{}} : {screen:'home',params:{}};
 }
 const INITIAL_ROUTE = routeFromPath();
+const AUTH_TOKEN_KEY = '5x5.auth.token';
 class Component extends DCLogic {
   state = { screen:INITIAL_ROUTE.screen, params:INITIAL_ROUTE.params, mobileNavOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, playerProfileYear:null, teamProfileYear:null, rouletteDone:false, drawnSeasonId:null, draftId:null,
     draftRoster:[null,null,null,null,null], draftCoach:null, draftCaptain:null,
@@ -2117,14 +2083,16 @@ class Component extends DCLogic {
     playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null, majorChampionName:'',
     guessMatchId:null, guessTargetSlug:null, guessScore:1000, guessAttempts:[], guessRevealedHints:[], guessPendingHint:null, guessInput:'', guessAutocompleteOpen:false, guessSelectedSlug:null, guessOver:false, guessWon:false,
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
-    rankingTab:'overall', userProfileTab:'visao', authName:'', authEmail:'', authPassword:'',
+    rankingTab:'overall', rankedLeaderboard:[], rankedToday:null, rankedRun:null, rankedMode:false, rankedLoading:false, rankedError:'', userProfileTab:'visao', authName:'', authEmail:'', authPassword:'', authUser:null, authToken:'', authSubmitting:false, authError:'', googleAuthEnabled:false,
     catalogLoading:true, catalogError:'', summary:{regions:0,countries:0,teams:0,players:0,links:0} };
 
   componentDidMount(){
     document.addEventListener('keydown', this._onKey = (e)=>{
-      if((e.metaKey||e.ctrlKey) && e.key==='k'){ e.preventDefault(); this.setState({searchOpen:true}); }
       if(e.key==='Escape') this.setState({searchOpen:false});
     });
+    this.restoreSession();
+    this.loadGoogleAuthConfig();
+    this.completeGoogleLogin();
     window.addEventListener('popstate', this._onPopState = ()=>{
       const route=routeFromPath();
       this.setState({screen:route.screen,params:route.params,mobileNavOpen:false,playerProfileYear:null,teamProfileYear:null});
@@ -2133,6 +2101,59 @@ class Component extends DCLogic {
     this.loadCatalog();
   }
   componentWillUnmount(){ document.removeEventListener('keydown', this._onKey); window.removeEventListener('popstate', this._onPopState); clearInterval(this._playerDraftTicker); clearTimeout(this._playerDraftTimer); clearTimeout(this._swissAutoTimer); }
+
+  authMessage = (payload, fallback) => {
+    const value=payload?.message;
+    if(typeof value==='string') return value;
+    if(Array.isArray(value)) return value.join(' ');
+    if(typeof value?.message==='string') return value.message;
+    if(Array.isArray(value?.message)) return value.message.join(' ');
+    return fallback;
+  };
+  loadGoogleAuthConfig = async () => {
+    try{
+      const response=await fetch('/api/auth/google/config');
+      const payload=await response.json();
+      this.setState({googleAuthEnabled:Boolean(payload.enabled)});
+    }catch(_error){ this.setState({googleAuthEnabled:false}); }
+  };
+  doGoogleAuth = () => {
+    if(!this.state.googleAuthEnabled || this.state.authSubmitting) return;
+    window.location.assign('/api/auth/google');
+  };
+  completeGoogleLogin = async () => {
+    const params=new URLSearchParams(window.location.search),code=params.get('google_code'),error=params.get('google_error');
+    if(!code && !error) return;
+    window.history.replaceState({},'',window.location.pathname);
+    if(error){ this.setState({authError:error}); return; }
+    this.setState({authSubmitting:true,authError:''});
+    try{
+      const response=await fetch('/api/auth/google/exchange',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível concluir o login com o Google.'));
+      this.saveAuthSession(payload);
+      this.showToast({icon:'✅',title:'Login realizado',desc:`Bem-vindo, ${payload.user.username}!`,accent:'#34c77b',border:'#33394a'});
+      this.nav('perfil');
+    }catch(exchangeError){ this.setState({authSubmitting:false,authError:exchangeError.message || 'Não foi possível entrar com o Google.'}); }
+  };
+  saveAuthSession = (session) => {
+    window.localStorage.setItem(AUTH_TOKEN_KEY,session.token);
+    this.setState({authUser:session.user,authToken:session.token,authPassword:'',authError:'',authSubmitting:false},()=>this.loadRankedData());
+  };
+  restoreSession = async () => {
+    const token=window.localStorage.getItem(AUTH_TOKEN_KEY);
+    if(!token){ if(this.state.screen==='perfil') this.nav('login'); return; }
+    try{
+      const response=await fetch('/api/auth/me',{headers:{Authorization:`Bearer ${token}`}});
+      if(!response.ok) throw new Error('invalid-session');
+      const user=await response.json();
+      this.setState({authUser:user,authToken:token},()=>this.loadRankedData());
+    }catch(_error){
+      window.localStorage.removeItem(AUTH_TOKEN_KEY);
+      this.setState({authUser:null,authToken:''});
+      if(this.state.screen==='perfil') this.nav('login');
+    }
+  };
 
   loadCatalog = async () => {
     try {
@@ -2190,6 +2211,7 @@ class Component extends DCLogic {
     const nextPath=pathForScreen(screen,params);
     if(window.location.pathname!==nextPath) window.history.pushState({screen,params},'',nextPath);
     this.setState({screen, params, mobileNavOpen:false, ...localYearReset});
+    if(screen==='ranking') this.loadRankedData();
     window.scrollTo(0,0);
     if(screen==='major-sorteio'){
       this.setState({rouletteDone:false, drawnSeasonId:null});
@@ -2219,6 +2241,7 @@ class Component extends DCLogic {
     setTimeout(()=>this._drawPlayerPool(),80);
   };
   backToMajorIntro = () => this.nav('major-intro');
+  goMajorFree = () => this.setState({rankedMode:false,rankedRun:null},()=>this.nav('major-intro'));
   restartMajorDraft = () => {
     clearTimeout(this._swissAutoTimer);
     clearTimeout(this._playerDraftTimer);
@@ -2364,6 +2387,51 @@ class Component extends DCLogic {
     this.setState({screen:'major-groups',params:{id:this.state.draftId},swissTeams:teams,swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'});
     window.scrollTo(0,0);
   };
+  loadRankedData = async () => {
+    this.setState({rankedLoading:true,rankedError:''});
+    try{
+      const token=this.state.authToken || window.localStorage.getItem(AUTH_TOKEN_KEY);
+      const requests=[fetch('/api/ranked/leaderboard?limit=100').then(async r=>{if(!r.ok) throw new Error('ranking');return r.json();})];
+      if(token) requests.push(fetch('/api/ranked/today',{headers:{Authorization:`Bearer ${token}`}}).then(async r=>{if(!r.ok) throw new Error('today');return r.json();}));
+      const [leaderboard,today]=await Promise.all(requests);
+      this.setState({rankedLeaderboard:leaderboard.entries || [],rankedToday:today || null,rankedRun:today?.run || this.state.rankedRun,rankedLoading:false});
+    }catch(_error){ this.setState({rankedLoading:false,rankedError:'Não foi possível carregar o ranking agora.'}); }
+  };
+  startRanked = async () => {
+    if(this.state.rankedLoading) return;
+    if(!this.state.authUser){ this.showToast({icon:'🔒',title:'Entre para jogar',desc:'A partida ranqueada precisa estar vinculada à sua conta.',accent:'#f2b53d',border:'#33394a'}); this.nav('login'); return; }
+    if(this.state.rankedToday?.played){ this.showToast({icon:'⏱',title:'Tentativa de hoje já usada',desc:'Uma nova partida será liberada amanhã.',accent:'#f2b53d',border:'#33394a'}); return; }
+    this.setState({rankedLoading:true,rankedError:''});
+    try{
+      const response=await fetch('/api/ranked/start',{method:'POST',headers:{Authorization:`Bearer ${this.state.authToken}`}});
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível iniciar a partida ranqueada.'));
+      this.setState({rankedMode:true,rankedRun:payload,rankedToday:{played:true,run:payload},rankedLoading:false},()=>this.nav('major-intro'));
+      this.showToast({icon:'🏆',title:'Partida ranqueada iniciada',desc:'Esta é sua tentativa de hoje. Boa campanha!',accent:'#f2b53d',border:'#33394a'});
+    }catch(error){ this.setState({rankedLoading:false,rankedError:error.message || 'Não foi possível iniciar.'}); this.loadRankedData(); }
+  };
+  _recordRankedEvent = async (eventType,eventKey) => {
+    const run=this.state.rankedRun;
+    if(!this.state.rankedMode || !run?.id || !this.state.authToken) return null;
+    try{
+      const response=await fetch(`/api/ranked/runs/${run.id}/events`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${this.state.authToken}`},body:JSON.stringify({eventType,eventKey})});
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível registrar os pontos.'));
+      const updatedRun=payload?.run;
+      if(!updatedRun || Array.isArray(updatedRun) || !Number.isFinite(Number(updatedRun.score))) throw new Error('A pontuação foi salva, mas a confirmação retornou incompleta. Atualize o ranking para conferir.');
+      this.setState({rankedRun:updatedRun,rankedToday:{...(this.state.rankedToday || {}),played:true,run:updatedRun}});
+      if(payload.awarded) this.showToast({icon:'✓',title:`+${payload.awarded} pontos conquistados`,desc:`Total nesta campanha: ${updatedRun.score} pontos.`,accent:'#34c77b',border:'rgba(52,199,123,.65)',background:'linear-gradient(135deg,#123326,#101d19)',descColor:'#a9d9bd',duration:6500});
+      return payload;
+    }catch(error){ this.showToast({icon:'⚠',title:'Pontuação pendente',desc:error.message || 'Não foi possível registrar os pontos.',accent:'#ef4444',border:'#33394a'}); return null; }
+  };
+  _completeRankedRun = async () => {
+    const run=this.state.rankedRun;
+    if(!this.state.rankedMode || !run?.id || run.status==='completed') return;
+    try{
+      const response=await fetch(`/api/ranked/runs/${run.id}/complete`,{method:'POST',headers:{Authorization:`Bearer ${this.state.authToken}`}});
+      if(response.ok){ const updated=await response.json(); this.setState({rankedRun:updated,rankedToday:{...(this.state.rankedToday || {}),played:true,run:updated}}); }
+    }catch(_error){}
+  };
   _buildSwissRound(teams,round){
     const active=teams.filter(t=>t.status==='playing');
     const matches=[];
@@ -2461,9 +2529,11 @@ class Component extends DCLogic {
         const finalResult=this._simulatePlayoffMatch(winnerTeams[0],winnerTeams[1],'post-user-final','MD5'),final=bracket.find(round=>round.key==='final');
         final.matches=[{a:winnerTeams[0],b:winnerTeams[1],result:finalResult}];champion=teamsById.get(finalResult.winnerId);
       }
-      this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffEliminated:true,playoffChampion:champion?.id||null,majorChampionName:champion?.name||'Campeão definido',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return;
+      this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffEliminated:true,playoffChampion:champion?.id||null,majorChampionName:champion?.name||'Campeão definido',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false},()=>this._completeRankedRun()); return;
     }
-    if(s.playoffStage==='final'){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffChampion:'user',majorChampionName:'SEU TIME · MISTO',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false}); return; }
+    const playoffEvent=s.playoffStage==='quarter'?'quarterfinal_win':s.playoffStage==='semi'?'semifinal_win':'final_win';
+    if(s.playoffStage==='final'){ this.setState({playoffBracket:bracket,playoffPendingMatches:null,playoffChampion:'user',majorChampionName:'SEU TIME · MISTO',swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false},()=>this._recordRankedEvent(playoffEvent,'playoff-final').finally(()=>this._completeRankedRun())); return; }
+    this._recordRankedEvent(playoffEvent,`playoff-${s.playoffStage}`);
     const teamsById=new Map(s.swissTeams.map(team=>[team.id,team])),winners=pending.map(result=>teamsById.get(result.winnerId)).filter(Boolean);
     const nextKey=s.playoffStage==='quarter'?'semi':'final',next=bracket.find(round=>round.key===nextKey);
     next.matches=nextKey==='semi'?[{a:winners[0],b:winners[1],result:null},{a:winners[2],b:winners[3],result:null}]:[{a:winners[0],b:winners[1],result:null}];
@@ -2567,11 +2637,13 @@ class Component extends DCLogic {
     const completedMatches=this._matchesWithUserStats(s.swissPendingMatches,s.swissUserRounds);
     this._applySwissMatches(teams,completedMatches);
     let round=s.swissRound+1, history=[...s.swissHistory,{round:s.swissRound+1,matches:completedMatches}];
+    const userMatch=completedMatches.find(match=>match.isUser);
+    if(userMatch?.winnerId==='user') this._recordRankedEvent('swiss_win',`swiss-round-${s.swissRound+1}`);
     if(teams.find(t=>t.id==='user')?.status!=='playing'){
       while(round<5 && teams.some(t=>t.status==='playing')){ const matches=this._buildSwissRound(teams,round+1); this._applySwissMatches(teams,matches); round++;history.push({round,matches}); }
     }
     const userStatus=teams.find(team=>team.id==='user')?.status;
-    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false},()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); });
+    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissLiveFinished:false},()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); else if(userStatus==='eliminated') this._completeRankedRun(); });
   }
   simulateSwissFast = ()=>{
     clearTimeout(this._swissAutoTimer);
@@ -2581,7 +2653,13 @@ class Component extends DCLogic {
       const matches=this._matchesWithUserStats(this._buildSwissRound(teams,round+1)); this._applySwissMatches(teams,matches); round++;history.push({round,matches});
     }
     const userStatus=teams.find(team=>team.id==='user')?.status;
-    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'fast',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'},()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); });
+    const rankedWins=[];
+    for(const entry of history.slice(this.state.swissHistory.length)){
+      const userMatch=entry.matches.find(match=>match.isUser);
+      if(userMatch?.winnerId==='user') rankedWins.push(entry.round);
+    }
+    const rankedUpdates=rankedWins.reduce((promise,rankedRound)=>promise.then(()=>this._recordRankedEvent('swiss_win',`swiss-round-${rankedRound}`)),Promise.resolve());
+    this.setState({swissTeams:teams,swissRound:round,swissHistory:history,swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'fast',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'},()=>rankedUpdates.finally(()=>{ if(userStatus==='qualified') this._startPlayoffs(teams); else if(userStatus==='eliminated') this._completeRankedRun(); }));
   };
   setSwissNormal = ()=>this.setState({swissMode:'normal'});
 
@@ -2713,11 +2791,51 @@ class Component extends DCLogic {
   openSeason = (id)=> this.nav('temporada-detalhe', {code:id});
   setRankingTab = (tab)=> this.setState({rankingTab:tab});
   setUserProfileTab = (tab)=> this.setState({userProfileTab:tab});
-  doLogin = () => { this.showToast({icon:'✅', title:'Login realizado', desc:'Bem-vindo de volta!', accent:'#34c77b', border:'#33394a'}); this.nav('perfil'); };
-  doCadastro = () => { this.showToast({icon:'✅', title:'Conta criada', desc:'Bem-vindo ao 5x5.gg!', accent:'#34c77b', border:'#33394a'}); this.nav('perfil'); };
-  onAuthName = (e)=> this.setState({authName:e.target.value});
-  onAuthEmail = (e)=> this.setState({authEmail:e.target.value});
-  onAuthPassword = (e)=> this.setState({authPassword:e.target.value});
+  doLogin = async () => {
+    if(this.state.authSubmitting) return;
+    const username=this.state.authName.trim(),password=this.state.authPassword;
+    if(username.length<3 || password.length<8){ this.setState({authError:'Informe um usuário válido e uma senha com pelo menos 8 caracteres.'}); return; }
+    this.setState({authSubmitting:true,authError:''});
+    try{
+      const response=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível entrar.'));
+      this.saveAuthSession(payload);
+      this.showToast({icon:'✅',title:'Login realizado',desc:`Bem-vindo, ${payload.user.username}!`,accent:'#34c77b',border:'#33394a'});
+      this.nav('perfil');
+    }catch(error){ this.setState({authSubmitting:false,authError:error.message || 'Não foi possível entrar.'}); }
+  };
+  doCadastro = async () => {
+    if(this.state.authSubmitting) return;
+    const username=this.state.authName.trim(),email=this.state.authEmail.trim(),password=this.state.authPassword;
+    if(!/^[a-zA-Z0-9_.-]{3,50}$/.test(username)){ this.setState({authError:'Use de 3 a 50 caracteres: letras, números, ponto, hífen ou underscore.'}); return; }
+    if(password.length<8){ this.setState({authError:'A senha deve ter pelo menos 8 caracteres.'}); return; }
+    this.setState({authSubmitting:true,authError:''});
+    try{
+      const body={username,password,...(email?{email}:{})};
+      const response=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível criar a conta.'));
+      this.saveAuthSession(payload);
+      this.showToast({icon:'✅',title:'Conta criada',desc:`Bem-vindo ao 5x5.gg, ${payload.user.username}!`,accent:'#34c77b',border:'#33394a'});
+      this.nav('perfil');
+    }catch(error){ this.setState({authSubmitting:false,authError:error.message || 'Não foi possível criar a conta.'}); }
+  };
+  doLogout = async () => {
+    const token=this.state.authToken || window.localStorage.getItem(AUTH_TOKEN_KEY);
+    try{ if(token) await fetch('/api/auth/logout',{method:'POST',headers:{Authorization:`Bearer ${token}`}}); }catch(_error){}
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
+    this.setState({authUser:null,authToken:'',authName:'',authEmail:'',authPassword:'',authError:'',mobileNavOpen:false,rankedToday:null,rankedRun:null,rankedMode:false});
+    this.nav('home');
+    this.showToast({icon:'✓',title:'Sessão encerrada',desc:'Você saiu da sua conta.',accent:'#2fb8c6',border:'#33394a'});
+  };
+  onAuthName = (e)=> this.setState({authName:e.target.value,authError:''});
+  onAuthEmail = (e)=> this.setState({authEmail:e.target.value,authError:''});
+  onAuthPassword = (e)=> this.setState({authPassword:e.target.value,authError:''});
+  openAdmin = () => {
+    if(this.state.authUser?.role!=='admin') return;
+    window.location.assign('/admin.html');
+  };
 
   _buildPlayerProfileData(slug){
     const base = playerOf(slug); if(!base) return null;
@@ -2755,7 +2873,7 @@ class Component extends DCLogic {
   closeSearch = () => this.setState({searchOpen:false});
   stopProp = (e) => e.stopPropagation();
   onSearchChange = (e) => this.setState({searchQuery:e.target.value});
-  showToast = (toast) => { this.setState({toast}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:null}), 3200); };
+  showToast = (toast) => { const normalized={background:'#12151c',descColor:'#9aa3b2',...toast}; this.setState({toast:normalized}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:null}), toast.duration || 3200); };
 
   renderVals(){
     const s = this.state;
@@ -2763,19 +2881,18 @@ class Component extends DCLogic {
     const navItems = [
       {key:'home', label:'Início'},
       {key:'jogar', label:'Jogar'},
-      {key:'jogadores', label:'Jogadores'},
-      {key:'times', label:'Times'},
       {key:'ranking', label:'Ranking'},
-      {key:'regras', label:'Regras'}
+      {key:'sobre', label:'Sobre'},
+      ...(s.authUser?.role==='admin'?[{key:'admin',label:'Admin',onClick:this.openAdmin}]:[])
     ];
     const isActiveScreen = (key) => s.screen===key || (key==='jogar' && s.screen.startsWith('major-')) || (key==='jogar' && s.screen.startsWith('adivinhar-')) || (key==='jogadores' && s.screen==='jogador-perfil') || (key==='times' && s.screen==='time-perfil');
     const navLinks = navItems.map(n=>({
-      label:n.label, onClick:()=>this.nav(n.key),
-      style:`padding:8px 14px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;color:${isActiveScreen(n.key)?'#f4f5f7':'#9aa3b2'};background:${isActiveScreen(n.key)?'#171a22':'transparent'}`
+      label:n.label,onClick:n.onClick || (()=>this.nav(n.key)),
+      style:`padding:8px 14px;border-radius:8px;font-size:13.5px;font-weight:${n.key==='admin'?800:600};cursor:pointer;color:${n.key==='admin'?'#f2b53d':isActiveScreen(n.key)?'#f4f5f7':'#9aa3b2'};background:${n.key==='admin'?'rgba(242,181,61,.08)':isActiveScreen(n.key)?'#171a22':'transparent'};border:${n.key==='admin'?'1px solid rgba(242,181,61,.2)':'1px solid transparent'}`
     }));
     const mobileNavLinks = navItems.map(n=>({
-      label:n.label, onClick:()=>this.nav(n.key),
-      mstyle:`padding:12px 10px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;color:${isActiveScreen(n.key)?'#f4f5f7':'#9aa3b2'};background:${isActiveScreen(n.key)?'#171a22':'transparent'}`
+      label:n.label,onClick:n.onClick || (()=>this.nav(n.key)),
+      mstyle:`padding:12px 10px;border-radius:8px;font-size:15px;font-weight:${n.key==='admin'?800:600};cursor:pointer;color:${n.key==='admin'?'#f2b53d':isActiveScreen(n.key)?'#f4f5f7':'#9aa3b2'};background:${n.key==='admin'?'rgba(242,181,61,.08)':isActiveScreen(n.key)?'#171a22':'transparent'}`
     }));
     const notifications = [];
     const searchQuery = s.searchQuery;
@@ -2788,13 +2905,7 @@ class Component extends DCLogic {
     const breadcrumbs = s.screen==='home' ? null : this._breadcrumbsFor(s);
 
     const heroStats = [{value:s.summary.teams,label:'TIMES'},{value:s.summary.players,label:'JOGADORES'},{value:s.summary.links,label:'VÍNCULOS'}];
-    const popularPlayers = [...currentPlayers].sort((a,b)=>b.overall-a.overall).slice(0,4).map(p=>({
-      onClick:()=>this.nav('jogador-perfil',{slug:p.slug}), nick:p.nick, countryCode:p.code,
-      teamName: teamOf(p.team).name, initials:p.nick.slice(0,2).toUpperCase(), avatarStyle:avatarStyle(teamOf(p.team).hue),
-      roles:p.roles.map(r=>roleChip(r)), rating:formatRating(p.rating), overall:p.overall
-    }));
     const recentResults = [];
-    const weeklyRanking = [...currentPlayers].sort((a,b)=>b.overall-a.overall).slice(0,5).map((p,index)=>({rank:index+1,name:p.nick,initials:p.nick.slice(0,2),points:String(p.overall),rankStyle:`width:20px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;color:${index<3?'#f2b53d':'#636d7e'}`}));
     const platformStats = [{value:s.summary.players,label:'JOGADORES CADASTRADOS'},{value:s.summary.teams,label:'TIMES'},{value:s.summary.countries,label:'PAÍSES'},{value:s.summary.regions,label:'REGIÕES'}];
 
     const majorRules = [
@@ -2823,9 +2934,8 @@ class Component extends DCLogic {
         const selected=optionCode===code;
         return {label:optionRole.label,icon:optionRole.icon,color:optionRole.color,bg:optionRole.bg,textColor:selected?'#f4f5f7':'#9aa3b2',check:selected?'✓':'',onSelect:(event)=>{event.stopPropagation();this.setStrategyRole(index,optionCode)},style:`display:flex;align-items:center;gap:7px;padding:7px;background:${selected?optionRole.bg:'#0d0f14'};border:1px solid ${selected?`${optionRole.color}66`:'#242833'};border-radius:9px;cursor:pointer;transition:border-color .16s ease,background .16s ease`};
       });
-      return {number:index+1,role:code,label:role.label,icon:role.icon,description:role.description,attribute:role.attribute,shortAttribute:role.attribute.replace(' alto','').replace(' alta + FIREPOWER',' + FIRE'),color:role.color,bg:role.bg,isOpen,chevron:isOpen?'▲':'▼',options,onToggle:()=>this.toggleStrategySlot(index),onPickerClick:(event)=>event.stopPropagation(),cardStyle:`position:relative;aspect-ratio:1/1;background:${isOpen?role.bg:'#0d0f14'};border:1px solid ${isOpen?role.color:'#2a2f3b'};border-radius:18px;padding:22px 9px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:${isOpen?`0 0 0 1px ${role.color}22,0 12px 30px rgba(0,0,0,.28)`:'inset 0 1px 0 rgba(255,255,255,.02)'};transition:transform .16s ease,border-color .16s ease,background .16s ease`,pickerStyle:`position:absolute;top:calc(100% + 9px);${opensLeft?'right:0':'left:0'};z-index:35;width:300px;background:#151922;border:1px solid #33394a;border-radius:13px;padding:10px;box-shadow:0 18px 50px rgba(0,0,0,.55);animation:toastin .16s ease`};
+      return {role:code,label:role.label,icon:role.icon,color:role.color,bg:role.bg,isOpen,options,onToggle:()=>this.toggleStrategySlot(index),onPickerClick:(event)=>event.stopPropagation(),cardStyle:`position:relative;min-height:132px;background:${isOpen?role.bg:'#0d0f14'};border:1px solid ${isOpen?role.color:'#2a2f3b'};border-radius:18px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;box-shadow:${isOpen?`0 0 0 1px ${role.color}22,0 12px 30px rgba(0,0,0,.28)`:'inset 0 1px 0 rgba(255,255,255,.02)'};transition:transform .16s ease,border-color .16s ease,background .16s ease`,pickerStyle:`position:absolute;top:calc(100% + 9px);${opensLeft?'right:0':'left:0'};z-index:35;width:300px;background:#151922;border:1px solid #33394a;border-radius:13px;padding:10px;box-shadow:0 18px 50px rgba(0,0,0,.55);animation:toastin .16s ease`};
     });
-    const strategyRequirements=s.strategyRoles.map((code,index)=>{ const role=STRATEGY_ROLES[code]; return {number:index+1,label:role.label,icon:role.icon,color:role.color,bg:role.bg,targets:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · ')}; });
     const supportCount=s.strategyRoles.filter(role=>role==='support').length;
     const entryCount=s.strategyRoles.filter(role=>role==='entry').length;
     const hasAwper=s.strategyRoles.includes('awper');
@@ -3030,7 +3140,7 @@ class Component extends DCLogic {
     const swissPoolLabels=['0–0','1–0 / 0–1','2–0 / 1–1 / 0–2','2–1 / 1–2','2–2'];
     const swissBracketColumns=Array.from({length:5},(_,index)=>{
       const round=index+1; const saved=s.swissHistory.find(item=>item.round===round)?.matches; const current=s.swissPendingMatches && s.swissRound+1===round?s.swissPendingMatches:null; const matches=saved || current || [];
-      return {title:`RODADA ${round}`,pools:swissPoolLabels[index],waiting:!matches.length,matches:matches.map(match=>{ const finished=!current, userWon=match.winnerId==='user'; return {teamA:match.teamA,teamB:match.teamB,pool:`POOL ${match.pool}`,score:current?(match.isUser?'AO VIVO':'SIMULANDO'):match.score,scoreColor:match.isUser?'#ff5c1a':'#aeb7c8',showOutcome:match.isUser,outcome:finished?(userWon?'VITÓRIA':'DERROTA'):'EM ANDAMENTO',outcomeStyle:`font-size:8.5px;font-weight:900;color:${finished?(userWon?'#34c77b':'#ef4444'):'#f2b53d'};margin-top:7px;padding-top:6px;border-top:1px solid #2c3240`,teamAStyle:`white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${finished&&match.winnerId===match.aId?'#34c77b':'#e1e4ea'};font-weight:${finished&&match.winnerId===match.aId?800:500}`,teamBStyle:`white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${finished&&match.winnerId===match.bId?'#34c77b':'#e1e4ea'};font-weight:${finished&&match.winnerId===match.bId?800:500}`,style:`background:${match.isUser?'rgba(255,92,26,.075)':'#141821'};border:1px solid ${match.isUser?'rgba(255,92,26,.48)':'#2c3240'};border-radius:7px;padding:9px;font-size:10.5px;line-height:1.3;color:#e1e4ea`};})};
+      return {title:`RODADA ${round}`,pools:swissPoolLabels[index],waiting:!matches.length,matches:matches.map(match=>{ const finished=!current, userWon=match.winnerId==='user'; return {teamA:match.teamA,teamB:match.teamB,pool:`POOL ${match.pool}`,score:current?(match.isUser?'AO VIVO':'SIMULANDO'):match.score,scoreColor:match.isUser?'#ff5c1a':'#aeb7c8',showOutcome:match.isUser,outcome:finished?(userWon?'VITÓRIA':'DERROTA'):'EM ANDAMENTO',outcomeStyle:`font-size:8.5px;font-weight:900;color:${finished?(userWon?'#34c77b':'#ef4444'):'#f2b53d'};white-space:nowrap`,teamAStyle:`white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${finished&&match.winnerId===match.aId?'#34c77b':'#e1e4ea'};font-weight:${finished&&match.winnerId===match.aId?800:700}`,teamBStyle:`white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${finished&&match.winnerId===match.bId?'#34c77b':'#e1e4ea'};font-weight:${finished&&match.winnerId===match.bId?800:700}`,style:`background:${match.isUser?'linear-gradient(90deg,rgba(255,92,26,.12),rgba(255,92,26,.045))':'#131821'};border:1px solid ${match.isUser?'rgba(255,92,26,.55)':'#293140'};border-left:${match.isUser?'2px solid #ff5c1a':'1px solid #293140'};border-radius:6px;padding:9px 10px;font-size:11.5px;line-height:1.15;color:#e1e4ea`};})};
     });
     const swissPrimaryLabel=swissFinished?(swissUserTeam.status==='qualified'?'Classificado para os playoffs':'Campanha encerrada'):s.swissPendingMatches?'Rounds sendo simulados automaticamente…':`Simular rodada ${s.swissRound+1}`;
     const swissPrimaryAction=swissFinished||s.swissPendingMatches?()=>{}:this.startSwissRound;
@@ -3306,16 +3416,12 @@ class Component extends DCLogic {
     }
 
     // ---- RANKING ----
-    const rankingTabDefs = [
-      {key:'overall', label:'Overall'}, {key:'firepower', label:'Firepower'}, {key:'entrying', label:'Entrying'},
-      {key:'trading', label:'Trading'}, {key:'opening', label:'Opening'}, {key:'clutching', label:'Clutching'},
-      {key:'sniping', label:'Sniping'}, {key:'utility', label:'Utility'}
-    ];
-    const rankingTabs = rankingTabDefs.map(rt=>({label:rt.label, onClick:()=>this.setRankingTab(rt.key),
-      style:`padding:10px 16px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;color:${s.rankingTab===rt.key?'#f4f5f7':'#636d7e'};border-bottom:2px solid ${s.rankingTab===rt.key?'#ff5c1a':'transparent'}`}));
-    const rankingItems = [...currentPlayers].filter(p=>Number.isFinite(p[s.rankingTab])).sort((a,b)=>b[s.rankingTab]-a[s.rankingTab]).slice(0,50).map((p,i)=>({
-      rank:i+1, name:`${p.nick} · ${p.country}`, value:String(p[s.rankingTab]), rankStyle:`width:22px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:${i<3?'#f2b53d':'#636d7e'}`
-    }));
+    const rankingItems=s.rankedLeaderboard.map((entry,i)=>({rank:entry.rank,name:entry.username,value:`${entry.points} PTS`,attempts:`${entry.attempts} ${entry.attempts===1?'PARTIDA':'PARTIDAS'}`,rankStyle:`width:26px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:${i<3?'#f2b53d':'#636d7e'}`}));
+    const rankedPoints=s.rankedRun?.score || 0;
+    const rankedPlayed=Boolean(s.rankedToday?.played);
+    const rankedButtonLabel=s.rankedLoading?'CARREGANDO…':!s.authUser?'ENTRAR PARA JOGAR':rankedPlayed?'PARTIDA DE HOJE JÁ JOGADA':'JOGAR PARTIDA RANQUEADA';
+    const rankedButtonStyle=`text-align:center;font-size:11.5px;font-weight:900;border-radius:8px;padding:12px 10px;cursor:${s.rankedLoading||rankedPlayed?'default':'pointer'};background:${rankedPlayed?'#1a1e28':'#ff5c1a'};color:${rankedPlayed?'#636d7e':'#0a0c10'}`;
+    const rankedAvailabilityText=s.rankedError || (!s.authUser?'Entre ou crie sua conta para participar.':rankedPlayed?'Sua próxima tentativa será liberada amanhã.':'Sua tentativa está disponível. O clique já conta como a partida do dia.');
 
     // ---- REGRAS ----
     const regrasSections = [
@@ -3403,39 +3509,41 @@ class Component extends DCLogic {
       profile, profileTabs, tabGeral, tabTemporadas, tabTimes, tabEstatisticas, tabMapas, tabMajors, tabCompanheiros,
       isTimesList: s.screen==='times', isTeamProfile: s.screen==='time-perfil', teamsListItems, teamProfile,
       isSeasonsList: s.screen==='temporadas', isSeasonDetail: s.screen==='temporada-detalhe', seasonsListItems, seasonDetail,
-      isRanking: s.screen==='ranking', rankingTabs, rankingItems,
+      isRanking: s.screen==='ranking', rankingItems, rankedLoading:s.rankedLoading, rankedPoints, rankedPointsColor:rankedPoints?'#f2b53d':'#f4f5f7', rankedAvailabilityText, rankedButtonLabel, rankedButtonStyle, startRanked:this.startRanked,
       isRegras: s.screen==='regras', regrasSections,
+      isSobre: s.screen==='sobre',
       isLogin: s.screen==='login', isCadastro: s.screen==='cadastro',
-      authName:s.authName, authEmail:s.authEmail, authPassword:s.authPassword, onAuthName:this.onAuthName, onAuthEmail:this.onAuthEmail, onAuthPassword:this.onAuthPassword, doLogin:this.doLogin, doCadastro:this.doCadastro,
-      isUserProfile: s.screen==='perfil', userProfileTabs, userTabVisao: s.userProfileTab==='visao', userTabHistorico: s.userProfileTab==='historico', userTabConquistas: s.userProfileTab==='conquistas',
+      authUser:s.authUser, authError:s.authError, authName:s.authName, authEmail:s.authEmail, authPassword:s.authPassword, googleAuthEnabled:s.googleAuthEnabled, loginButtonLabel:s.authSubmitting?'Entrando…':'Entrar', registerButtonLabel:s.authSubmitting?'Criando conta…':'Criar conta', onAuthName:this.onAuthName, onAuthEmail:this.onAuthEmail, onAuthPassword:this.onAuthPassword, doLogin:this.doLogin, doCadastro:this.doCadastro, doGoogleAuth:this.doGoogleAuth, doLogout:this.doLogout,
+      isUserProfile: s.screen==='perfil' && Boolean(s.authUser), userProfileTabs, userTabVisao: s.userProfileTab==='visao', userTabHistorico: s.userProfileTab==='historico', userTabConquistas: s.userProfileTab==='conquistas',
       userStats, userHistorico, userAchievements,
       majorRules, majorHistory, rouletteDone:s.rouletteDone, drawnSeason, startDraft:this.startDraft,
-      strategyPresets, strategySlots, strategyRequirements, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro, restartMajorDraft:this.restartMajorDraft,
+      strategyPresets, strategySlots, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro, restartMajorDraft:this.restartMajorDraft,
       playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftShellStyle, playerDraftPoolStyle, playerDraftSelectionHint, playerDraftActionText, playerDraftRerollLabel, playerDraftRerollStyle, finishPlayerDraftStyle,
       rerollPlayerDraft:this.rerollPlayerDraft, backToStrategy:this.backToStrategy, finishPlayerDraft:this.finishPlayerDraft,
-      goMajor: ()=>this.nav('major-intro'), goGuess:()=>this.nav('adivinhar-intro'),
+      goMajor:this.goMajorFree, goGuess:()=>this.nav('adivinhar-intro'),
       goJogadoresLink:()=>this.nav('jogadores'), goRankingLink:()=>this.nav('ranking'), goCadastroLink:()=>this.nav('cadastro'), goSorteio:()=>this.nav('major-strategy'),
       onFooterJogar:(e)=>{e.preventDefault();this.nav('jogar')}, onFooterMajorIntro:(e)=>{e.preventDefault();this.nav('major-intro')}, onFooterAdivinhar:(e)=>{e.preventDefault();this.nav('adivinhar-intro')}, onFooterRanking:(e)=>{e.preventDefault();this.nav('ranking')},
       onFooterJogadores:(e)=>{e.preventDefault();this.nav('jogadores')}, onFooterTimes:(e)=>{e.preventDefault();this.nav('times')}, onFooterTemporadas:(e)=>{e.preventDefault();this.nav('temporadas')},
       onFooterLogin:(e)=>{e.preventDefault();this.nav('login')}, onFooterCadastro:(e)=>{e.preventDefault();this.nav('cadastro')}, onFooterRegras:(e)=>{e.preventDefault();this.nav('regras')},
-      heroStats, popularPlayers, recentResults, weeklyRanking, platformStats,
-      user:{initials:'VC', name:'Você'},
+      heroStats, recentResults, platformStats,
+      user:{initials:(s.authUser?.username || '').slice(0,2).toUpperCase(),name:s.authUser?.username || '',email:s.authUser?.email || 'E-mail não informado',roleLabel:s.authUser?.role==='admin'?'ADMINISTRADOR':'JOGADOR',roleColor:s.authUser?.role==='admin'?'#f2b53d':'#2fb8c6',roleBg:s.authUser?.role==='admin'?'rgba(242,181,61,.1)':'rgba(47,184,198,.1)'},
       navLinks, mobileNavLinks,
       notifMenuOpen:s.notifMenuOpen, notifications,
       mobileNavOpen:s.mobileNavOpen, toggleMobileNav:this.toggleMobileNav,
       searchOpen:s.searchOpen, searchQuery, searchResults, searchEmpty,
       openSearch:this.openSearch, closeSearch:this.closeSearch, stopProp:this.stopProp, onSearchChange:this.onSearchChange,
       toggleNotifMenu:this.toggleNotifMenu,
-      goHome:this.goHome, goPerfil:this.goPerfil, nav:this.nav,
+      goHome:this.goHome, goPerfil:this.goPerfil, goLogin:()=>this.nav('login'), goCadastro:()=>this.nav('cadastro'), nav:this.nav,
       toast:s.toast,
       breadcrumbs
     };
   }
 
   _breadcrumbsFor(s){
+    const labels={sobre:'Sobre'};
     return [
       {label:'Início', onClick:()=>this.nav('home'), style:'cursor:pointer;color:#636d7e', hasNext:true},
-      {label:s.screen, onClick:()=>{}, style:'color:#d8dce3;font-weight:600', hasNext:false}
+      {label:labels[s.screen] || s.screen, onClick:()=>{}, style:'color:#d8dce3;font-weight:600', hasNext:false}
     ];
   }
 }
