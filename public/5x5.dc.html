@@ -120,7 +120,7 @@
         <div style="position:relative">
           <div onClick="{{ toggleNotifMenu }}" style="width:36px;height:36px;border-radius:8px;background:#12151c;border:1px solid #242833;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9aa3b2;position:relative">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            <div style="position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#ff5c1a;border:2px solid #0a0c10"></div>
+            <sc-if value="{{ notifications.length }}"><div style="position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#ff5c1a;border:2px solid #0a0c10"></div></sc-if>
           </div>
           <sc-if value="{{ notifMenuOpen }}">
             <div style="position:absolute;top:44px;right:0;width:280px;background:#12151c;border:1px solid #242833;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:50;overflow:hidden">
@@ -128,12 +128,14 @@
               <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="3">
                 <div style="padding:11px 14px;border-bottom:1px solid #1a1e28;display:flex;gap:10px;align-items:flex-start">
                   <div style="{{ n.dotStyle }}"></div>
-                  <div>
-                    <div style="font-size:12.5px;color:#e6e8ec;line-height:1.4">{{ n.text }}</div>
-                    <div style="font-size:10.5px;color:#636d7e;margin-top:2px">{{ n.time }}</div>
+                  <div style="min-width:0">
+                    <div style="font-size:12.5px;font-weight:700;color:#e6e8ec;line-height:1.35">{{ n.title }}</div>
+                    <div style="font-size:11.5px;color:#9aa3b2;line-height:1.45;margin-top:3px">{{ n.message }}</div>
+                    <div style="font-size:10.5px;color:#636d7e;margin-top:4px">{{ n.time }}</div>
                   </div>
                 </div>
               </sc-for>
+              <sc-if value="{{ !notifications.length }}"><div style="padding:24px 14px;text-align:center;font-size:12px;color:#636d7e">Nenhuma novidade publicada.</div></sc-if>
             </div>
           </sc-if>
         </div>
@@ -253,15 +255,11 @@
                 BASE HISTÓRICA · 2017–2026
               </div>
               <h1 style="font-family:'Chakra Petch',sans-serif;font-size:56px;line-height:1.02;font-weight:700;margin:0 0 20px;letter-spacing:-.01em">Monte sua lineup.<br/>Vença o Major.<br/><span style="color:#ff5c1a">Prove que manja de CS.</span></h1>
-              <p style="font-size:16.5px;color:#9aa3b2;line-height:1.6;max-width:520px;margin:0 0 32px">5x5 é um jogo de navegador sobre a história e as estatísticas do competitivo de Counter-Strike. Drafte lendas de diferentes eras, simule um Major inteiro e teste seu conhecimento adivinhando jogadores.</p>
+              <p style="font-size:16.5px;color:#9aa3b2;line-height:1.6;max-width:520px;margin:0 0 32px">5x5 é um jogo de navegador sobre a história e as estatísticas do competitivo de Counter-Strike. Monte uma lineup com jogadores de diferentes eras e tente levá-la ao título de um Major.</p>
               <div style="display:flex;gap:14px;flex-wrap:wrap">
                 <div onClick="{{ goMajor }}" style="display:flex;align-items:center;gap:10px;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14.5px;padding:14px 24px;border-radius:10px;cursor:pointer;box-shadow:0 8px 24px rgba(255,92,26,.25)" style-hover="background:#ff7640">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7z"></path></svg>
                   Montar meu time
-                </div>
-                <div onClick="{{ goGuess }}" style="display:flex;align-items:center;gap:10px;background:#171a22;border:1px solid #2fb8c6;color:#2fb8c6;font-weight:700;font-size:14.5px;padding:14px 24px;border-radius:10px;cursor:pointer" style-hover="background:#1a222a">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                  Adivinhar jogador
                 </div>
               </div>
             </div>
@@ -289,26 +287,17 @@
       <section style="max-width:1360px;margin:0 auto;padding:72px 24px">
         <div style="text-align:center;margin-bottom:44px">
           <div style="font-size:12.5px;font-weight:700;color:#2fb8c6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Como funciona</div>
-          <h2 style="font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700;margin:0">Dois jeitos de jogar</h2>
+          <h2 style="font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700;margin:0">Monte, simule e conquiste</h2>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" data-modes-grid="1">
+        <div style="max-width:760px;margin:0 auto" data-modes-grid="1">
           <div onClick="{{ goMajor }}" style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:32px;cursor:pointer;position:relative;overflow:hidden" style-hover="border-color:#ff5c1a">
             <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(255,92,26,.15),transparent 70%)"></div>
             <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,92,26,.14);display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:#ff5c1a">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7z"></path></svg>
             </div>
             <h3 style="font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;margin:0 0 10px">Monte seu time e dispute um Major</h3>
-            <p style="font-size:14px;color:#9aa3b2;line-height:1.6;margin:0 0 20px">Sorteie uma temporada, drafte 5 jogadores e um coach entre lendas de diferentes eras, monte funções e simule uma campanha inteira de Major.</p>
+            <p style="font-size:14px;color:#9aa3b2;line-height:1.6;margin:0 0 20px">Defina as cinco posições da sua formação, escolha jogadores históricos com bom encaixe e dispute a fase suíça e os playoffs de um Major.</p>
             <div style="font-size:13px;font-weight:700;color:#ff5c1a">Começar draft →</div>
-          </div>
-          <div onClick="{{ goGuess }}" style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:32px;cursor:pointer;position:relative;overflow:hidden" style-hover="border-color:#2fb8c6">
-            <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(47,184,198,.15),transparent 70%)"></div>
-            <div style="width:48px;height:48px;border-radius:12px;background:rgba(47,184,198,.14);display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:#2fb8c6">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            </div>
-            <h3 style="font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;margin:0 0 10px">Quem é o jogador?</h3>
-            <p style="font-size:14px;color:#9aa3b2;line-height:1.6;margin:0 0 20px">Um jogador misterioso por rodada. Use dicas de país, funções, times e Majors para descobrir quem é — quanto menos dicas, mais pontos.</p>
-            <div style="font-size:13px;font-weight:700;color:#2fb8c6">Jogar agora →</div>
           </div>
         </div>
       </section>
@@ -358,52 +347,38 @@
       </section>
 
       <!-- CTA CONTA -->
-      <section style="max-width:1360px;margin:0 auto;padding:80px 24px;text-align:center">
-        <h2 style="font-family:'Chakra Petch',sans-serif;font-size:30px;font-weight:700;margin:0 0 14px">Crie sua conta e comece a disputar</h2>
-        <p style="font-size:15px;color:#9aa3b2;margin:0 0 28px;max-width:480px;margin-left:auto;margin-right:auto">Salve suas campanhas, acompanhe seu histórico de adivinhações e suba no ranking semanal.</p>
-        <div onClick="{{ goCadastroLink }}" style="display:inline-flex;align-items:center;gap:10px;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14.5px;padding:14px 28px;border-radius:10px;cursor:pointer">Criar conta grátis</div>
-      </section>
+      <sc-if value="{{ !authUser }}">
+        <section style="max-width:1360px;margin:0 auto;padding:80px 24px;text-align:center">
+          <h2 style="font-family:'Chakra Petch',sans-serif;font-size:30px;font-weight:700;margin:0 0 14px">Crie sua conta e comece a disputar</h2>
+          <p style="font-size:15px;color:#9aa3b2;margin:0 0 28px;max-width:480px;margin-left:auto;margin-right:auto">Dispute uma campanha ranqueada por dia, acumule pontos pelas vitórias e suba na classificação geral.</p>
+          <div onClick="{{ goCadastroLink }}" style="display:inline-flex;align-items:center;gap:10px;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:14.5px;padding:14px 28px;border-radius:10px;cursor:pointer">Criar conta grátis</div>
+        </section>
+      </sc-if>
     </sc-if>
 
     <sc-if value="{{ isJogarHub }}" hint-placeholder-val="{{ true }}">
       <div data-screen-label="Central de Jogos" style="max-width:1360px;margin:0 auto;padding:32px 24px 80px">
-        <h1 style="font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700;margin:0 0 6px">Central de jogos</h1>
-        <p style="font-size:14.5px;color:#9aa3b2;margin:0 0 32px">Escolha um modo e comece a jogar.</p>
+        <h1 style="font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700;margin:0 0 6px">Jogar</h1>
+        <p style="font-size:14.5px;color:#9aa3b2;margin:0 0 32px">Monte sua lineup histórica e dispute um Major completo.</p>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px" data-hub-modes="1">
+        <div style="max-width:760px;margin-bottom:40px" data-hub-modes="1">
           <div style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:28px;display:flex;flex-direction:column">
             <div style="width:44px;height:44px;border-radius:11px;background:rgba(255,92,26,.14);display:flex;align-items:center;justify-content:center;color:#ff5c1a;margin-bottom:16px">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7z"></path></svg>
             </div>
             <h3 style="font-family:'Chakra Petch',sans-serif;font-size:20px;font-weight:700;margin:0 0 8px">Monte seu time e dispute um Major</h3>
-            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 24px;flex:1">Sorteie a temporada, drafte sua lineup e simule a campanha.</p>
+            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 24px;flex:1">Escolha a formação, encontre cinco jogadores que encaixem nas posições e avance pela fase suíça e pelos playoffs.</p>
             <div onClick="{{ goMajor }}" style="text-align:center;background:#ff5c1a;color:#0a0c10;font-weight:700;font-size:13.5px;padding:12px;border-radius:9px;cursor:pointer">Jogar</div>
           </div>
-          <div style="background:#12151c;border:1px solid #242833;border-radius:16px;padding:28px;display:flex;flex-direction:column">
-            <div style="width:44px;height:44px;border-radius:11px;background:rgba(47,184,198,.14);display:flex;align-items:center;justify-content:center;color:#2fb8c6;margin-bottom:16px">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            </div>
-            <h3 style="font-family:'Chakra Petch',sans-serif;font-size:20px;font-weight:700;margin:0 0 8px">Quem é o jogador?</h3>
-            <p style="font-size:13.5px;color:#9aa3b2;line-height:1.6;margin:0 0 24px;flex:1">Descubra um jogador misterioso usando o mínimo de dicas possível.</p>
-            <div onClick="{{ goGuess }}" style="text-align:center;background:#2fb8c6;color:#0a0c10;font-weight:700;font-size:13.5px;padding:12px;border-radius:9px;cursor:pointer">Jogar</div>
-          </div>
-        </div>
-
-        <div style="max-width:660px">
-            <h3 style="font-size:15px;font-weight:700;color:#e6e8ec;margin:0 0 14px">Em breve</h3>
-            <div style="background:#12151c;border:1px dashed #33394a;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#9aa3b2">Modo difícil — Adivinhação</span><span style="font-size:10.5px;font-weight:700;color:#636d7e;background:#1a1e28;padding:2px 8px;border-radius:5px">EM BREVE</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#9aa3b2">Draft cooperativo (2 jogadores)</span><span style="font-size:10.5px;font-weight:700;color:#636d7e;background:#1a1e28;padding:2px 8px;border-radius:5px">EM BREVE</span></div>
-            </div>
         </div>
       </div>
     </sc-if>
 
     <sc-if value="{{ isMajorIntro }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Introdução Major" style="max-width:960px;margin:0 auto;padding:32px 24px 80px">
-        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,92,26,.1);border:1px solid rgba(255,92,26,.3);border-radius:100px;padding:5px 14px;font-size:11.5px;font-weight:700;color:#ff5c1a;margin-bottom:18px">MINIGAME 1</div>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,92,26,.1);border:1px solid rgba(255,92,26,.3);border-radius:100px;padding:5px 14px;font-size:11.5px;font-weight:700;color:#ff5c1a;margin-bottom:18px">DRAFT · MAJOR</div>
         <h1 style="font-family:'Chakra Petch',sans-serif;font-size:36px;font-weight:700;margin:0 0 14px">Monte seu time e dispute um Major</h1>
-        <p style="font-size:15px;color:#9aa3b2;line-height:1.7;margin:0 0 32px">Uma temporada é sorteada para você. A partir do elenco de jogadores elegíveis daquela época, monte uma escalação de 5 titulares e 1 coach, distribua funções e leve seu time para disputar um Major simulado contra outras lineups.</p>
+        <p style="font-size:15px;color:#9aa3b2;line-height:1.7;margin:0 0 32px">Defina as cinco posições da sua formação, escolha jogadores históricos que encaixem em cada responsabilidade e leve sua lineup para disputar um Major simulado contra outras equipes.</p>
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:36px" data-rules-grid="1">
           <sc-for list="{{ majorRules }}" as="r" hint-placeholder-count="4">
@@ -415,8 +390,8 @@
         </div>
 
         <div style="background:#12151c;border:1px solid #242833;border-radius:12px;padding:20px;margin-bottom:32px">
-          <div style="font-size:13px;font-weight:700;color:#e6e8ec;margin-bottom:10px">Funções são flexíveis</div>
-          <p style="font-size:13px;color:#9aa3b2;line-height:1.7;margin:0">Um jogador pode acumular várias funções (ex: Entry + Rifler) e elas variam conforme o time e a temporada escolhidos. O entrosamento entre os cinco titulares também afeta o desempenho — jogadores que já competiram juntos em campanhas reais rendem melhor no draft.</p>
+          <div style="font-size:13px;font-weight:700;color:#e6e8ec;margin-bottom:10px">Suas escolhas influenciam a campanha</div>
+          <p style="font-size:13px;color:#9aa3b2;line-height:1.7;margin:0">O encaixe do jogador na posição escolhida, a cobertura das responsabilidades do time e o entrosamento entre os cinco titulares alteram a força da lineup usada nas simulações.</p>
         </div>
 
         <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
@@ -735,18 +710,6 @@
                 </div>
               </sc-for>
             </div>
-            <div style="{{ coachSlotStyle }}">
-              <sc-if value="{{ coach }}" hint-placeholder-val="{{ false }}">
-                <div style="{{ coachAvatarStyle }}">C</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#f4f5f7">{{ coach.name }}</div><div style="font-size:11px;color:#636d7e">Coach</div></div>
-                <div onClick="{{ removeCoach }}" style="cursor:pointer;color:#636d7e;font-size:13px">✕</div>
-              </sc-if>
-              <sc-if value="{{ !coach }}">
-                <span style="font-size:12px;color:#4a505e;flex:1">Coach — vazio</span>
-                <div onClick="{{ openCoachPicker }}" style="font-size:11.5px;font-weight:700;color:#2fb8c6;cursor:pointer">Escolher</div>
-              </sc-if>
-            </div>
-
             <div style="margin:16px 0;border-top:1px solid #1a1e28"></div>
             <div style="font-size:12px;font-weight:700;color:#9aa3b2;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">Composição</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
@@ -821,31 +784,6 @@
       </div>
     </sc-if>
 
-    <!-- COACH PICKER MODAL -->
-    <sc-if value="{{ coachPickerOpen }}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{ closeCoachPicker }}" style="position:fixed;inset:0;background:rgba(5,6,9,.7);z-index:80;display:flex;align-items:center;justify-content:center">
-        <div onClick="{{ stopProp }}" style="width:520px;max-width:92vw;background:#12151c;border:1px solid #242833;border-radius:14px;padding:22px;max-height:80vh;overflow-y:auto">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <span style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700">Escolher coach</span>
-            <div onClick="{{ closeCoachPicker }}" style="cursor:pointer;color:#636d7e">✕</div>
-          </div>
-          <sc-for list="{{ coachOptions }}" as="c" hint-placeholder-count="3">
-            <div onClick="{{ c.onSelect }}" style="background:#0d0f14;border:1px solid #242833;border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer" style-hover="border-color:#33394a">
-              <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-                <span style="font-size:14.5px;font-weight:800;color:#f4f5f7">{{ c.name }}</span>
-                <span style="font-size:11px;color:#636d7e">Ex-{{ c.pastTeam }}</span>
-              </div>
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-                <sc-for list="{{ c.attrs }}" as="a" hint-placeholder-count="4">
-                  <div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#e6e8ec">{{ a.value }}</div><div style="font-size:9.5px;color:#636d7e">{{ a.label }}</div></div>
-                </sc-for>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-    </sc-if>
-
     <sc-if value="{{ isResumo }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Resumo da Escalação" style="max-width:1200px;margin:0 auto;padding:24px 24px 90px">
         <h1 style="font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;margin:0 0 4px">Resumo da escalação</h1>
@@ -861,12 +799,7 @@
             </div>
           </sc-for>
         </div>
-        <div style="background:#12151c;border:1px solid #242833;border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:32px">
-          <div style="{{ resumoCoach.avatarStyle }}">C</div>
-          <div><div style="font-size:13.5px;font-weight:800;color:#f4f5f7">{{ resumoCoach.name }}</div><div style="font-size:11px;color:#636d7e">Coach · Liderança {{ resumoCoach.leadership }} · Tática {{ resumoCoach.tatica }}</div></div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px" data-resumo-grid="1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:32px 0" data-resumo-grid="1">
           <div style="background:#12151c;border:1px solid #242833;border-radius:14px;padding:24px">
             <div style="font-size:13px;font-weight:700;color:#9aa3b2;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px">Radar da equipe</div>
             <svg viewBox="0 0 240 240" style="width:100%;max-width:280px;display:block;margin:0 auto">
@@ -1740,7 +1673,6 @@
           <h1 style="font-family:'Chakra Petch',sans-serif;font-size:34px;line-height:1.15;max-width:650px;margin:0 0 20px">Dois amigos, código e uma paixão por Counter-Strike.</h1>
           <p style="font-size:16px;color:#aeb6c5;line-height:1.75;max-width:760px;margin:0">Somos dois amigos desenvolvedores que gostam de CS e decidiram criar um jogo totalmente gratuito para a comunidade. A ideia é ter algo divertido e rápido para jogar enquanto a fila não encontra uma partida — ou simplesmente quando você está sem nada para fazer.</p>
           <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:28px">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#2fb8c6;background:rgba(47,184,198,.09);border:1px solid rgba(47,184,198,.25);border-radius:6px;padding:7px 9px">2 AMIGOS DEVS</span>
             <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#34c77b;background:rgba(52,199,123,.09);border:1px solid rgba(52,199,123,.25);border-radius:6px;padding:7px 9px">100% GRATUITO</span>
             <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;color:#f2b53d;background:rgba(242,181,61,.09);border:1px solid rgba(242,181,61,.25);border-radius:6px;padding:7px 9px">FEITO PARA A COMUNIDADE</span>
           </div>
@@ -1833,7 +1765,6 @@
         <div style="display:flex;flex-direction:column;gap:9px">
           <a href="#" onClick="{{ onFooterJogar }}" style="font-size:13px;color:#9aa3b2">Central de jogos</a>
           <a href="#" onClick="{{ onFooterMajorIntro }}" style="font-size:13px;color:#9aa3b2">Monte seu time</a>
-          <a href="#" onClick="{{ onFooterAdivinhar }}" style="font-size:13px;color:#9aa3b2">Quem é o jogador?</a>
           <a href="#" onClick="{{ onFooterRanking }}" style="font-size:13px;color:#9aa3b2">Ranking</a>
         </div>
       </div>
@@ -1963,9 +1894,9 @@ function playersSharedSeason(a,b){
   const historyA=a?.teamHistory || [], historyB=b?.teamHistory || [];
   return historyA.some(first=>historyB.some(second=>first.year===second.year&&first.teamSlug===second.teamSlug));
 }
-function evaluateTeam(assignments,{coach=false,fixedChemistry=null}={}){
+function evaluateTeam(assignments,{fixedChemistry=null}={}){
   const valid=assignments.filter(item=>item?.player);
-  if(!valid.length) return {strength:50,base:50,chemistry:25,chemistryBonus:-2,compositionBonus:-6,coachBonus:0,players:[]};
+  if(!valid.length) return {strength:50,base:50,chemistry:25,chemistryBonus:-2,compositionBonus:-6,players:[]};
   const players=valid.map(item=>{ const fit=evaluateRole(item.player,item.role); const overall=Number.isFinite(Number(item.player.overall))?Number(item.player.overall):50; return {...item,fit,contribution:overall*.35+fit.score*.65}; });
   const base=players.reduce((sum,item)=>sum+item.contribution,0)/players.length;
   let pairs=0,together=0;
@@ -1975,8 +1906,7 @@ function evaluateTeam(assignments,{coach=false,fixedChemistry=null}={}){
   const roles=players.map(item=>item.role), uniqueRoles=new Set(roles).size;
   let compositionBonus=CORE_TEAM_ROLES.reduce((sum,role)=>sum+(roles.includes(role) ? .65 : -2.25),0);
   compositionBonus+=uniqueRoles>=5?1.25:uniqueRoles===4?.6:uniqueRoles<=2?-1.5:0;
-  const coachBonus=coach?4:0;
-  return {strength:base+chemistryBonus+compositionBonus+coachBonus,base,chemistry,chemistryBonus,compositionBonus,coachBonus,players};
+  return {strength:base+chemistryBonus+compositionBonus,base,chemistry,chemistryBonus,compositionBonus,players};
 }
 function rolePermutations(values){
   if(values.length<=1) return [values];
@@ -2045,9 +1975,7 @@ const SCREEN_PATHS = {
   'major-draft':'/jogar/monte-seu-time/elenco', 'major-groups':'/jogar/monte-seu-time/grupos',
   'major-playoffs':'/jogar/monte-seu-time/playoffs',
   'major-simulacao':'/jogar/monte-seu-time/simulacao', 'major-partida':'/jogar/monte-seu-time/partida',
-  'major-resultado':'/jogar/monte-seu-time/resultado', 'major-resumo':'/jogar/monte-seu-time/resumo',
-  'adivinhar-intro':'/jogar/quem-e-o-jogador', 'adivinhar-partida':'/jogar/quem-e-o-jogador/partida',
-  'adivinhar-resultado':'/jogar/quem-e-o-jogador/resultado'
+  'major-resultado':'/jogar/monte-seu-time/resultado', 'major-resumo':'/jogar/monte-seu-time/resumo'
 };
 function cleanSegment(value){ return encodeURIComponent(String(value || '').toLowerCase()); }
 function pathForScreen(screen, params={}){
@@ -2059,6 +1987,7 @@ function pathForScreen(screen, params={}){
 function routeFromPath(pathname=window.location.pathname){
   const path = decodeURIComponent(pathname).replace(/\/+$/, '') || '/';
   if(path==='/' || path==='/5x5.dc.html') return {screen:'home',params:{}};
+  if(path.toLowerCase().startsWith('/jogar/quem-e-o-jogador')) return {screen:'jogar',params:{}};
   const player = path.match(/^\/jogadores\/([^/]+)$/i);
   if(player) return {screen:'jogador-perfil',params:{slug:player[1].toUpperCase()}};
   const team = path.match(/^\/times\/([^/]+)$/i);
@@ -2072,17 +2001,17 @@ const INITIAL_ROUTE = routeFromPath();
 const AUTH_TOKEN_KEY = '5x5.auth.token';
 class Component extends DCLogic {
   state = { screen:INITIAL_ROUTE.screen, params:INITIAL_ROUTE.params, mobileNavOpen:false, notifMenuOpen:false, searchOpen:false, searchQuery:'', toast:null, playerProfileYear:null, teamProfileYear:null, rouletteDone:false, drawnSeasonId:null, draftId:null,
-    draftRoster:[null,null,null,null,null], draftCoach:null, draftCaptain:null,
+    draftRoster:[null,null,null,null,null], draftCaptain:null,
     strategyPreset:'balanced', strategyRoles:['entry','awper','support','rifler','lurker'], openStrategySlot:null,
     playerDraftRolling:false, playerDraftYear:null, playerDraftTeamSlug:null, playerDraftCandidateSlugs:[], playerDraftSelectedSlug:null, playerDraftSwapIndex:null, playerDraftRerolls:0, playerDraftPreviewYear:'—', playerDraftPreviewTeam:'Preparando sorteio',
     draftFilters:{search:'', team:'', role:'', sortBy:'overall', onlyEligible:true},
-    playerDrawerSlug:null, coachPickerOpen:false,
+    playerDrawerSlug:null,
     simRound:0, simMatches:[], simEliminated:false, simChampion:false, simSkipAnim:false,
     swissTeams:[], swissRound:0, swissHistory:[], swissPendingMatches:null, swissUserRounds:[], swissUserRoundIndex:0, swissMode:'normal', swissLiveOpen:false, swissLiveFinished:false, swissLiveStatsView:'map-1', majorLiveContext:'swiss',
     playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null, majorChampionName:'',
     guessMatchId:null, guessTargetSlug:null, guessScore:1000, guessAttempts:[], guessRevealedHints:[], guessPendingHint:null, guessInput:'', guessAutocompleteOpen:false, guessSelectedSlug:null, guessOver:false, guessWon:false,
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
-    rankingTab:'overall', rankedLeaderboard:[], rankedToday:null, rankedRun:null, rankedMode:false, rankedLoading:false, rankedError:'', userProfileTab:'visao', authName:'', authEmail:'', authPassword:'', authUser:null, authToken:'', authSubmitting:false, authError:'', googleAuthEnabled:false,
+    rankingTab:'overall', rankedLeaderboard:[], rankedToday:null, rankedRun:null, rankedMode:false, rankedLoading:false, rankedError:'', notifications:[], userProfileTab:'visao', authName:'', authEmail:'', authPassword:'', authUser:null, authToken:'', authSubmitting:false, authError:'', googleAuthEnabled:false,
     catalogLoading:true, catalogError:'', summary:{regions:0,countries:0,teams:0,players:0,links:0} };
 
   componentDidMount(){
@@ -2092,6 +2021,7 @@ class Component extends DCLogic {
     this.restoreSession();
     this.loadGoogleAuthConfig();
     this.completeGoogleLogin();
+    this.loadNotifications();
     window.addEventListener('popstate', this._onPopState = ()=>{
       const route=routeFromPath();
       this.setState({screen:route.screen,params:route.params,mobileNavOpen:false,playerProfileYear:null,teamProfileYear:null});
@@ -2108,6 +2038,17 @@ class Component extends DCLogic {
     if(typeof value?.message==='string') return value.message;
     if(Array.isArray(value?.message)) return value.message.join(' ');
     return fallback;
+  };
+
+  loadNotifications = async () => {
+    try {
+      const response = await fetch('/api/notifications');
+      if(!response.ok) throw new Error('notifications');
+      const notifications = await response.json();
+      this.setState({notifications:Array.isArray(notifications)?notifications:[]});
+    } catch(_error) {
+      this.setState({notifications:[]});
+    }
   };
   loadGoogleAuthConfig = async () => {
     try{
@@ -2249,7 +2190,7 @@ class Component extends DCLogic {
     if(window.location.pathname!==nextPath) window.history.pushState({screen,params},'',nextPath);
     this.setState({
       screen,params,draftId:null,drawnSeasonId:null,rouletteDone:false,
-      draftRoster:[null,null,null,null,null],draftCoach:null,draftCaptain:null,
+      draftRoster:[null,null,null,null,null],draftCaptain:null,
       strategyPreset:'balanced',strategyRoles:['entry','awper','support','rifler','lurker'],openStrategySlot:null,
       playerDraftRolling:false,playerDraftYear:null,playerDraftTeamSlug:null,playerDraftCandidateSlugs:[],playerDraftSelectedSlug:null,playerDraftSwapIndex:null,playerDraftRerolls:0,
       swissTeams:[],swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1',majorLiveContext:'swiss',
@@ -2352,11 +2293,7 @@ class Component extends DCLogic {
   removeSlot = (idx)=> this.setState(s=>{ const roster=[...s.draftRoster]; const removed=roster[idx]; roster[idx]=null; return {draftRoster:roster, draftCaptain: removed && s.draftCaptain===removed.slug ? null : s.draftCaptain}; });
   setSlotRole = (idx, role)=> this.setState(s=>{ const roster=[...s.draftRoster]; roster[idx] = {...roster[idx], role}; return {draftRoster:roster}; });
   setCaptain = (slug)=> this.setState({draftCaptain:slug});
-  openCoachPicker = ()=> this.setState({coachPickerOpen:true});
-  closeCoachPicker = ()=> this.setState({coachPickerOpen:false});
-  selectCoach = (slug)=> this.setState({draftCoach:slug, coachPickerOpen:false});
-  removeCoach = ()=> this.setState({draftCoach:null});
-  clearRoster = ()=> this.setState({draftRoster:[null,null,null,null,null], draftCoach:null, draftCaptain:null});
+  clearRoster = ()=> this.setState({draftRoster:[null,null,null,null,null], draftCaptain:null});
   goResumo = ()=> {
     const s = this.state;
     if(s.draftRoster.filter(Boolean).length < 5){ this.showToast({icon:'⚠️', title:'Escalação incompleta', desc:'Preencha os 5 slots antes de confirmar.', accent:'#ef4444', border:'#33394a'}); return; }
@@ -2665,7 +2602,7 @@ class Component extends DCLogic {
   _teamEvaluation(){
     const s = this.state;
     const assignments=s.draftRoster.map((item,index)=>item?{player:this._draftPlayer(item.slug,item.year),role:s.strategyRoles[index]}:null).filter(item=>item?.player);
-    return evaluateTeam(assignments,{coach:!!s.draftCoach});
+    return evaluateTeam(assignments);
   }
   _teamOverall(){ return this._teamEvaluation().strength; }
   _simulateOneMatch(round){
@@ -2893,7 +2830,17 @@ class Component extends DCLogic {
       label:n.label,onClick:n.onClick || (()=>this.nav(n.key)),
       mstyle:`padding:12px 10px;border-radius:8px;font-size:15px;font-weight:${n.key==='admin'?800:600};cursor:pointer;color:${n.key==='admin'?'#f2b53d':isActiveScreen(n.key)?'#f4f5f7':'#9aa3b2'};background:${n.key==='admin'?'rgba(242,181,61,.08)':isActiveScreen(n.key)?'#171a22':'transparent'}`
     }));
-    const notifications = [];
+    const notificationMeta={
+      news:{label:'Novidade',color:'#2fb8c6'},
+      update:{label:'Atualização',color:'#34c77b'},
+      warning:{label:'Aviso',color:'#f2b53d'},
+      maintenance:{label:'Manutenção',color:'#ff5c1a'}
+    };
+    const notifications=(s.notifications||[]).map(item=>{
+      const meta=notificationMeta[item.type]||notificationMeta.news;
+      const date=item.publishedAt?new Date(item.publishedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'';
+      return {...item,time:`${meta.label}${date?` · ${date}`:''}`,dotStyle:`width:7px;height:7px;border-radius:50%;background:${meta.color};margin-top:5px;flex-shrink:0;box-shadow:0 0 8px ${meta.color}55`};
+    });
     const searchQuery = s.searchQuery;
     const searchResults = searchQuery.length>0 ? [
       ...PLAYERS.filter(p=>p.nick.toLowerCase().includes(searchQuery.toLowerCase())).slice(0,5).map(p=>({title:p.nick,subtitle:`${p.country}${p.team ? ` · ${teamOf(p.team).name}` : ''}`,type:'Jogador',iconText:p.nick.slice(0,2),iconStyle:'width:32px;height:32px;border-radius:7px;background:#171a22;color:#ff5c1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800',onClick:()=>{this.nav('jogador-perfil',{slug:p.slug});this.closeSearch();}})),
@@ -2908,10 +2855,10 @@ class Component extends DCLogic {
     const platformStats = [{value:s.summary.players,label:'JOGADORES CADASTRADOS'},{value:s.summary.teams,label:'TIMES'},{value:s.summary.countries,label:'PAÍSES'},{value:s.summary.regions,label:'REGIÕES'}];
 
     const majorRules = [
-      {icon:'👥', title:'5 titulares + 1 coach', desc:'Escolha cinco jogadores e um coach dentre o elenco elegível da temporada sorteada.', color:'#ff5c1a'},
-      {icon:'🎯', title:'Funções não são exclusivas', desc:'IGL, AWPer, Entry e outras funções podem se acumular no mesmo jogador.', color:'#2fb8c6'},
-      {icon:'🤝', title:'Entrosamento importa', desc:'Jogadores que já competiram juntos em campanhas reais rendem melhor.', color:'#34c77b'},
-      {icon:'🏆', title:'Campanha progressiva', desc:'Avance rodada a rodada em um Major simulado com bracket real.', color:'#f2b53d'}
+      {icon:'⬡', title:'Defina as 5 posições', desc:'Monte a formação com Entry, AWPer, Support, Rifler e Lurker ou personalize as responsabilidades.', color:'#ff5c1a'},
+      {icon:'🎯', title:'Escolha pelo encaixe', desc:'Cada candidato possui um nível de compatibilidade com as posições que ainda estão livres.', color:'#2fb8c6'},
+      {icon:'🤝', title:'Entrosamento importa', desc:'Jogadores que já atuaram juntos na mesma equipe e temporada fortalecem a lineup.', color:'#34c77b'},
+      {icon:'🏆', title:'Fase suíça e playoffs', desc:'Consiga três vitórias para avançar e tente vencer quartas, semifinal e final.', color:'#f2b53d'}
     ];
     const majorHistory = [];
     const drawnSeason = s.drawnSeasonId ? seasonOf(s.drawnSeasonId) : {label:'',period:'',engine:'',mapCount:0,maps:[],year:this._draftYear()};
@@ -3037,14 +2984,6 @@ class Component extends DCLogic {
       };
     });
 
-    const coach = s.draftCoach ? COACHES.find(c=>c.slug===s.draftCoach) : null;
-    const coachSlotStyle = `display:flex;align-items:center;gap:10px;background:#0d0f14;border:1px ${coach?'solid #1a1e28':'dashed #262b36'};border-radius:9px;padding:10px 12px;min-height:52px`;
-    const coachAvatarStyle = 'width:32px;height:32px;border-radius:8px;background:rgba(124,140,248,.18);color:#7c8cf8;display:flex;align-items:center;justify-content:center;font-family:\'Chakra Petch\',sans-serif;font-weight:700;font-size:12px';
-    const coachOptions = COACHES.map(c=>({
-      name:c.name, pastTeam:c.pastTeam, onSelect:()=>this.selectCoach(c.slug),
-      attrs:[{label:'Liderança',value:c.leadership},{label:'Tática',value:c.tatica},{label:'Desenvolv.',value:c.desenvolvimento},{label:'Mental',value:c.mental}]
-    }));
-
     const filledPlayers = s.draftRoster.filter(Boolean).map(r=>this._draftPlayer(r.slug,r.year)).filter(Boolean);
     const avg = (arr)=> arr.length? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
     const teamEvaluation=this._teamEvaluation();
@@ -3060,7 +2999,6 @@ class Component extends DCLogic {
     if(!filledPlayers.some(p=>p.roles.includes('igl'))) draftWarnings.push('Nenhum jogador com função de IGL atribuída.');
     if(!filledPlayers.some(p=>p.roles.includes('awper'))) draftWarnings.push('Escalação sem AWPer dedicado.');
     if(filledPlayers.length && filledPlayers.length<5) draftWarnings.push(`Faltam ${5-filledPlayers.length} titular(es) para completar a escalação.`);
-    if(!coach) draftWarnings.push('Nenhum coach selecionado.');
     const teamsInRoster = new Set(filledPlayers.map(p=>p.team));
     if(filledPlayers.length>=3 && teamsInRoster.size===filledPlayers.length) draftWarnings.push('Baixo entrosamento: todos vindos de times diferentes.');
 
@@ -3072,8 +3010,6 @@ class Component extends DCLogic {
       const roleCode=s.strategyRoles[index],fit=evaluateRole(p,roleCode),tone=fitTone(fit.score);
       return { avatarStyle:avatarStyle(team.hue), initials:p.nick.slice(0,2).toUpperCase(), nick:p.nick, isCaptain:s.draftCaptain===r.slug, roleLabel:STRATEGY_ROLES[roleCode]?.label||roleCode, overall:p.overall,fitScore:fit.score,fitStatus:fit.status,fitColor:tone.color,fitBg:tone.bg };
     });
-    const resumoCoach = coach || {name:'Nenhum coach selecionado', leadership:'—', tatica:'—', avatarStyle:coachAvatarStyle};
-    if(coach) resumoCoach.avatarStyle = coachAvatarStyle;
     const axes = [
       {label:'FORÇA', value: Math.round(teamEvaluation.strength)},
       {label:'ENCAIXE', value: averageFit},
@@ -3420,12 +3356,11 @@ class Component extends DCLogic {
     const rankedPlayed=Boolean(s.rankedToday?.played);
     const rankedButtonLabel=s.rankedLoading?'CARREGANDO…':!s.authUser?'ENTRAR PARA JOGAR':rankedPlayed?'PARTIDA DE HOJE JÁ JOGADA':'JOGAR PARTIDA RANQUEADA';
     const rankedButtonStyle=`text-align:center;font-size:11.5px;font-weight:900;border-radius:8px;padding:12px 10px;cursor:${s.rankedLoading||rankedPlayed?'default':'pointer'};background:${rankedPlayed?'#1a1e28':'#ff5c1a'};color:${rankedPlayed?'#636d7e':'#0a0c10'}`;
-    const rankedAvailabilityText=s.rankedError || (!s.authUser?'Entre ou crie sua conta para participar.':rankedPlayed?'Sua próxima tentativa será liberada amanhã.':'Sua tentativa está disponível. O clique já conta como a partida do dia.');
+    const rankedAvailabilityText=s.rankedError || (!s.authUser?'Entre ou crie sua conta para participar.':rankedPlayed?'Sua próxima tentativa será liberada amanhã às 00:01 (horário de Brasília).':'Sua tentativa está disponível. Uma nova partida é liberada diariamente às 00:01 (horário de Brasília).');
 
     // ---- REGRAS ----
     const regrasSections = [
-      {title:'Monte seu time e dispute um Major', text:'Sorteie uma temporada, drafte 5 titulares e 1 coach entre jogadores elegíveis daquele período, distribua funções livremente e simule uma campanha completa de Major.'},
-      {title:'Quem é o jogador?', text:'Descubra o jogador misterioso em até 6 tentativas. Dicas extras podem ser reveladas a um custo em pontos — quanto menos dicas, maior a pontuação final.'},
+      {title:'Monte seu time e dispute um Major', text:'Defina as cinco posições da formação, escolha um jogador histórico para cada vaga e simule uma campanha completa com fase suíça e playoffs.'},
       {title:'Como interpretar os atributos HLTV', text:'Cada atributo vai de 0 a 100 e descreve principalmente o estilo e a frequência das ações do jogador, não simplesmente se ele é bom ou ruim. Na referência da HLTV, 50 representa a média de um profissional do alto nível; por isso, uma nota baixa em determinado atributo pode apenas indicar outra função dentro do time.'},
       {title:'Firepower', text:'Mede a produção ofensiva bruta por meio de abates, dano e multikills. Não considera vantagens de sobrevivência ou consistência entre rounds, diferenciando-se de um rating geral.'},
       {title:'Entrying', text:'Indica com que frequência o jogador entra primeiro e acaba sacrificado para abrir espaço. Usa especialmente mortes que foram trocadas pelos companheiros; uma nota alta mostra tendência à função de entry, não necessariamente maior eficiência.'},
@@ -3435,7 +3370,7 @@ class Component extends DCLogic {
       {title:'Sniping', text:'É baseado nos abates com AWP e SSG 08. Valores baixos costumam indicar riflers, a faixa intermediária identifica híbridos ou AWP secundária e valores altos apontam AWPers primários.'},
       {title:'Utility', text:'Avalia o uso de granadas a partir de flashbangs utilizadas, flash assists e dano total de utilitários, valorizando jogadores de suporte e especialistas nesse recurso.'},
       {title:'Dados por ano', text:'Os atributos e o overall do jogador são consultados no ano selecionado dentro do perfil dele. No perfil do time, o ano selecionado troca somente a lineup. As demais telas mostram o cadastro mais recente disponível de cada jogador.'},
-      {title:'Pontuação e ranking', text:'Sua pontuação é calculada a partir das campanhas do Major e das rodadas de adivinhação, e alimenta o ranking semanal da plataforma.'}
+      {title:'Pontuação e ranking', text:'Na campanha ranqueada, cada vitória suíça vale 10 pontos, quartas e semifinal valem 30 cada e a final vale 50. Cada conta possui uma tentativa ranqueada por dia.'}
     ];
 
     // ---- PERFIL DO USUÁRIO ----
@@ -3485,11 +3420,10 @@ class Component extends DCLogic {
       isResumo: s.screen==='major-resumo',
       backToDraft:this.backToDraft, disputarMajor:this.disputarMajor,
       draftFilters:s.draftFilters, onFilterSearch:this.onFilterSearch, onFilterTeam:this.onFilterTeam, onFilterRole:this.onFilterRole, onFilterSort:this.onFilterSort, onFilterEligible:this.onFilterEligible,
-      teamOptions, roleOptions, filteredPlayers, rosterSlots, coach, coachSlotStyle, coachAvatarStyle, coachOptions, coachPickerOpen:s.coachPickerOpen,
-      openCoachPicker:this.openCoachPicker, closeCoachPicker:this.closeCoachPicker, removeCoach:this.removeCoach,
+      teamOptions, roleOptions, filteredPlayers, rosterSlots,
       compBars, draftWarnings, confirmButtonStyle, clearRoster:this.clearRoster, goResumo:this.goResumo,
       playerDrawer, closePlayerDrawer:this.closePlayerDrawer,
-      resumoPlayers, resumoCoach, radarPoints, radarRings, radarLabels, mapStrengths, mapStrengthAverage, strengths, weaknesses, classificationChance, classificationBarStyle,
+      resumoPlayers, radarPoints, radarRings, radarLabels, mapStrengths, mapStrengthAverage, strengths, weaknesses, classificationChance, classificationBarStyle,
       teamPower:Math.round(teamEvaluation.strength),teamFit:averageFit,teamChemistry:teamEvaluation.chemistry,teamCompositionModifier:`${teamEvaluation.compositionBonus>=0?'+':''}${teamEvaluation.compositionBonus.toFixed(1)}`,
       isSimulacao: s.screen==='major-simulacao', isPartida: s.screen==='major-partida', isResultado: s.screen==='major-resultado',
       isMajorGroups:s.screen==='major-groups', swissStageTitle:'Fase de grupos · 16 times', swissRoundLabel:`RODADA ${s.swissRound}/5`, swissCampaignRecord, swissEliminationNotice, showSwissKdr, swissBracketColumns, swissStandings, swissRoundMatches, swissMatchKdr, swissUserMatchCount, swissUserMatch, swissLiveModal, closeSwissLive:this.closeSwissLive, swissPrimaryLabel, swissPrimaryAction, swissPrimaryStyle, swissNormalStyle, swissFastStyle, setSwissNormal:this.setSwissNormal, simulateSwissFast:this.simulateSwissFast,
@@ -3519,9 +3453,9 @@ class Component extends DCLogic {
       strategyPresets, strategySlots, strategyRoleOptions, strategyAnalysis, confirmStrategy:this.confirmStrategy, backToMajorIntro:this.backToMajorIntro, restartMajorDraft:this.restartMajorDraft,
       playerDraftRolling:s.playerDraftRolling, playerDraftYear:s.playerDraftYear, playerDraftTeamName:playerDraftTeam.name, playerDraftPreviewYear:s.playerDraftPreviewYear, playerDraftPreviewTeam:s.playerDraftPreviewTeam, playerDraftCandidates, playerDraftSlots, playerDraftFilledCount, playerDraftShellStyle, playerDraftPoolStyle, playerDraftSelectionHint, playerDraftActionText, playerDraftRerollLabel, playerDraftRerollStyle, finishPlayerDraftStyle,
       rerollPlayerDraft:this.rerollPlayerDraft, backToStrategy:this.backToStrategy, finishPlayerDraft:this.finishPlayerDraft,
-      goMajor:this.goMajorFree, goGuess:()=>this.nav('adivinhar-intro'),
+      goMajor:this.goMajorFree,
       goJogadoresLink:()=>this.nav('jogadores'), goRankingLink:()=>this.nav('ranking'), goCadastroLink:()=>this.nav('cadastro'), goSorteio:()=>this.nav('major-strategy'),
-      onFooterJogar:(e)=>{e.preventDefault();this.nav('jogar')}, onFooterMajorIntro:(e)=>{e.preventDefault();this.nav('major-intro')}, onFooterAdivinhar:(e)=>{e.preventDefault();this.nav('adivinhar-intro')}, onFooterRanking:(e)=>{e.preventDefault();this.nav('ranking')},
+      onFooterJogar:(e)=>{e.preventDefault();this.nav('jogar')}, onFooterMajorIntro:(e)=>{e.preventDefault();this.nav('major-intro')}, onFooterRanking:(e)=>{e.preventDefault();this.nav('ranking')},
       onFooterJogadores:(e)=>{e.preventDefault();this.nav('jogadores')}, onFooterTimes:(e)=>{e.preventDefault();this.nav('times')}, onFooterTemporadas:(e)=>{e.preventDefault();this.nav('temporadas')},
       onFooterLogin:(e)=>{e.preventDefault();this.nav('login')}, onFooterCadastro:(e)=>{e.preventDefault();this.nav('cadastro')}, onFooterRegras:(e)=>{e.preventDefault();this.nav('regras')},
       heroStats, recentResults, platformStats,
