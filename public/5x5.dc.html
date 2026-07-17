@@ -854,7 +854,7 @@
           <div style="display:grid;grid-template-columns:repeat(4,auto);gap:14px;font-size:10px;color:#636d7e">
             <span>FORÇA <b style="color:#f4f5f7">{{ teamPower }}</b></span><span>FIT <b style="color:#2fb8c6">{{ teamFit }}</b></span><span>ENTROSAMENTO <b style="color:#34c77b">{{ teamChemistry }}</b></span><span>COMPOSIÇÃO <b style="color:#f2b53d">{{ teamCompositionModifier }}</b></span>
           </div>
-        </div>
+        </div></sc-if>
 
         <div style="display:flex;gap:14px;justify-content:flex-end">
           <div onClick="{{ backToDraft }}" style="font-size:13.5px;font-weight:700;color:#9aa3b2;background:#12151c;border:1px solid #242833;border-radius:9px;padding:13px 24px;cursor:pointer">Voltar ao draft</div>
@@ -952,7 +952,7 @@
               <div style="background:#0a0e14;border:1px solid #293140;border-radius:8px;padding:10px;align-self:start"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 1px"><b style="font-family:'Chakra Petch',sans-serif;font-size:11.5px;color:#f4f5f7;letter-spacing:.03em">{{ column.title }}</b><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#7b8598">{{ column.pools }}</span></div><div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ column.matches }}" as="match" hint-placeholder-count="4"><div style="{{ match.style }}"><div style="display:grid;grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr);align-items:center;gap:5px"><div style="{{ match.teamAStyle }};text-align:right">{{ match.teamA }}</div><div style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:800;text-align:center;color:#596274">×</div><div style="{{ match.teamBStyle }}">{{ match.teamB }}</div></div><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;color:#697488;font-size:8.5px;margin-top:5px;padding-top:4px;border-top:1px solid #252c39"><span>{{ match.pool }}</span><b style="font-family:'JetBrains Mono',monospace;font-size:11px;color:{{ match.scoreColor }};white-space:nowrap">{{ match.score }}</b><span style="text-align:right"><sc-if value="{{ match.showOutcome }}"><b style="{{ match.outcomeStyle }}">{{ match.outcome }}</b></sc-if></span></div></div></sc-for><sc-if value="{{ column.waiting }}"><div style="border:1px dashed #33394a;border-radius:6px;padding:15px 8px;text-align:center;font-size:10px;color:#7b8598">Aguardando rodada anterior</div></sc-if></div></div>
             </sc-for>
           </div>
-        </div></sc-if>
+        </div>
         </div>
         <sc-if value="{{ showSwissKdr }}" hint-placeholder-val="{{ false }}">
           <details data-expand-card="kdr-summary">
@@ -1634,20 +1634,24 @@
             <div style="font-size:11px;font-weight:800;color:#636d7e;letter-spacing:.05em;margin-bottom:7px">SUA PARTIDA DE HOJE</div>
             <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:{{ rankedPointsColor }};margin-bottom:4px">{{ rankedPoints }} PTS</div>
             <div style="font-size:11.5px;color:#7f899a;line-height:1.5;margin-bottom:16px">{{ rankedAvailabilityText }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0d1016;border:1px solid #242a36;border-radius:8px;padding:10px 12px;margin-bottom:12px">
+              <span style="font-size:10px;font-weight:800;color:#636d7e;letter-spacing:.05em">SUA POSIÇÃO</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:900;color:{{ rankedPositionColor }}">{{ rankedPositionLabel }}</span>
+            </div>
             <div onClick="{{ startRanked }}" style="{{ rankedButtonStyle }}">{{ rankedButtonLabel }}</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px"><div><h2 style="font-family:'Chakra Petch',sans-serif;font-size:20px;margin:0 0 3px">Classificação geral</h2><div style="font-size:11px;color:#636d7e">Pontos acumulados em campanhas ranqueadas</div></div><div style="font-size:10px;color:#636d7e">ATUALIZAÇÃO EM TEMPO REAL</div></div>
         <div style="background:#12151c;border:1px solid #242833;border-radius:12px;overflow:hidden">
           <sc-for list="{{ rankingItems }}" as="ri" hint-placeholder-count="6">
-            <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid #1a1e28">
+            <div style="{{ ri.rowStyle }}">
               <span style="{{ ri.rankStyle }}">{{ ri.rank }}</span>
               <span style="flex:1;font-size:13.5px;font-weight:700;color:#e6e8ec">{{ ri.name }}</span>
               <span style="font-size:10px;color:#636d7e">{{ ri.attempts }}</span>
               <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:800;color:#f2b53d">{{ ri.value }}</span>
             </div>
           </sc-for>
-          <sc-if value="{{ !rankingItems.length && !rankedLoading }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ rankingEmpty }}" hint-placeholder-val="{{ false }}">
             <div style="text-align:center;padding:48px 20px;color:#636d7e">Ainda não há pontuações. Jogue a primeira partida ranqueada.</div>
           </sc-if>
         </div>
@@ -2346,14 +2350,14 @@ class Component extends DCLogic {
   startRanked = async () => {
     if(this.state.rankedLoading) return;
     if(!this.state.authUser){ this.showToast({icon:'🔒',title:'Entre para jogar',desc:'A partida ranqueada precisa estar vinculada à sua conta.',accent:'#f2b53d',border:'#33394a'}); this.nav('login'); return; }
-    if(this.state.rankedToday?.played){ this.showToast({icon:'⏱',title:'Tentativa de hoje já usada',desc:'Uma nova partida será liberada amanhã.',accent:'#f2b53d',border:'#33394a'}); return; }
+    if(this.state.rankedToday?.played && !this.state.rankedToday?.canPlay){ this.showToast({icon:'⏱',title:'Tentativa de hoje já usada',desc:'Uma nova partida será liberada amanhã ou pelo administrador.',accent:'#f2b53d',border:'#33394a'}); return; }
     this.setState({rankedLoading:true,rankedError:''});
     try{
       const response=await fetch('/api/ranked/start',{method:'POST',headers:{Authorization:`Bearer ${this.state.authToken}`}});
       const payload=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível iniciar a partida ranqueada.'));
-      this.setState({rankedMode:true,rankedRun:payload,rankedToday:{played:true,run:payload},rankedLoading:false},()=>this.nav('major-intro'));
-      this.showToast({icon:'🏆',title:'Partida ranqueada iniciada',desc:'Esta é sua tentativa de hoje. Boa campanha!',accent:'#f2b53d',border:'#33394a'});
+      this.setState({rankedMode:true,rankedRun:payload,rankedToday:{played:true,canPlay:Boolean(payload.canPlay),unlimited:Boolean(payload.unlimited),attemptsToday:payload.attemptsToday,dailyLimit:payload.dailyLimit,run:payload},rankedLoading:false},()=>this.nav('major-intro'));
+      this.showToast({icon:'🏆',title:'Partida ranqueada iniciada',desc:payload.unlimited?'Modo de testes sem limite diário ativo. Boa campanha!':'Esta tentativa foi registrada. Boa campanha!',accent:'#f2b53d',border:'#33394a'});
     }catch(error){ this.setState({rankedLoading:false,rankedError:error.message || 'Não foi possível iniciar.'}); this.loadRankedData(); }
   };
   _recordRankedEvent = async (eventType,eventKey) => {
@@ -3363,12 +3367,21 @@ class Component extends DCLogic {
     }
 
     // ---- RANKING ----
-    const rankingItems=s.rankedLeaderboard.map((entry,i)=>({rank:entry.rank,name:entry.username,value:`${entry.points} PTS`,attempts:`${entry.attempts} ${entry.attempts===1?'PARTIDA':'PARTIDAS'}`,rankStyle:`width:26px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:${i<3?'#f2b53d':'#636d7e'}`}));
+    const rankingItems=s.rankedLeaderboard.map((entry,i)=>{
+      const isCurrent=Boolean(s.authUser)&&Number(entry.userId)===Number(s.authUser.id);
+      return {rank:entry.rank,name:`${entry.username}${isCurrent?' · VOCÊ':''}`,value:`${entry.points} PTS`,attempts:`${entry.attempts} ${entry.attempts===1?'PARTIDA':'PARTIDAS'}`,rankStyle:`width:26px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:${i<3?'#f2b53d':'#636d7e'}`,rowStyle:`display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid #1a1e28;background:${isCurrent?'rgba(255,92,26,.075)':'transparent'};box-shadow:${isCurrent?'inset 3px 0 #ff5c1a':'none'}`};
+    });
+    const currentRankingEntry=s.authUser?s.rankedLeaderboard.find(entry=>Number(entry.userId)===Number(s.authUser.id)):null;
+    const currentRanking=s.rankedToday?.ranking || currentRankingEntry;
+    const rankedPositionLabel=!s.authUser?'ENTRE PARA VER':currentRanking?`#${currentRanking.rank}${currentRanking.total?` DE ${currentRanking.total}`:''}`:'SEM CLASSIFICAÇÃO';
+    const rankedPositionColor=currentRanking?'#f2b53d':'#7f899a';
+    const rankingEmpty=!s.rankedLoading&&rankingItems.length===0;
     const rankedPoints=s.rankedRun?.score || 0;
-    const rankedPlayed=Boolean(s.rankedToday?.played);
-    const rankedButtonLabel=s.rankedLoading?'CARREGANDO…':!s.authUser?'ENTRAR PARA JOGAR':rankedPlayed?'PARTIDA DE HOJE JÁ JOGADA':'JOGAR PARTIDA RANQUEADA';
+    const rankedCanPlay=Boolean(s.rankedToday?.canPlay ?? !s.rankedToday?.played);
+    const rankedPlayed=Boolean(s.rankedToday?.played&&!rankedCanPlay);
+    const rankedButtonLabel=s.rankedLoading?'CARREGANDO…':!s.authUser?'ENTRAR PARA JOGAR':rankedPlayed?'PARTIDA DE HOJE JÁ JOGADA':s.rankedToday?.unlimited?'JOGAR PARTIDA RANQUEADA · SEM LIMITE':'JOGAR PARTIDA RANQUEADA';
     const rankedButtonStyle=`text-align:center;font-size:11.5px;font-weight:900;border-radius:8px;padding:12px 10px;cursor:${s.rankedLoading||rankedPlayed?'default':'pointer'};background:${rankedPlayed?'#1a1e28':'#ff5c1a'};color:${rankedPlayed?'#636d7e':'#0a0c10'}`;
-    const rankedAvailabilityText=s.rankedError || (!s.authUser?'Entre ou crie sua conta para participar.':rankedPlayed?'Sua próxima tentativa será liberada amanhã às 00:01 (horário de Brasília).':'Sua tentativa está disponível. Uma nova partida é liberada diariamente às 00:01 (horário de Brasília).');
+    const rankedAvailabilityText=s.rankedError || (!s.authUser?'Entre ou crie sua conta para participar.':s.rankedToday?.unlimited?'Modo de testes ativo: sua conta não possui limite diário.':rankedPlayed?'Sua próxima tentativa será liberada amanhã às 00:01 (horário de Brasília).':'Sua tentativa está disponível. Uma nova partida é liberada diariamente às 00:01 (horário de Brasília).');
 
     // ---- REGRAS ----
     const regrasSections = [
@@ -3454,7 +3467,7 @@ class Component extends DCLogic {
       profile, profileTabs, tabGeral, tabTemporadas, tabTimes, tabEstatisticas, tabMapas, tabMajors, tabCompanheiros,
       isTimesList: s.screen==='times', isTeamProfile: s.screen==='time-perfil', teamsListItems, teamProfile,
       isSeasonsList: s.screen==='temporadas', isSeasonDetail: s.screen==='temporada-detalhe', seasonsListItems, seasonDetail,
-      isRanking: s.screen==='ranking', rankingItems, rankedLoading:s.rankedLoading, rankedPoints, rankedPointsColor:rankedPoints?'#f2b53d':'#f4f5f7', rankedAvailabilityText, rankedButtonLabel, rankedButtonStyle, startRanked:this.startRanked,
+      isRanking: s.screen==='ranking', rankingItems, rankingEmpty, rankedLoading:s.rankedLoading, rankedPoints, rankedPointsColor:rankedPoints?'#f2b53d':'#f4f5f7', rankedPositionLabel, rankedPositionColor, rankedAvailabilityText, rankedButtonLabel, rankedButtonStyle, startRanked:this.startRanked,
       isRegras: s.screen==='regras', regrasSections,
       isSobre: s.screen==='sobre',
       isLogin: s.screen==='login', isCadastro: s.screen==='cadastro',
