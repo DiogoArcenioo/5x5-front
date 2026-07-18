@@ -1,6 +1,6 @@
 # 5x5 Front
 
-Frontend Next.js do 5x5.gg. Ele serve o jogo e o painel administrativo e encaminha `/api/*` ao backend Nest.
+Frontend Next.js do 5x5. Ele serve o jogo e o painel administrativo e encaminha `/api/*` ao backend Nest.
 
 ## Desenvolvimento
 
