@@ -820,7 +820,8 @@
                     </div>
                     <sc-if value="{{ slot.swapSelected }}"><div style="font-size:9px;font-weight:800;color:#0a0c10;background:#f2b53d;border-radius:5px;padding:4px 6px">MOVER / TROCAR</div></sc-if>
                   </div>
-                  <sc-if value="{{ slot.filled }}"><div style="display:flex;gap:10px;margin-top:11px;padding-top:9px;border-top:1px solid #242833;font-size:10.5px;color:#636d7e;flex-wrap:wrap"><span>ANO <b style="color:#c8ccd4">{{ slot.year }}</b></span><span>TIME <b style="color:#c8ccd4">{{ slot.teamName }}</b></span><span>OVR <b style="color:#c8ccd4">{{ slot.overall }}</b></span><span style="color:{{ slot.color }}">{{ slot.attribute }}</span></div></sc-if>
+                  <sc-if value="{{ rankedMode }}"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:12px;padding-top:9px;border-top:1px solid #242833"><span style="font-size:8px;font-weight:900;letter-spacing:.08em;color:#636d7e">VALORIZA</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;color:{{ slot.color }}">{{ slot.priorityText }}</span></div></sc-if>
+                  <sc-if value="{{ slot.filled }}"><div style="display:flex;gap:10px;margin-top:11px;padding-top:9px;border-top:1px solid #242833;font-size:10.5px;color:#636d7e;flex-wrap:wrap"><span>ANO <b style="color:#c8ccd4">{{ slot.year }}</b></span><span>TIME <b style="color:#c8ccd4">{{ slot.teamName }}</b></span><span>OVR <b style="color:#c8ccd4">{{ slot.overall }}</b></span><sc-if value="{{ !rankedMode }}"><span style="color:{{ slot.color }}">{{ slot.attribute }}</span></sc-if></div></sc-if>
                 </div>
               </sc-for>
             </div>
@@ -1058,11 +1059,11 @@
             <div style="font-size:13px;font-weight:700;color:#9aa3b2;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px">Radar da equipe</div>
             <svg viewBox="0 0 240 240" style="width:100%;max-width:280px;display:block;margin:0 auto">
               <sc-for list="{{ radarRings }}" as="ring" hint-placeholder-count="4">
-                <polygon points="{{ ring.points }}" fill="none" stroke="#1a1e28" stroke-width="1"></polygon>
+                <polygon sc-camel-points="{{ ring.points }}" fill="none" stroke="#1a1e28" stroke-width="1"></polygon>
               </sc-for>
-              <polygon points="{{ radarPoints }}" fill="rgba(255,92,26,.18)" stroke="#ff5c1a" stroke-width="2"></polygon>
+              <polygon sc-camel-points="{{ radarPoints }}" fill="rgba(255,92,26,.18)" stroke="#ff5c1a" stroke-width="2"></polygon>
               <sc-for list="{{ radarLabels }}" as="rl" hint-placeholder-count="5">
-                <text x="{{ rl.x }}" y="{{ rl.y }}" fill="#9aa3b2" font-size="10" text-anchor="middle">{{ rl.label }}</text>
+                <text sc-camel-x="{{ rl.x }}" sc-camel-y="{{ rl.y }}" fill="#9aa3b2" font-size="10" text-anchor="middle">{{ rl.label }}</text>
               </sc-for>
             </svg>
           </div>
@@ -2214,6 +2215,23 @@ function inferredRoles(player){
 let SEASONS_FULL = [];
 function seasonOf(id){ return SEASONS_FULL.find(x=>x.id===id); }
 const COACHES = [];
+function secureRandomIndex(length){
+  if(!Number.isInteger(length) || length<=0) throw new RangeError('A lista do sorteio precisa ter ao menos uma opção.');
+  const range=0x100000000;
+  const limit=range-(range%length);
+  const value=new Uint32Array(1);
+  do { window.crypto.getRandomValues(value); } while(value[0]>=limit);
+  return value[0]%length;
+}
+function randomItem(items){ return items[secureRandomIndex(items.length)]; }
+function shuffledItems(items){
+  const shuffled=[...items];
+  for(let index=shuffled.length-1;index>0;index--){
+    const swapIndex=secureRandomIndex(index+1);
+    [shuffled[index],shuffled[swapIndex]]=[shuffled[swapIndex],shuffled[index]];
+  }
+  return shuffled;
+}
 function mulberry32(seed){ return function(){ let t = seed += 0x6D2B79F5; t = Math.imul(t ^ t>>>15, t | 1); t ^= t + Math.imul(t ^ t>>>7, t | 61); return ((t ^ t>>>14) >>> 0) / 4294967296; }; }
 function hashStr(str){ let h=0; for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i))|0; } return h>>>0; }
 const OPPONENT_POOL = [
@@ -2268,16 +2286,17 @@ class Component extends DCLogic {
     playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null, majorChampionName:'',
     guessMatchId:null, guessTargetSlug:null, guessScore:1000, guessAttempts:[], guessRevealedHints:[], guessPendingHint:null, guessInput:'', guessAutocompleteOpen:false, guessSelectedSlug:null, guessOver:false, guessWon:false,
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
-    rankingTab:'overall', rankedLeaderboard:[], rankedToday:null, rankedRun:null, rankedMode:false, rankedLoading:false, rankedError:'', notifications:[], userProfileTab:'visao', authName:'', authEmail:'', authPassword:'', authUser:null, authSubmitting:false, authError:'', googleAuthEnabled:false,
+    rankingTab:'overall', rankedLeaderboard:[], rankedToday:null, rankedRun:null, rankedField:[], rankedMode:false, rankedLoading:false, rankedError:'', notifications:[], userProfileTab:'visao', authName:'', authEmail:'', authPassword:'', authUser:null, authSubmitting:false, authError:'', googleAuthEnabled:false,
     catalogLoading:true, catalogError:'', summary:{regions:0,countries:0,teams:0,players:0,links:0} };
 
   componentDidMount(){
     document.addEventListener('keydown', this._onKey = (e)=>{
       if(e.key==='Escape') this.setState({searchOpen:false});
     });
-    this.restoreSession();
     this.loadGoogleAuthConfig();
-    this.completeGoogleLogin();
+    const googleParams=new URLSearchParams(window.location.search);
+    if(googleParams.has('google_code') || googleParams.has('google_error')) this.completeGoogleLogin();
+    else this.restoreSession();
     this.loadNotifications();
     window.addEventListener('popstate', this._onPopState = ()=>{
       const route=routeFromPath();
@@ -2351,17 +2370,11 @@ class Component extends DCLogic {
 
   loadCatalog = async () => {
     try {
-      const [summary, teamsPage, playersPage] = await Promise.all([
-        fetch('/api/catalog/summary').then(r=>{ if(!r.ok) throw new Error('summary'); return r.json(); }),
-        fetch('/api/catalog/teams?page=1&pageSize=100').then(r=>{ if(!r.ok) throw new Error('teams'); return r.json(); }),
-        fetch('/api/catalog/players?page=1&pageSize=100').then(r=>{ if(!r.ok) throw new Error('players'); return r.json(); })
-      ]);
-      const extraPlayerPages = [];
-      for(let page=2;page<=(playersPage.meta?.totalPages || 1);page++){
-        extraPlayerPages.push(fetch(`/api/catalog/players?page=${page}&pageSize=100`).then(r=>r.json()));
-      }
-      const playerPages = await Promise.all(extraPlayerPages);
-      const teamDetails = await Promise.all((teamsPage.data || []).map(t=>fetch(`/api/catalog/teams/${encodeURIComponent(t.slug)}`).then(r=>r.json())));
+      const response = await fetch('/api/catalog/bootstrap');
+      if(!response.ok) throw new Error('catalog-bootstrap');
+      const catalog = await response.json();
+      const summary = catalog.summary || {};
+      const teamDetails = catalog.teams || [];
       const detailsBySlug = new Map(teamDetails.map(t=>[t.slug,t]));
       const playerTeams = new Map();
       for(const team of teamDetails){
@@ -2377,12 +2390,12 @@ class Component extends DCLogic {
         }
       }
       const hues = ['#ff5c1a','#4f8dfd','#2fb8c6','#7c8cf8','#34c77b','#f2b53d','#d65db1','#3ddbb8'];
-      TEAMS = (teamsPage.data || []).map((team,index)=>{
+      TEAMS = teamDetails.map((team,index)=>{
         const detail = detailsBySlug.get(team.slug) || {};
         return {...team, tag:team.shortName || team.name.slice(0,3), country:team.countryName || '', code:team.countryCode || '',
           region:team.regionName || '', hue:hues[index % hues.length], active:null, founded:'', lineups:detail.lineups || []};
       });
-      const rawPlayers = [...(playersPage.data || []), ...playerPages.flatMap(p=>p.data || [])];
+      const rawPlayers = catalog.players || [];
       PLAYERS = rawPlayers.map(player=>{
         const history = (playerTeams.get(player.slug) || []).sort((a,b)=>b.year-a.year);
         const current = history[0] || {};
@@ -2412,7 +2425,7 @@ class Component extends DCLogic {
       if(!SEASONS_FULL.length){ this.showToast({icon:'⚠️',title:'Sem temporadas',desc:'Nenhuma temporada foi cadastrada ainda.',accent:'#f2b53d',border:'#33394a'}); return; }
       clearTimeout(this._rt);
       this._rt = setTimeout(()=>{
-        const pick = SEASONS_FULL[Math.floor(Math.random()*SEASONS_FULL.length)];
+        const pick = randomItem(SEASONS_FULL);
         this.setState({rouletteDone:true, drawnSeasonId:pick.id});
       }, 1400);
     }
@@ -2435,7 +2448,7 @@ class Component extends DCLogic {
     setTimeout(()=>this._drawPlayerPool(),80);
   };
   backToMajorIntro = () => this.nav('major-intro');
-  goMajorFree = () => this.setState({rankedMode:false,rankedRun:null},()=>this.nav('major-intro'));
+  goMajorFree = () => this.setState({rankedMode:false,rankedRun:null,rankedField:[]},()=>this.nav('major-intro'));
   restartMajorDraft = () => {
     clearTimeout(this._swissAutoTimer);
     clearTimeout(this._playerDraftTimer);
@@ -2455,27 +2468,37 @@ class Component extends DCLogic {
   backToStrategy = () => this.nav('major-strategy');
   _drawPlayerPool = () => {
     const used=new Set(this.state.draftRoster.filter(Boolean).map(r=>r.slug));
-    const pools=[];
+    const poolsByYear=new Map();
     for(const team of TEAMS){
       for(const lineup of team.lineups || []){
         const slugs=(lineup.players || []).map(p=>p.slug).filter(slug=>!used.has(slug));
-        if(slugs.length) pools.push({year:lineup.year,teamSlug:team.slug,slugs});
+        if(slugs.length){
+          const year=Number(lineup.year);
+          const yearPools=poolsByYear.get(year) || [];
+          yearPools.push({year,teamSlug:team.slug,slugs});
+          poolsByYear.set(year,yearPools);
+        }
       }
     }
-    if(!pools.length){
+    const eligibleYears=[...poolsByYear.keys()];
+    if(!eligibleYears.length){
       this.showToast({icon:'⚠️',title:'Sorteio indisponível',desc:'Não há outros jogadores elegíveis no catálogo.',accent:'#f2b53d',border:'#33394a'});
       return;
     }
+    const drawPool=()=>{
+      const year=randomItem(eligibleYears);
+      return randomItem(poolsByYear.get(year));
+    };
     this.setState({playerDraftRolling:true,playerDraftSelectedSlug:null});
     clearTimeout(this._playerDraftTimer);
     clearInterval(this._playerDraftTicker);
     this._playerDraftTicker=setInterval(()=>{
-      const preview=pools[Math.floor(Math.random()*pools.length)];
+      const preview=drawPool();
       this.setState({playerDraftPreviewYear:preview.year,playerDraftPreviewTeam:teamOf(preview.teamSlug).name});
     },95);
     this._playerDraftTimer=setTimeout(()=>{
       clearInterval(this._playerDraftTicker);
-      const pool=pools[Math.floor(Math.random()*pools.length)];
+      const pool=drawPool();
       this.setState({playerDraftRolling:false,playerDraftYear:pool.year,playerDraftTeamSlug:pool.teamSlug,playerDraftCandidateSlugs:pool.slugs,playerDraftDetailsSlug:null,drawnSeasonId:`s${pool.year}`});
     },1400);
   };
@@ -2559,23 +2582,29 @@ class Component extends DCLogic {
   };
   backToDraft = ()=> this.nav('major-draft', {id:this.state.draftId});
   disputarMajor = ()=> {
-    const entrants=[],candidates=[];
-    for(const team of TEAMS){
-      let best=null;
-      for(const lineup of team.lineups || []){
-        if((lineup.players || []).length<5) continue;
-        const evaluation=bestLineupEvaluation(lineup.players || []);
-        if(!best||evaluation.strength>best.evaluation.strength) best={team,lineup,evaluation};
+    let selected=[];
+    if(this.state.rankedMode){
+      selected=(this.state.rankedField || []).map(entry=>{
+        const team=TEAMS.find(item=>item.slug===entry.teamSlug);
+        const lineup=team?.lineups?.find(item=>Number(item.year)===Number(entry.year));
+        return team && lineup && (lineup.players || []).length>=5 ? {team,lineup} : null;
+      }).filter(Boolean);
+      if(selected.length!==15){
+        this.showToast({icon:'⚠',title:'Major ranqueado indisponível',desc:'Não foi possível carregar os 15 adversários oficiais desta rodada. Atualize a página e tente novamente.',accent:'#ef4444',border:'#33394a'});
+        return;
       }
-      if(best) candidates.push(best);
+    }else{
+      const candidates=[];
+      for(const team of TEAMS){
+        const lineups=(team.lineups || []).filter(lineup=>(lineup.players || []).length>=5);
+        if(lineups.length) candidates.push({team,lineups});
+      }
+      selected=shuffledItems(candidates).slice(0,15).map(({team,lineups})=>({team,lineup:randomItem(lineups)}));
     }
-    candidates.sort((a,b)=>b.evaluation.strength-a.evaluation.strength);
-    const rng=mulberry32(hashStr(`${this.state.draftId || 'major'}-field`));
-    while(entrants.length<15&&candidates.length){
-      const eliteWindow=Math.min(6,candidates.length),index=Math.min(eliteWindow-1,Math.floor(Math.pow(rng(),1.7)*eliteWindow));
-      const pick=candidates.splice(index,1)[0],lineupEvaluation=pick.evaluation;
-      entrants.push({id:pick.team.slug,name:`${pick.team.name.toUpperCase()} · ${pick.lineup.year}`,tag:pick.team.tag,year:pick.lineup.year,strength:lineupEvaluation.strength,evaluation:lineupEvaluation,wins:0,losses:0,status:'playing',opponents:[]});
-    }
+    const entrants=selected.map(({team,lineup})=>{
+      const evaluation=bestLineupEvaluation(lineup.players || []);
+      return {id:team.slug,name:`${team.name.toUpperCase()} · ${lineup.year}`,tag:team.tag,year:lineup.year,strength:evaluation.strength,evaluation,wins:0,losses:0,status:'playing',opponents:[]};
+    });
     const teams=[{id:'user',name:'SEU TIME · MISTO',tag:'VOCÊ',year:'MISTO',strength:this._teamOverall(),wins:0,losses:0,status:'playing',isUser:true,opponents:[]},...entrants];
     window.history.pushState({screen:'major-groups',params:{id:this.state.draftId}},'',pathForScreen('major-groups',{id:this.state.draftId}));
     this.setState({screen:'major-groups',params:{id:this.state.draftId},swissTeams:teams,swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1'});
@@ -2585,10 +2614,14 @@ class Component extends DCLogic {
     this.setState({rankedLoading:true,rankedError:''});
     try{
       const requests=[fetch('/api/ranked/leaderboard?limit=100').then(async r=>{if(!r.ok) throw new Error('ranking');return r.json();})];
-      if(this.state.authUser) requests.push(fetch('/api/ranked/today').then(async r=>{if(!r.ok) throw new Error('today');return r.json();}));
+      if(this.state.authUser) requests.push(fetch('/api/ranked/today',{credentials:'same-origin'}).then(async r=>{if(!r.ok){const error=new Error(r.status===401?'session':'today');error.status=r.status;throw error;}return r.json();}));
       const [leaderboard,today]=await Promise.all(requests);
-      this.setState({rankedLeaderboard:leaderboard.entries || [],rankedToday:today || null,rankedRun:today?.run || this.state.rankedRun,rankedLoading:false});
-    }catch(_error){ this.setState({rankedLoading:false,rankedError:'Não foi possível carregar o ranking agora.'}); }
+      this.setState({rankedLeaderboard:leaderboard.entries || [],rankedToday:today || null,rankedRun:today?.run || this.state.rankedRun,rankedField:today?.field || this.state.rankedField,rankedLoading:false});
+    }catch(error){
+      if(error?.status===401){
+        this.setState({authUser:null,rankedToday:null,rankedRun:null,rankedField:[],rankedMode:false,rankedLoading:false,rankedError:'Sua sessão expirou. Entre novamente para jogar a ranqueada.'});
+      }else this.setState({rankedLoading:false,rankedError:'Não foi possível carregar o ranking agora.'});
+    }
   };
   startRanked = async () => {
     if(this.state.rankedLoading) return;
@@ -2596,12 +2629,20 @@ class Component extends DCLogic {
     if(this.state.rankedToday?.played && !this.state.rankedToday?.canPlay){ this.showToast({icon:'⏱',title:'Tentativa de hoje já usada',desc:'Uma nova partida será liberada amanhã ou pelo administrador.',accent:'#f2b53d',border:'#33394a'}); return; }
     this.setState({rankedLoading:true,rankedError:''});
     try{
-      const response=await fetch('/api/ranked/start',{method:'POST'});
+      const response=await fetch('/api/ranked/start',{method:'POST',credentials:'same-origin'});
       const payload=await response.json().catch(()=>({}));
-      if(!response.ok) throw new Error(this.authMessage(payload,'Não foi possível iniciar a partida ranqueada.'));
-      this.setState({rankedMode:true,rankedRun:payload,rankedToday:{played:true,canPlay:Boolean(payload.canPlay),unlimited:Boolean(payload.unlimited),attemptsToday:payload.attemptsToday,dailyLimit:payload.dailyLimit,run:payload},rankedLoading:false},()=>this.nav('major-intro'));
+      if(!response.ok){const error=new Error(this.authMessage(payload,'Não foi possível iniciar a partida ranqueada.'));error.status=response.status;throw error;}
+      this.setState({rankedMode:true,rankedRun:payload,rankedField:payload.field || [],rankedToday:{played:true,canPlay:Boolean(payload.canPlay),unlimited:Boolean(payload.unlimited),attemptsToday:payload.attemptsToday,dailyLimit:payload.dailyLimit,run:payload,field:payload.field,cycle:payload.cycle},rankedLoading:false},()=>this.nav('major-intro'));
       this.showToast({icon:'🏆',title:'Partida ranqueada iniciada',desc:payload.unlimited?'Modo de testes sem limite diário ativo. Boa campanha!':'Esta tentativa foi registrada. Boa campanha!',accent:'#f2b53d',border:'#33394a'});
-    }catch(error){ this.setState({rankedLoading:false,rankedError:error.message || 'Não foi possível iniciar.'}); this.loadRankedData(); }
+    }catch(error){
+      if(error?.status===401){
+        this.setState({authUser:null,rankedToday:null,rankedRun:null,rankedField:[],rankedMode:false,rankedLoading:false,rankedError:'Sua sessão expirou. Entre novamente para jogar.'});
+        this.showToast({icon:'🔒',title:'Sessão expirada',desc:'Entre novamente para iniciar a partida ranqueada.',accent:'#f2b53d',border:'#33394a'});
+      }else{
+        this.setState({rankedLoading:false,rankedError:error.message || 'Não foi possível iniciar.'});
+        this.loadRankedData();
+      }
+    }
   };
   _recordRankedEvent = async (eventType,eventKey) => {
     const run=this.state.rankedRun;
@@ -2631,11 +2672,11 @@ class Component extends DCLogic {
     const pools=new Map();
     for(const team of active){ const key=`${team.wins}-${team.losses}`; if(!pools.has(key)) pools.set(key,[]); pools.get(key).push(team); }
     for(const poolTeams of pools.values()){
-      const available=[...poolTeams].sort((a,b)=>b.strength-a.strength);
+      const available=shuffledItems(poolTeams);
       while(available.length>1){
-      const a=available.shift(); let opponentIndex=-1;
-      for(let i=available.length-1;i>=0;i--){ if(!(a.opponents || []).includes(available[i].id)){ opponentIndex=i; break; } }
-      if(opponentIndex<0) opponentIndex=available.length-1;
+      const a=available.shift();
+      const freshOpponentIndexes=available.map((team,index)=>(a.opponents || []).includes(team.id)?-1:index).filter(index=>index>=0);
+      const opponentIndex=randomItem(freshOpponentIndexes.length?freshOpponentIndexes:available.map((_,index)=>index));
       const b=available.splice(opponentIndex,1)[0];
       const deciding=a.wins===2||a.losses===2||b.wins===2||b.losses===2;
       const seed=hashStr(`${this.state.draftId}-${round}-${a.id}-${b.id}`); const rng=mulberry32(seed);
@@ -2683,7 +2724,7 @@ class Component extends DCLogic {
     return {aId:a.id,bId:b.id,teamA:a.name,teamB:b.name,pool:'PLAYOFFS',winnerId:aWon?a.id:b.id,loserId:aWon?b.id:a.id,format,score:`${aMaps}–${bMaps}`,chanceA:1/(1+Math.pow(10,(effectiveB-effectiveA)/MATCH_BALANCE.curve)),effectiveA,effectiveB,isUser:a.isUser||b.isUser};
   }
   _startPlayoffs(teams){
-    const qualified=teams.filter(team=>team.status==='qualified').sort((a,b)=>b.wins-a.wins||a.losses-b.losses||b.strength-a.strength).slice(0,8);
+    const qualified=shuffledItems(teams.filter(team=>team.status==='qualified')).sort((a,b)=>b.wins-a.wins||a.losses-b.losses).slice(0,8);
     if(!qualified.some(team=>team.id==='user')||qualified.length<8) return;
     const pairs=[[qualified[0],qualified[7]],[qualified[3],qualified[4]],[qualified[1],qualified[6]],[qualified[2],qualified[5]]];
     const bracket=[
@@ -3016,7 +3057,7 @@ class Component extends DCLogic {
   };
   doLogout = async () => {
     try{ await fetch('/api/auth/logout',{method:'POST'}); }catch(_error){}
-    this.setState({authUser:null,authName:'',authEmail:'',authPassword:'',authError:'',mobileNavOpen:false,rankedToday:null,rankedRun:null,rankedMode:false});
+    this.setState({authUser:null,authName:'',authEmail:'',authPassword:'',authError:'',mobileNavOpen:false,rankedToday:null,rankedRun:null,rankedField:[],rankedMode:false});
     this.nav('home');
     this.showToast({icon:'✓',title:'Sessão encerrada',desc:'Você saiu da sua conta.',accent:'#2fb8c6',border:'#33394a'});
   };
@@ -3173,7 +3214,7 @@ class Component extends DCLogic {
       const movingItem=canReceiveMove?s.draftRoster[s.playerDraftSwapIndex]:null;
       const previewPlayer=p;
       const fit=previewPlayer?evaluateRole(previewPlayer,roleCode):null; const tone=fitTone(fit?.score || 0);
-      return {filled:!!p,swapSelected,roleLabel:role.label,roleIcon:role.icon,attribute:role.attribute,color:role.color,bg:role.bg,fitLabel:fit?`FIT ${fit.score}/100 · ${fit.status}`:'SEM JOGADOR',fitColor:fit?tone.color:'#636d7e',fitBg:fit?tone.bg:'#171a22',requirementText:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · '),playerName:p?p.nick:(canPlace?'Clique para posicionar':canReceiveMove?'Clique para mover aqui':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':canReceiveMove?'#f2b53d':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():role.icon,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:${p?'12px':'20px'};font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':canReceiveMove?'rgba(242,181,61,.045)':'#0d0f14'};border:1px solid ${swapSelected||canReceiveMove?'#f2b53d':canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace||canReceiveMove?'pointer':'default'};min-height:118px`,year:rosterItem?.year || movingItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
+      return {filled:!!p,swapSelected,roleLabel:role.label,roleIcon:role.icon,attribute:role.attribute,priorityText:role.attribute.replace(/\s*\+\s*/g,' · '),color:role.color,bg:role.bg,fitLabel:fit?`FIT ${fit.score}/100 · ${fit.status}`:'SEM JOGADOR',fitColor:fit?tone.color:'#636d7e',fitBg:fit?tone.bg:'#171a22',requirementText:role.requirements.map(([key,target])=>`${SKILL_META[key].short} ${target}+`).join(' · '),playerName:p?p.nick:(canPlace?'Clique para posicionar':canReceiveMove?'Clique para mover aqui':'Posição disponível'),playerColor:p?'#f4f5f7':canPlace?'#ff5c1a':canReceiveMove?'#f2b53d':'#636d7e',avatarText:p?p.nick.slice(0,2).toUpperCase():role.icon,avatarStyle:`width:42px;height:42px;border-radius:10px;background:${p?`${team.hue}22`:role.bg};color:${p?team.hue:role.color};border:1px ${p?'solid':'dashed'} ${p?`${team.hue}55`:role.color};display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:${p?'12px':'20px'};font-weight:800`,style:`background:${swapSelected?'rgba(242,181,61,.06)':canReceiveMove?'rgba(242,181,61,.045)':'#0d0f14'};border:1px solid ${swapSelected||canReceiveMove?'#f2b53d':canPlace?'#ff5c1a':'#242833'};border-radius:11px;padding:14px;cursor:${p||canPlace||canReceiveMove?'pointer':'default'};min-height:118px`,year:rosterItem?.year || movingItem?.year || '',teamName:team?.name || '',overall:p?.overall || '',onPlace:()=>this.handlePlayerDraftSlot(index)};
     });
     const playerDraftFilledCount=s.draftRoster.filter(Boolean).length;
     const playerDraftComplete=playerDraftFilledCount===5;

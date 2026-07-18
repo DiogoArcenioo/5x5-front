@@ -92,6 +92,17 @@ async function genericUpdate(resource,id,data){await api(`/admin/data/${resource
 async function genericDelete(resource,id){await api(`/admin/data/${resource}`,{method:'DELETE',body:JSON.stringify({key:{id}})})}
 async function refresh(message){await load();render();notify(message)}
 function bind(){
+  if(state.page==='ranking'){
+    const fieldCard=document.createElement('div');
+    fieldCard.className='card';
+    fieldCard.style.marginBottom='16px';
+    fieldCard.innerHTML='<h2>Major ranqueado do ciclo atual</h2><p class="sub">Todos os jogadores enfrentam os mesmos 15 times e lineups. O sorteio diário muda automaticamente às 00:01 (horário de Brasília).</p><div class="actions"><button class="btn danger" id="resetRankedField">Sortear novo Major para todos</button></div>';
+    $('#app .card')?.before(fieldCard);
+    $('#resetRankedField').onclick=async()=>{
+      if(!confirm('Sortear outros 15 times para todos e liberar uma nova edição ranqueada agora? Pontos acumulados não serão apagados.'))return;
+      try{await api('/admin/ranking/reset-field',{method:'POST'});await refresh('Novo Major ranqueado sorteado para todos.')}catch(e){notify(e.message,true)}
+    };
+  }
   $('#draftModuleToggle').onclick=()=>{state.draftMenuOpen=!state.draftMenuOpen;syncDraftMenu()};
   $$('[data-page]').forEach(x=>x.onclick=()=>{state.page=x.dataset.page;state.editingTeam=state.editingPlayer=state.editingUser=state.editingNotification=null;render()});
   $('#regionForm')?.addEventListener('submit',async e=>{e.preventDefault();try{const d=numberPayload(e.target);d.code=d.code.toUpperCase();await genericCreate('regions',d);await refresh('Região cadastrada.')}catch(x){notify(x.message,true)}});

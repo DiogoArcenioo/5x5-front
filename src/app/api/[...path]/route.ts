@@ -41,7 +41,9 @@ async function forward(request: Request, context: ApiRouteContext): Promise<Resp
 
   if (process.env.NODE_ENV === "production" && UNSAFE_METHODS.has(request.method)) {
     const configuredSite = new URL(process.env.SITE_URL || "https://cs5x5.com").origin;
-    if (request.headers.get("origin") !== configuredSite) {
+    const currentSite = new URL(request.url).origin;
+    const requestOrigin = request.headers.get("origin");
+    if (!requestOrigin || !new Set([configuredSite, currentSite]).has(requestOrigin)) {
       return Response.json({ statusCode: 403, message: "Origem da requisição não autorizada." }, { status: 403 });
     }
   }
