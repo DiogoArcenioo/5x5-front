@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Equipe 5x5", url: siteUrl }],
   creator: "Equipe 5x5",
   publisher: "5x5",
+  other: {
+    "google-adsense-account": "ca-pub-2427981300799321",
+  },
   alternates: { canonical: "/inicio" },
   robots: {
     index: true,
