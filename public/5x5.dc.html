@@ -2189,7 +2189,11 @@ class Component extends DCLogic {
         const mapComplete=roundIndex===mapResult.rounds.length-1,nextSeriesUs=seriesUs+(mapComplete&&mapResult.winnerId==='user'?1:0),nextSeriesThem=seriesThem+(mapComplete&&mapResult.winnerId!=='user'?1:0);
         totalRounds++;
         const snapshot={map:mapIndex+1,name:mapResult.name,us,them,userStats:clone(userStats),opponentStats:clone(opponentStats)};
+        const overtimeLabel=round.period==='overtime'?`OT ${round.overtimePeriod} · `:'';
         frames.push({us,them,map:mapIndex+1,mapName:mapResult.name,totalMaps:match.mapResults.length,mapRound:us+them,seriesUs:nextSeriesUs,seriesThem:nextSeriesThem,totalRounds,mapComplete,userStats:clone(userStats),opponentStats:clone(opponentStats),aggregateUserStats:combined(aggregateUser,userStats),aggregateOpponentStats:combined(aggregateOpponent,opponentStats),mapStats:mapComplete?[...completedMaps,snapshot]:[...completedMaps],roundWinner:mapComplete?`${mapResult.name} encerrado · ${us} a ${them}`:userWonRound?'SEU TIME venceu o round':'ADVERSÁRIO venceu o round'});
+        const currentFrame=frames[frames.length-1];
+        currentFrame.overtimePeriod=round.overtimePeriod||0;
+        if(overtimeLabel) currentFrame.roundWinner=`${overtimeLabel}${currentFrame.roundWinner}`;
       });
       const finalRound=mapResult.rounds[mapResult.rounds.length-1],finalUs=userIsA?finalRound.scoreA:finalRound.scoreB,finalThem=userIsA?finalRound.scoreB:finalRound.scoreA;
       completedMaps.push({map:mapIndex+1,name:mapResult.name,us:finalUs,them:finalThem,userStats:clone(userStats),opponentStats:clone(opponentStats)});
