@@ -1755,7 +1755,7 @@ class Component extends DCLogic {
     strategyPreset:'balanced', strategyRoles:['entry','awper','support','rifler','lurker'], openStrategySlot:null,
     playerDraftRolling:false, playerDraftYear:null, playerDraftTeamSlug:null, playerDraftCandidateSlugs:[], playerDraftSelectedSlug:null, playerDraftSwapIndex:null, playerDraftDetailsSlug:null, playerDraftRerolls:0, playerDraftPreviewYear:'—', playerDraftPreviewTeam:'Preparando sorteio',
     swissTeams:[], swissRound:0, swissHistory:[], swissPendingMatches:null, swissUserRounds:[], swissUserRoundIndex:0, swissMode:'normal', swissLiveOpen:false, swissLiveFinished:false, swissLiveStatsView:'map-1', majorLiveContext:'swiss',
-    playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null, majorChampionName:'',
+    playoffBracket:[], playoffStage:'quarter', playoffPendingMatches:null, playoffEliminated:false, playoffChampion:null, majorChampionName:'', eliminationStage:null, eliminationRound:null, eliminationRecord:'',
     playersFilters:{search:'', country:'', role:'', status:''}, playersView:'cards', perfilActiveTab:'geral',
     cookieBannerVisible:false, cookieSettingsOpen:false, cookiePreferences:{necessary:true,analytics:false,ads:false},
     rankedLeaderboard:[], rankedToday:null, rankedRun:null, rankedField:[], rankedMode:false, casualRun:null, rankedLoading:false, rankedError:'', rankedPendingCampaign:null, rankedPendingAward:0, notifications:[], userProfileTab:'visao', authName:'', authEmail:'', authPassword:'', authUser:null, authSubmitting:false, authError:'', googleAuthEnabled:false,
@@ -1965,8 +1965,14 @@ class Component extends DCLogic {
     if(navigate){const path=pathForScreen(screen,params);if(window.location.pathname!==path)window.history.pushState({screen,params},'',path);window.scrollTo(0,0);}
     const roles=campaign.roles||this.state.strategyRoles,roster=(campaign.draft?.roster||[]).map((item,index)=>item?{...item,role:roles[index]}:null);
     const eliminated=campaign.outcome?.kind==='eliminated',champion=campaign.outcome?.kind==='champion';
+    const legacyPlayoffLoss=(campaign.playoffBracket||[]).find(round=>round.matches?.some(match=>match.result?.isUser&&match.result.winnerId!=='user'));
+    const legacySwissExit=[...(campaign.swissHistory||[])].reverse().find(entry=>entry.matches?.some(match=>match.isUser));
+    const userTeam=(campaign.teams||[]).find(team=>team.id==='user');
+    const eliminationStage=eliminated?(campaign.outcome?.eliminationStage||legacyPlayoffLoss?.key||'swiss'):null;
+    const eliminationRound=eliminated?(campaign.outcome?.eliminationRound||legacySwissExit?.round||null):null;
+    const eliminationRecord=eliminated?(campaign.outcome?.eliminationRecord||(userTeam?`${userTeam.wins}-${userTeam.losses}`:'')):'';
     const updatedRun={...(currentRun||{}),...(run||{}),campaign};window.localStorage.setItem('5x5.active.mode',mode);if(!isRanked)window.localStorage.setItem('5x5.casual.run',updatedRun.id);
-    this.setState({screen:navigate?screen:this.state.screen,params:navigate?params:this.state.params,draftId,strategyRoles:[...roles],draftRoster:roster,rankedMode:isRanked,rankedRun:isRanked?updatedRun:this.state.rankedRun,casualRun:isRanked?this.state.casualRun:updatedRun,rankedField:isRanked?(campaign.field||this.state.rankedField):this.state.rankedField,swissTeams:campaign.teams||[],swissRound:campaign.swissRound||0,swissHistory:campaign.swissHistory||[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissLiveOpen:false,swissLiveFinished:false,playoffBracket:campaign.playoffBracket||[],playoffStage:campaign.playoffStage||'quarter',playoffPendingMatches:null,playoffEliminated:eliminated,playoffChampion:champion?'user':eliminated?'eliminated':null,majorChampionName:campaign.outcome?.championName||'',rankedPendingCampaign:null,rankedPendingAward:0});
+    this.setState({screen:navigate?screen:this.state.screen,params:navigate?params:this.state.params,draftId,strategyRoles:[...roles],draftRoster:roster,rankedMode:isRanked,rankedRun:isRanked?updatedRun:this.state.rankedRun,casualRun:isRanked?this.state.casualRun:updatedRun,rankedField:isRanked?(campaign.field||this.state.rankedField):this.state.rankedField,swissTeams:campaign.teams||[],swissRound:campaign.swissRound||0,swissHistory:campaign.swissHistory||[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissLiveOpen:false,swissLiveFinished:false,playoffBracket:campaign.playoffBracket||[],playoffStage:campaign.playoffStage||'quarter',playoffPendingMatches:null,playoffEliminated:eliminated,playoffChampion:champion?'user':eliminated?'eliminated':null,majorChampionName:campaign.outcome?.championName||'',eliminationStage,eliminationRound,eliminationRecord,rankedPendingCampaign:null,rankedPendingAward:0});
   };
   _startCasualCampaign = async (navigate=true) => {
     const run=await this._rankedRequest('/api/casual/start',{method:'POST'});window.localStorage.setItem('5x5.casual.run',run.id);this.setState({casualRun:run,rankedMode:false});if(navigate)this._hydrateRankedCampaign(run.campaign,run,true,'casual');return run;
@@ -1999,7 +2005,7 @@ class Component extends DCLogic {
       strategyPreset:'balanced',strategyRoles:['entry','awper','support','rifler','lurker'],openStrategySlot:null,
       playerDraftRolling:false,playerDraftYear:null,playerDraftTeamSlug:null,playerDraftCandidateSlugs:[],playerDraftSelectedSlug:null,playerDraftSwapIndex:null,playerDraftDetailsSlug:null,playerDraftRerolls:0,
       swissTeams:[],swissRound:0,swissHistory:[],swissPendingMatches:null,swissUserRounds:[],swissUserRoundIndex:0,swissMode:'normal',swissLiveOpen:false,swissLiveFinished:false,swissLiveStatsView:'map-1',majorLiveContext:'swiss',
-      playoffBracket:[],playoffStage:'quarter',playoffPendingMatches:null,playoffEliminated:false,playoffChampion:null
+      playoffBracket:[],playoffStage:'quarter',playoffPendingMatches:null,playoffEliminated:false,playoffChampion:null,majorChampionName:'',eliminationStage:null,eliminationRound:null,eliminationRecord:''
     });
     if(!this.state.rankedMode) this.setState({casualRun:null});
     window.scrollTo(0,0);
@@ -2537,9 +2543,24 @@ class Component extends DCLogic {
     const campaignKdr=[...campaignStatTotals.values()].map(player=>{ const kd=player.kills/Math.max(1,player.deaths); return {...player,kd:kd.toFixed(2),color:kd>=1.15?'#34c77b':kd>=.95?'#f2b53d':'#ef7d7d'}; }).sort((a,b)=>Number(b.kd)-Number(a.kd));
     const swissUserMatchCount=s.swissHistory.reduce((total,entry)=>total+entry.matches.filter(match=>match.isUser).length,0);
     const showSwissKdr=Boolean(swissEliminationNotice&&campaignKdr.length);
+    const eliminationStageTitles={swiss:'Seu time foi eliminado na fase suíça',quarter:'Seu time foi eliminado nas quartas de final',semi:'Seu time foi eliminado na semifinal',final:'Seu time foi eliminado na final'};
+    const eliminationStageNames={swiss:'fase suíça',quarter:'quartas de final',semi:'semifinal',final:'final'};
+    const eliminatedPlayoffRound=(s.playoffBracket||[]).find(round=>round.key===s.eliminationStage);
+    const eliminatedPlayoffMatch=eliminatedPlayoffRound?.matches.find(match=>match.result?.isUser&&match.result.winnerId!=='user')?.result;
+    const eliminatedSwissEntry=[...s.swissHistory].reverse().find(entry=>entry.matches.some(match=>match.isUser));
+    const eliminatedSwissMatch=eliminatedSwissEntry?.matches.find(match=>match.isUser&&match.winnerId!=='user');
+    const eliminationMatch=s.eliminationStage==='swiss'?eliminatedSwissMatch:eliminatedPlayoffMatch;
+    const eliminationOpponent=eliminationMatch?(eliminationMatch.aId==='user'?eliminationMatch.teamB:eliminationMatch.teamA):'';
+    const eliminationDetails=[];
+    if(s.eliminationStage==='swiss'&&s.eliminationRound) eliminationDetails.push(`A eliminação ocorreu na rodada ${s.eliminationRound} da fase suíça`);
+    else eliminationDetails.push(`A eliminação ocorreu ${s.eliminationStage==='quarter'?'nas':'na'} ${eliminationStageNames[s.eliminationStage]||'campanha'}`);
+    if(eliminationOpponent) eliminationDetails.push(`contra ${eliminationOpponent}`);
+    if(eliminationMatch?.score) eliminationDetails.push(`pelo placar de ${eliminationMatch.score}`);
+    if(s.eliminationStage==='swiss'&&s.eliminationRecord) eliminationDetails.push(`com campanha ${String(s.eliminationRecord).replace('-', '–')}`);
+    const eliminationDescription=`${eliminationDetails.join(', ')}. O Major continuou e o campeão foi ${s.majorChampionName||'definido posteriormente'}.`;
     const playoffCanPlay=s.screen==='major-playoffs'&&!s.playoffEliminated&&!s.playoffChampion&&!s.playoffPendingMatches;
     let playoffView={rounds:playoffRounds,canPlay:playoffCanPlay,primaryAction:this.startPlayoffRound,primaryLabel:`JOGAR ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,eyebrow:'VOCÊ ESTÁ NOS PLAYOFFS',title:`Próximo desafio: ${playoffStageLabels[s.playoffStage] || 'PLAYOFFS'}`,description:'Analise os dois lados da chave e vença a série para continuar no Major.',bannerColor:'#2fb8c6',statusBg:'rgba(47,184,198,.1)',statusLabel:'AGUARDANDO',bannerStyle:'background:linear-gradient(135deg,#151922,#10131a);border:1px solid #33394a;border-left:4px solid #2fb8c6;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
-    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,showRestart:true,restartAction:this.restartMajorDraft,eyebrow:'FIM DE CAMPANHA',title:'Seu time foi eliminado nos playoffs',description:`O Major continuou após sua eliminação. Campeão: ${s.majorChampionName||'a definir'}.`,bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:`CAMPEÃO · ${s.majorChampionName||'A DEFINIR'}`,bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
+    if(s.playoffEliminated) playoffView={...playoffView,canPlay:false,showRestart:true,restartAction:this.restartMajorDraft,eyebrow:'FIM DE CAMPANHA',title:eliminationStageTitles[s.eliminationStage]||'Sua campanha foi encerrada',description:eliminationDescription,bannerColor:'#ef5d68',statusBg:'rgba(239,68,68,.12)',statusLabel:`CAMPEÃO · ${s.majorChampionName||'A DEFINIR'}`,bannerStyle:'background:linear-gradient(135deg,rgba(239,68,68,.14),#10131a);border:1px solid rgba(239,68,68,.5);border-left:4px solid #ef4444;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
     if(s.playoffChampion==='user') playoffView={...playoffView,canPlay:false,eyebrow:'CAMPEÃO DO MAJOR',title:'Seu time conquistou o título!',description:'Você venceu quartas, semifinal e final do Major.',bannerColor:'#f2b53d',statusBg:'rgba(242,181,61,.12)',statusLabel:'CAMPEÃO',bannerStyle:'background:linear-gradient(135deg,rgba(242,181,61,.17),#10131a);border:1px solid rgba(242,181,61,.55);border-left:4px solid #f2b53d;border-radius:14px;padding:17px 19px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap'};
 
     // ---- QUEM É O JOGADOR ----
